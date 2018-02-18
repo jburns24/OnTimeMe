@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams , LoadingController, Loading} from 'ionic-angular';
 import { AlertController } from 'ionic-angular/components/alert/alert-controller';
+import { GooglePlus } from '@ionic-native/google-plus'
 import { TabsPage } from '../tabs/tabs';
 
 /**
@@ -19,7 +20,8 @@ export class LoginGatePage {
   loading: Loading;
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
-     private alertCrl: AlertController, private loadingCtrl: LoadingController) {
+     private alertCrl: AlertController, private loadingCtrl: LoadingController,
+     private googlePlus: GooglePlus) {
   }
   
   public createAccount() {
@@ -28,6 +30,14 @@ export class LoginGatePage {
   }
 
   public loginAccount() {
+    this.googlePlus.login(
+      {
+        'webClientId': '1081548052006-j1cdfrdq6keh24aecm19jv5eb9jl5ro6.apps.googleusercontent.com'
+      }).then((res) => {
+        console.log(res);
+      }, (err) => {
+        console.log(err);
+      });
     this.showLoading();
     // attempt login
     this.navCtrl.setRoot(TabsPage);
