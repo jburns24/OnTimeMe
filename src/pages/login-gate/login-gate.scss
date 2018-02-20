@@ -3,10 +3,13 @@ page-login-gate {
         background: #56CA96;
         
         .logo {
-            font-size: 3em;
+            font-size: 9.8vw;
+            width: 100%;
             font-weight: bolder;
             color: aliceblue;
-            letter-spacing: -3px;         
+            letter-spacing: -3px;
+            text-align: center;
+            padding-top: 30px;
         }
         .logo-row {
             padding-top: 70px;
