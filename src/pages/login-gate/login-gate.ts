@@ -32,9 +32,10 @@ export class LoginGatePage {
   public loginAccount() {
     this.googlePlus.login(
       {
-        'webClientId': '1081548052006-j1cdfrdq6keh24aecm19jv5eb9jl5ro6.apps.googleusercontent.com'
+        'scopes': 'https://www.googleapis.com/auth/calendar',
+        'webClientId': '1081548052006-j1cdfrdq6keh24aecm19jv5eb9jl5ro6.apps.googleusercontent.com',
       }).then((res) => {
-        console.log(res);
+        alert(JSON.stringify(res));
       }, (err) => {
         console.log(err);
       });
