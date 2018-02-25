@@ -81,6 +81,7 @@
     <plugin name="cordova-plugin-ionic-webview" spec="^1.1.16" />
     <plugin name="cordova-plugin-ionic-keyboard" spec="^2.0.5" />
     <plugin name="cordova-plugin-googleplus" spec="~5.2.1">
-        <variable name="RESERVED_CLIENT_ID" value="48154208638-9s41ff8vjkbrg6926s7ir16koeigi0fp.apps.googleusercontent.com" />
+        <variable name="REVERSED_CLIENT_ID" value="48154208638-3t8h605hrv9o8tjgqhmk1g5bi1n2aj1j.apps.googleusercontent.com" />
+        <variable name="RESERVED_CLIENT_ID" value="48154208638-3t8h605hrv9o8tjgqhmk1g5bi1n2aj1j.apps.googleusercontent.com" />
     </plugin>
 </widget>
