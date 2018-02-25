@@ -32,7 +32,7 @@ export class LoginGatePage {
   public loginAccount() {
     this.googlePlus.login(
       {
-        'webClientId': ' 48154208638-4ft567fs3nsgpu6ru7jueudgnmb0uoru.apps.googleusercontent.com',
+        'webClientId': '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com',
       }).then((res) => {
         console.log("xxx" + res);
       }, (err) => {
