@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams , LoadingController, Loading} from 'ionic-angular';
+import { IonicPage, NavController, NavParams , LoadingController, Loading, Platform} from 'ionic-angular';
 import { AlertController } from 'ionic-angular/components/alert/alert-controller';
 import { GooglePlus } from '@ionic-native/google-plus'
 import { TabsPage } from '../tabs/tabs';
@@ -21,7 +21,14 @@ export class LoginGatePage {
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
      private alertCrl: AlertController, private loadingCtrl: LoadingController,
-     private googlePlus: GooglePlus) {
+     private googlePlus: GooglePlus, private platform: Platform) {
+       this.showLoading();
+       this.platform.ready().then(() => {
+        this.dismissLoading();
+       }, (err) => {
+         console.log(err);
+       }
+      );
   }
   
   public createAccount() {
@@ -34,13 +41,12 @@ export class LoginGatePage {
       {
         'webClientId': '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com',
       }).then((res) => {
-        console.log("xxx" + res);
+        this.showLoading();
+        this.navCtrl.setRoot(TabsPage);
+        console.log(res);
       }, (err) => {
-        console.log("xxx" + err);
-      });
-    this.showLoading();
-    // attempt login
-    this.navCtrl.setRoot(TabsPage);
+        console.log(err);
+      });    
   }
 
   showLoading() {
@@ -49,6 +55,10 @@ export class LoginGatePage {
       dismissOnPageChange: true
     });
     this.loading.present();
+  }
+
+  dismissLoading() {
+    this.loading.dismiss();
   }
 
   showError(text) {
