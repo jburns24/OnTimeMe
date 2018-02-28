@@ -24,7 +24,7 @@ export class LoginGatePage {
      private googlePlus: GooglePlus, private platform: Platform) {
        this.showLoading();
        this.platform.ready().then(() => {
-        this.dismissLoading();
+          this.dismissLoading();
        }, (err) => {
          console.log(err);
        }
@@ -39,6 +39,7 @@ export class LoginGatePage {
   public loginAccount() {
     this.googlePlus.login(
       {
+        'scopes': 'https://www.googleapis.com/auth/admin.directory.resource.calendar',
         'webClientId': '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com',
       }).then((res) => {
         this.showLoading();
