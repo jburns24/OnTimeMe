@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
-import { AlertController } from 'ionic-angular';
+import { AlertController, ViewController } from 'ionic-angular';
+import { NativeStorage } from '@ionic-native/native-storage';
 
 // Native storage allows the data to be persistent, meaning that
 // the data will exist for as long as the app exists (installed).
@@ -12,7 +13,9 @@ import { AlertController } from 'ionic-angular';
   templateUrl: 'preference.html',
 })
 export class PreferencePage {
-  constructor(public navCtrl: NavController, public navParams: NavParams, public alertCrl: AlertController) {
+  constructor(public navCtrl: NavController, public navParams: NavParams,
+    public alertCrl: AlertController, public viewCtrl: ViewController,
+    public storage: NativeStorage) {
 
   }
   showRadioAlert(){
@@ -45,7 +48,6 @@ export class PreferencePage {
         //this.testRadioOpen = false;
       //  this.testRadioResult = data;
     });
-
     alert.present();
     /*
     // Adding user peference to local storage
@@ -62,4 +64,17 @@ export class PreferencePage {
       console.log("getting preference");
     }*/
   }
+/*
+  this.storage.setItem('preference', {property: 'car'})
+  .then(
+    () => console.log('car set!'),
+    error => console.error('Error storing item', error)
+  );
+
+  this.storage.getItem('preference')
+  .then(
+    data => console.log(data),
+    error => console.log(error)
+  );
+*/
 }
