@@ -1,15 +1,15 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams , LoadingController, Loading, Platform} from 'ionic-angular';
 import { AlertController } from 'ionic-angular/components/alert/alert-controller';
 import { GooglePlus } from '@ionic-native/google-plus'
 import { TabsPage } from '../tabs/tabs';
-
-/**
- * Generated class for the LoginGatePage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
+import {
+  IonicPage,
+  NavController,
+  NavParams ,
+  LoadingController,
+  Loading, Platform,
+  MenuController
+} from 'ionic-angular';
 
 @IonicPage()
 @Component({
@@ -20,8 +20,11 @@ export class LoginGatePage {
   loading: Loading;
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
-     private alertCrl: AlertController, private loadingCtrl: LoadingController,
-     private googlePlus: GooglePlus, private platform: Platform) {
+    private alertCrl: AlertController, private loadingCtrl: LoadingController,
+    private googlePlus: GooglePlus, private platform: Platform,
+    private menu: MenuController) {
+       // Diable menu in the login gate page
+       this.ionViewDidEnter();
        this.showLoading();
        this.platform.ready().then(() => {
           this.dismissLoading();
@@ -30,7 +33,7 @@ export class LoginGatePage {
        }
       );
   }
-  
+
   public createAccount() {
     // register account
     this.navCtrl.setRoot(TabsPage);
@@ -47,7 +50,7 @@ export class LoginGatePage {
         console.log(res);
       }, (err) => {
         console.log(err);
-      });    
+      });
   }
 
   showLoading() {
@@ -68,8 +71,13 @@ export class LoginGatePage {
     let alert = this.alertCrl.create({
       title: 'Fail',
       subTitle: text,
-      buttons: ['OK']      
+      buttons: ['OK']
     });
     alert.present();
+  }
+
+  // Disable menu in the login gate
+  ionViewDidEnter(){
+    this.menu.enable(false);
   }
 }

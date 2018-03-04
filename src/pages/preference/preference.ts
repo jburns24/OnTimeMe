@@ -29,13 +29,13 @@ export class PreferencePage {
       type: 'radio',
       label: 'Bike',
       value: 'Bike',
-      checked: true
+      checked: false
     });
     alert.addInput({
       type: 'radio',
       label: 'Walk',
       value: 'Walk',
-      checked: true
+      checked: false
     });
 
     alert.addButton('Cancel');

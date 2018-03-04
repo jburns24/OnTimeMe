@@ -1,11 +1,7 @@
 import { Component } from '@angular/core';
-import { NavController } from 'ionic-angular';
+import { NavController, MenuController } from 'ionic-angular';
 import { GooglePlus } from '@ionic-native/google-plus';
 import { LoginGatePage } from '../login-gate/login-gate';
-
-// Since root page is the page we will land on after we land
-// on after we log in, then lets add a button to set preference
-// in here that will take us to the preference page.
 import { PreferencePage } from '../preference/preference';
 
 @Component({
@@ -14,11 +10,17 @@ import { PreferencePage } from '../preference/preference';
 })
 export class HomePage {
   // Assign PreferencePage a property so we can use it in the home.html that will
-  // take us to the preference page.
+  // take us to the preference page. ** DELETE WHEN MENU IS FULLY IMPLEMENTED!!!
   preference = PreferencePage;
 
-  constructor(public navCtrl: NavController, private googlePlus: GooglePlus ){
+  constructor(public navCtrl: NavController, private googlePlus: GooglePlus,
+    private menu: MenuController){
+    // After we login and land on the home page enable the menus
+    this.enableMenu();
+  }
 
+  enableMenu(){
+    this.menu.enable(true);
   }
 
   logout () {
