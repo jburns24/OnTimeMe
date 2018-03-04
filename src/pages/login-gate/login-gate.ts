@@ -2,12 +2,13 @@ import { Component } from '@angular/core';
 import { AlertController } from 'ionic-angular/components/alert/alert-controller';
 import { GooglePlus } from '@ionic-native/google-plus'
 import { TabsPage } from '../tabs/tabs';
+import { NativeStorage } from '@ionic-native/native-storage';
+import { HomePage } from '../home/home';
 import {
   IonicPage,
   NavController,
-  NavParams ,
   LoadingController,
-  Loading, Platform,
+  Loading,
   MenuController
 } from 'ionic-angular';
 
@@ -19,19 +20,11 @@ import {
 export class LoginGatePage {
   loading: Loading;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams,
-    private alertCrl: AlertController, private loadingCtrl: LoadingController,
-    private googlePlus: GooglePlus, private platform: Platform,
-    private menu: MenuController) {
+  constructor(public navCtrl: NavController, private alertCrl: AlertController,
+    private loadingCtrl: LoadingController, private googlePlus: GooglePlus,
+    private menu: MenuController, private storage: NativeStorage) {
        // Diable menu in the login gate page
-       this.ionViewDidEnter();
-       this.showLoading();
-       this.platform.ready().then(() => {
-          this.dismissLoading();
-       }, (err) => {
-         console.log(err);
-       }
-      );
+       this.disableMenu();
   }
 
   public createAccount() {
@@ -40,34 +33,48 @@ export class LoginGatePage {
   }
 
   public loginAccount() {
+    // Create a loading status
+    this.loading = this.loadingCtrl.create({
+      content: 'Please wait...'
+    });
+    // Present it when the login button is pressed
+    this.loading.present();
+
+    // Begin google plus login process
     this.googlePlus.login(
       {
         'scopes': 'https://www.googleapis.com/auth/admin.directory.resource.calendar',
         'webClientId': '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com',
-      }).then((res) => {
-        this.showLoading();
-        this.navCtrl.setRoot(TabsPage);
-        console.log(res);
-      }, (err) => {
-        console.log(err);
+      })
+      .then((user) => {
+        // Dismiss the loading after login successful
+        this.loading.dismiss();
+
+        //this.navCtrl.setRoot(TabsPage);
+
+        // Add user to local storage
+        this.storage.setItem('user', {
+          name: user.displayName,
+          email: user.email,
+          picture: user.imageUrl
+        })
+        .then(() => {
+          // If user added successfully then go on to home page
+          this.navCtrl.setRoot(HomePage);
+        }, (error) => {
+          // Else user was not added successfully, send error to console
+          console.log(error);
+        })
+      }, (error) => {
+        // If google log-in was unsuccessful, then output to console
+        // show the error as well.
+        console.log(error);
+        this.loading.dismiss();
+        this.showError(error);
       });
   }
 
-  showLoading() {
-    this.loading = this.loadingCtrl.create({
-      content: 'Please wait...',
-      dismissOnPageChange: true
-    });
-    this.loading.present();
-  }
-
-  dismissLoading() {
-    this.loading.dismiss();
-  }
-
   showError(text) {
-    this.loading.dismiss();
-
     let alert = this.alertCrl.create({
       title: 'Fail',
       subTitle: text,
@@ -75,9 +82,8 @@ export class LoginGatePage {
     });
     alert.present();
   }
-
   // Disable menu in the login gate
-  ionViewDidEnter(){
+  disableMenu(){
     this.menu.enable(false);
   }
 }
