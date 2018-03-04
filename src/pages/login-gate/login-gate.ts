@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { AlertController } from 'ionic-angular/components/alert/alert-controller';
-import { GooglePlus } from '@ionic-native/google-plus'
+import { GooglePlus } from '@ionic-native/google-plus';
 import { TabsPage } from '../tabs/tabs';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { HomePage } from '../home/home';

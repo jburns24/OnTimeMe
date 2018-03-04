@@ -13,10 +13,11 @@ import { NativeStorage } from '@ionic-native/native-storage';
   templateUrl: 'preference.html',
 })
 export class PreferencePage {
+  transMode: any;
+
   constructor(public navCtrl: NavController, public navParams: NavParams,
     public alertCrl: AlertController, public viewCtrl: ViewController,
     public storage: NativeStorage) {
-
   }
   showRadioAlert(){
     let alert = this.alertCrl.create();
@@ -43,38 +44,20 @@ export class PreferencePage {
 
     alert.addButton('Cancel');
     alert.addButton({
-      text: 'OK'
-      //handler: data => {
-        //this.testRadioOpen = false;
-      //  this.testRadioResult = data;
+      text: 'OK',
+      handler: data => {
+        this.storage.setItem('transMode', data);
+        console.log("data is :", data);
+        
+        this.storage.getItem('transMode').then((data) => {
+          this.transMode = data;
+          console.log("Retrieve: ", this.transMode);
+        }, error => {
+          console.log("Cannot retrieve mode", error)
+        });      }
     });
     alert.present();
-    /*
-    // Adding user peference to local storage
-    setPreference(mode){
-      // Params: reference_to_value, value, success_callback, error_callback
-      NativeStorage.setItem("preference", "car", "set_success", "set_failed");
-      console.log("setting preference");
-    }
 
-    // Retrieve the preference
-    getPreference(){
-      // Params: reference_to_value, success_callback, error_callback
-      NativeStorage.getItem("preference", "get_success", "get_failed");
-      console.log("getting preference");
-    }*/
+
   }
-/*
-  this.storage.setItem('preference', {property: 'car'})
-  .then(
-    () => console.log('car set!'),
-    error => console.error('Error storing item', error)
-  );
-
-  this.storage.getItem('preference')
-  .then(
-    data => console.log(data),
-    error => console.log(error)
-  );
-*/
 }
