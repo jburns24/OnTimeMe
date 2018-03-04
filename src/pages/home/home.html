@@ -1,9 +1,20 @@
 <ion-header>
   <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
     <ion-title>Home</ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
+  <p>This is the home page for our OnTimeMe app. This page will later have menus
+  that will allow the user to do certain things like set a timer, check schedule,
+  see current travel time for specific events, etc.
+  </p>
+  <br>
+  <br>
+  Options:
+  <button ion-button [navPush]="preference">Preference</button>
   <button ion-button class="logout-btn" (click)='logout()'>Logout</button>
 </ion-content>
