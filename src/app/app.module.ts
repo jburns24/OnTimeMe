@@ -1,10 +1,11 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
+import { IonicApp, IonicModule, IonicErrorHandler} from 'ionic-angular';
 import { GooglePlus } from '@ionic-native/google-plus';
 import { MyApp } from './app.component';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
+import { NativeStorage } from '@ionic-native/native-storage';
 
 // Pages
 import { AboutPage } from '../pages/about/about';
@@ -43,6 +44,7 @@ import { TabsPage } from '../pages/tabs/tabs';
     SplashScreen,
     GooglePlus,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
+    NativeStorage
   ]
 })
 export class AppModule {}
