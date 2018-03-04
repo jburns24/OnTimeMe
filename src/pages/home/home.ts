@@ -3,6 +3,7 @@ import { NavController, MenuController } from 'ionic-angular';
 import { GooglePlus } from '@ionic-native/google-plus';
 import { LoginGatePage } from '../login-gate/login-gate';
 import { PreferencePage } from '../preference/preference';
+import { NativeStorage } from '@ionic-native/native-storage';
 
 @Component({
   selector: 'page-home',
@@ -14,8 +15,8 @@ export class HomePage {
   preference = PreferencePage;
 
   constructor(public navCtrl: NavController, private googlePlus: GooglePlus,
-    private menu: MenuController){
-    // After we login and land on the home page enable the menus
+    private menu: MenuController, private storage: NativeStorage){
+    // After we login and land on the home page, enable the menu for current user
     this.enableMenu();
   }
 
@@ -23,9 +24,17 @@ export class HomePage {
     this.menu.enable(true);
   }
 
+  // When user logs-out, we must delete the users local profile, to
+  // allow our app to know that no user's are logged on. The check for
+  // users logged on? is in the app.component.ts file.
   logout () {
     // google logout
-    this.googlePlus.logout();
-    this.navCtrl.setRoot(LoginGatePage);
+    this.googlePlus.logout().then((user) => {
+      this.storage.remove('user');
+      // After delete of user profile then go to login gate page
+      this.navCtrl.setRoot(LoginGatePage);
+    }, (error) => {
+      console.log(error);
+    });
   }
 }
