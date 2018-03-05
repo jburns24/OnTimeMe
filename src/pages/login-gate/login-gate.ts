@@ -44,7 +44,7 @@ export class LoginGatePage {
     this.googlePlus.login(
       {
         'scopes': 'https://www.googleapis.com/auth/admin.directory.resource.calendar',
-        'webClientId': '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com',
+        'webClientId': '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com'
       })
       .then((user) => {
         // Dismiss the loading after login successful

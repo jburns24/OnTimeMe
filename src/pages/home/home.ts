@@ -44,20 +44,27 @@ export class HomePage {
   // allow our app to know that no user's are logged on. The check for
   // users logged on? is in the app.component.ts file.
   logout () {
-    // DEBUG: TROUBLE SHOOT THIS...cannot log out when exit app and return
-    this.googlePlus.logout().then((response) => {
-      this.storage.remove('user');
-      this.navCtrl.setRoot(LoginGatePage);
-      console.log("successful logout");
-    }, (error) => {
-      this.googlePlus.disconnect().then ((res) => {
-      this.storage.remove('user');
-      this.navCtrl.setRoot(LoginGatePage);
-      console.log("Successfully disconnected");
-      }, (err) => {
-        console.log("disconnect error", err);
+    this.googlePlus.trySilentLogin({
+      'webClientId': '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com'
+    })
+    .then ((res) => {
+      this.googlePlus.logout().then((response) => {
+        this.storage.remove('user');
+        this.navCtrl.setRoot(LoginGatePage);
+        console.log("successful logout");
+      }, (error) => {
+        this.googlePlus.disconnect()
+        .then ((res) => {
+          this.storage.remove('user');
+          this.navCtrl.setRoot(LoginGatePage);
+          console.log("Successfully disconnected");
+        }, (err) => {
+          console.log("disconnect error", err);
+        });
+        console.log ("Logout error", error);
       });
-      console.log ("Logout error", error);
+    }, (error) => {
+      console.log ("trySilentLogin failed", error);
     });
   }
 }
