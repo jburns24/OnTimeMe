@@ -10,9 +10,6 @@ import { NativeStorage } from '@ionic-native/native-storage';
   templateUrl: 'home.html'
 })
 export class HomePage {
-  // Assign PreferencePage a property so we can use it in the home.html that will
-  // take us to the preference page. ** DELETE WHEN MENU IS FULLY IMPLEMENTED!!!
-  preference = PreferencePage;
   user: any;
   email: any;
   picture: any;
