@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { NavController, MenuController } from 'ionic-angular';
 import { GooglePlus } from '@ionic-native/google-plus';
 import { LoginGatePage } from '../login-gate/login-gate';
-import { PreferencePage } from '../preference/preference';
 import { NativeStorage } from '@ionic-native/native-storage';
 
 @Component({

@@ -18,6 +18,12 @@ export class PreferencePage {
   constructor(public navCtrl: NavController, public navParams: NavParams,
     public alertCrl: AlertController, public viewCtrl: ViewController,
     public storage: NativeStorage) {
+    this.storage.getItem('transMode').then( (data) => {
+      this.transMode = data;
+    }, (error) => {
+      console.log("Preference dont exist using default car", error);
+      this.transMode = "Car";
+    });
   }
   showRadioAlert(){
     let alert = this.alertCrl.create();
@@ -48,16 +54,18 @@ export class PreferencePage {
       handler: data => {
         this.storage.setItem('transMode', data);
         console.log("data is :", data);
-        
-        this.storage.getItem('transMode').then((data) => {
-          this.transMode = data;
-          console.log("Retrieve: ", this.transMode);
-        }, error => {
-          console.log("Cannot retrieve mode", error)
-        });      }
+        // After item is set call getMode to update mode to user
+        this.getMode();
+      }
     });
     alert.present();
-
-
+  }
+  getMode(){
+    this.storage.getItem('transMode').then((data) => {
+      this.transMode = data;
+      console.log("Retrieve: ", this.transMode);
+    }, error => {
+      console.log("Cannot retrieve mode", error)
+    });
   }
 }
