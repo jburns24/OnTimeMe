@@ -12,7 +12,6 @@ import { LoginGatePage } from '../pages/login-gate/login-gate';
 import { HomePage } from '../pages/home/home';
 import { PreferencePage } from '../pages/preference/preference';
 import { NativeStorage } from '@ionic-native/native-storage';
-import { GooglePlus } from '@ionic-native/google-plus';
 import {
   Platform,
   MenuController,
@@ -41,7 +40,6 @@ export class MyApp {
     private loadingCtrl: LoadingController,
     private storage: NativeStorage,
     private alertCrl: AlertController,
-    private googlePlus: GooglePlus
   ){
     // This function will initialize the app upon opening the app.
     // Anything you want initialized, do it here!!!!
@@ -68,7 +66,6 @@ export class MyApp {
       this.storage.getItem('user') // Try to get item from local storage and...
       .then( (data) => {
         // Succeed, profile exists...allow that person to access his/her data.
-        this.googlePlus.trySilentLogin();
         this.nav.setRoot(HomePage);
         this.splashScreen.hide();
       }, (error) => {
