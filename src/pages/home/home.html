@@ -1,3 +1,4 @@
+<ion-content class="home-content" padding>
 <ion-header>
   <ion-navbar>
     <button ion-button menuToggle>
@@ -6,19 +7,19 @@
     <ion-title>Home</ion-title>
   </ion-navbar>
 </ion-header>
-
-<ion-content padding>
-  <h3>OnTimeMe</h3>
-  <h1> Be On Time...</h1>
   <div class="home-hello">
-		<img src="https://vergecampus.com/wp-content/uploads/2016/08/Be_on_time.jpg" />
-    <img src="{{picture}}" />
-    <h1>Welcome {{user}}!</h1>
+    <br>
+    <br>
+  <h1 class="logo">Be On Time...</h1>
+<!--		<img src="https://vergecampus.com/wp-content/uploads/2016/08/Be_on_time.jpg" /> -->
+      <br>
+  <div class="text-align: center;">
+  <ion-item no-lines style="background-color:transparent"><ion-avatar item-start><img src="{{picture}}"></ion-avatar> <h1>Hello {{user}}!</h1></ion-item>
     <p>Email: {{email}}</p>
   </div>
-  <br>
-  <br>
-  Options:
-  <button ion-button [navPush]="preference">Preference</button>
-  <button ion-button class="logout-btn" (click)='logout()'>Logout</button>
+  </div>
+    <div text-center>
+    <!--<div class="text-align: center;">-->
+    <button ion-button (click)='logout()'>Logout</button>
+    </div>
 </ion-content>

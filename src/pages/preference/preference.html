@@ -1,18 +1,19 @@
+<ion-content padding class="page-content">
 <ion-header>
 	<ion-navbar>
 		<button ion-button menuToggle>
 			<ion-icon name="menu"></ion-icon>
 		</button>
-		<ion-title>Preference</ion-title>
+		<ion-title>Preferences</ion-title>
 	</ion-navbar>
 </ion-header>
-
-<ion-content padding>
+    <br>
+    <br>
   <h4>Choose your preferred mode of transportation</h4>
-  <button ion-button block (click)="showRadioAlert()">
-    Mode
+  <button ion-button block class="mode_bttn" (click)="showRadioAlert()">
+    Change Mode
   </button>
-	<br>
-	<br>
-	<p> Your mode is currently set to: {{transMode}} </p>
+    <br>
+    <br>
+    <p> Your mode is currently set to: {{transMode}} </p>
 </ion-content>
