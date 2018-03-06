@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { AlertController } from 'ionic-angular/components/alert/alert-controller';
 import { GooglePlus } from '@ionic-native/google-plus';
-import { TabsPage } from '../tabs/tabs';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { HomePage } from '../home/home';
 import {
@@ -25,11 +24,6 @@ export class LoginGatePage {
     private menu: MenuController, private storage: NativeStorage) {
        // Diable menu in the login gate page
        this.disableMenu();
-  }
-
-  public createAccount() {
-    // register account
-    this.navCtrl.setRoot(TabsPage);
   }
 
   public loginAccount() {
