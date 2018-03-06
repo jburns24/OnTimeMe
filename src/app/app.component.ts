@@ -12,6 +12,7 @@ import { LoginGatePage } from '../pages/login-gate/login-gate';
 import { HomePage } from '../pages/home/home';
 import { PreferencePage } from '../pages/preference/preference';
 import { NativeStorage } from '@ionic-native/native-storage';
+import { GooglePlus } from '@ionic-native/google-plus';
 import {
   Platform,
   MenuController,
@@ -40,6 +41,7 @@ export class MyApp {
     private loadingCtrl: LoadingController,
     private storage: NativeStorage,
     private alertCrl: AlertController,
+    private googlePlus: GooglePlus
   ){
     // This function will initialize the app upon opening the app.
     // Anything you want initialized, do it here!!!!
@@ -105,5 +107,31 @@ export class MyApp {
   openPage(page){
     this.menu.close();
     this.nav.setRoot(page.component);
+  }
+
+  // When user logs-out, we must delete the users local profile, to
+  // allow our app to know that no user's are logged on. The check for
+  // users logged on? is in the app.component.ts file.
+  logout () {
+    this.googlePlus.trySilentLogin({
+      'webClientId': '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com'
+    }).then ((res) => {
+      this.googlePlus.logout().then((response) => {
+        this.storage.remove('user');
+        this.nav.setRoot(LoginGatePage);
+        console.log("successful logout");
+      }, (error) => {
+        this.googlePlus.disconnect().then ((res) => {
+          this.storage.remove('user');
+          this.nav.setRoot(LoginGatePage);
+          console.log("Successfully disconnected");
+        }, (err) => {
+          console.log("disconnect error", err);
+        });
+        console.log ("Logout error", error);
+      });
+    }, (error) => {
+      console.log ("trySilentLogin failed", error);
+    });
   }
 }
