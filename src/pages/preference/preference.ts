@@ -12,6 +12,7 @@ import { NativeStorage } from '@ionic-native/native-storage';
 })
 export class PreferencePage {
   transMode: any;
+  flag: boolean;
 
   constructor(
     public navCtrl: NavController,
@@ -55,7 +56,6 @@ export class PreferencePage {
         // as a key value pair.
         this.storage.getItem('user').then( (user) => {
           this.storage.setItem(user.id, data);
-
           //////////////// DEBUG: check the value /////////////////
           this.storage.getItem(user.id).then( (mode) => {
           console.log("Preference::setItem(): user id:",
