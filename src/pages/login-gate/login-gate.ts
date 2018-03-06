@@ -31,29 +31,23 @@ export class LoginGatePage {
     this.loading = this.loadingCtrl.create({
       content: 'Please wait...'
     });
-    // Present it when the login button is pressed
+    // Present loading when the login button is pressed
     this.loading.present();
-
     // Begin google plus login process
     this.googlePlus.login(
       {
         'scopes': 'https://www.googleapis.com/auth/admin.directory.resource.calendar',
         'webClientId': '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com'
-      })
-      .then((user) => {
+      }).then((user) => {
         // Dismiss the loading after login successful
         this.loading.dismiss();
-
-        //this.navCtrl.setRoot(TabsPage);
-
-        // Add user to local storage
+        // Add user to native storage, 'user' is the reference name.
         this.storage.setItem('user', {
           name: user.displayName,
           id: user.userId,
           email: user.email,
           picture: user.imageUrl
-        })
-        .then(() => {
+        }).then(() => {
           // If user added successfully then go on to home page
           this.navCtrl.setRoot(HomePage);
         }, (error) => {
@@ -77,6 +71,7 @@ export class LoginGatePage {
     });
     alert.present();
   }
+  
   // Disable menu in the login gate
   disableMenu(){
     this.menu.enable(false);
