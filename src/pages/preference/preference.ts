@@ -3,9 +3,7 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { AlertController, ViewController } from 'ionic-angular';
 import { NativeStorage } from '@ionic-native/native-storage';
 
-// Native storage allows the data to be persistent, meaning that
-// the data will exist for as long as the app exists (installed).
-//import { NativeStorage } from 'nativestorage';
+
 
 @IonicPage()
 @Component({
@@ -14,29 +12,18 @@ import { NativeStorage } from '@ionic-native/native-storage';
 })
 export class PreferencePage {
   transMode: any;
-  user_id: any;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams,
-    public alertCrl: AlertController, public viewCtrl: ViewController,
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    public alertCrl: AlertController,
+    public viewCtrl: ViewController,
     public storage: NativeStorage) {
-    this.storage.getItem('user').then( (user) => {
-      if (this.user_id == user.userId){
-        this.storage.getItem(this.user_id).then((user_id) => {
-          this.transMode = user_id.data;
-          console.log("Preference::getMode(): success!");
-        }, (error) => {
-          console.log("Preference::getMode(): failure!", error);
-        });
-      };
-  /*    let temp_id = user.userId;
-      this.storage.getItem(temp_id).then(
-        id => this.transMode = id.data
-      );*/
-    }, (error) => {
-      console.log("Preference dont exist using default car", error);
-      this.transMode = "Car";
-    });
+      // Call getMode to get the current selected or default
+      // transportation mode each time the preference page is opened.
+      this.getMode();
   }
+
   showRadioAlert(){
     let alert = this.alertCrl.create();
     alert.setTitle('Select Transportation Mode');
@@ -64,35 +51,46 @@ export class PreferencePage {
     alert.addButton({
       text: 'OK',
       handler: data => {
-        // Get the user id and map the data to the user id
+        // Get the current user id and mode. Store it into the native storage
+        // as a key value pair.
         this.storage.getItem('user').then( (user) => {
-          this.user_id = user.id;
-          this.storage.setItem(this.user_id,{
-            data: data
+          this.storage.setItem(user.id, data);
+
+          //////////////// DEBUG: check the value /////////////////
+          this.storage.getItem(user.id).then( (mode) => {
+          console.log("Preference::setItem(): user id:",
+            user.id, "mode:", mode);
           });
-          console.log("transMode data is :", data, "user_id :", this.user_id.data);
+          /////////////////////////////////////////////////////////
         }, (error) => {
-          console.log("Preference::error while getting item", error);
+          console.log("Preference::getItem(): error while getting user", error);
         });
-        // After item is set call getMode to update mode to user
+        // After mode is set call getMode to allow the current user to see
+        // the selected mode.
         this.getMode();
       }
     });
     alert.present();
   }
+
   getMode(){
     this.storage.getItem('user').then((user) => {
-      if (this.user_id == user.userId){
-        this.storage.getItem(this.user_id).then((user_id) => {
-          this.transMode = user_id.data;
-          console.log("Preference::getMode(): success!");
-        }, (error) => {
-          console.log("Preference::getMode(): failure!", error);
-        });
-      }
-      console.log("Retrieve: ", this.transMode);
+      // If this succeeds, then there exists a key value pair that contains:
+      // <key: user_id>, <value: user-selected mode>.
+      this.storage.getItem(user.id).then((mode) => {
+        this.transMode = mode;
+        console.log("Preference::getMode(): success!");
+        console.log("==> curUser.id:", user.id, "mode:", this.transMode);
+      }, (error) => {
+          // If getItem() fails, then there are no such entries in the native
+          // storage. Let's make one with a default value "Car".
+          console.log("Preference::getMode(): no user found in native storage!");
+          console.log("==> setting mode to \"car\" and mapping it to user");
+          this.storage.setItem(user.id, "Car");
+          this.transMode = "Car";
+      });
     }, error => {
-      console.log("Cannot retrieve mode", error)
+      console.log("Preference::getMode(): Cannot find user:", error);
     });
   }
 }
