@@ -13,9 +13,11 @@
     <h1 class="logo">Be On Time...</h1>
     <br>
     <div class="text-align: center;">
-      <ion-item no-lines style="background-color:transparent" *ngIf="user">
+      <!-- Take off the class=center for this block to restore to:
+           avatar(left) and userinfo(right) -->
+      <ion-item class="center" no-lines style="background-color:transparent">
         <ion-avatar item-left>
-          <img src="{{picture}}">
+          <img src="{{picture}}" class="center">
         </ion-avatar>
         <h2>Hello {{user}}!</h2>
         <h3>{{email}}</h3>
