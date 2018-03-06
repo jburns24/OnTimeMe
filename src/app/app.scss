@@ -30,3 +30,63 @@ $colors: (
 h1 {
     font-family: Ubuntu;
 }
+
+@media (min-width: 768px) {
+	.ion-page {
+		margin-left: 30%;
+		width: 70%;
+	}
+
+	ion-menu {
+		width: 30%;
+		display: block;
+	}
+
+	.bar-button-menutoggle {
+		display: none;
+	}
+
+	ion-menu ion-backdrop {
+		display: none;
+	}
+
+	ion-content {
+		border-left: none;
+	}
+
+	ion-menu[type=overlay] .menu-inner {
+		-webkit-transform: translateX(0px) !important;
+		transform: translateX(0px) !important;
+		box-shadow: none;
+		width: 100%;
+	}
+}
+
+h1.as-header-icon {
+	text-align: center;
+}
+
+h1.as-header-icon ion-icon{
+	font-size: 6em;
+}
+
+/*
+ * Components Icons page style
+ */
+.icons-page {
+  ion-icon {
+    font-size: 50px;
+  }
+
+  ion-row {
+    height: 100%;
+    flex-wrap: wrap;
+  }
+
+  ion-col {
+    flex: 0 0 25%;
+    max-width: 25%;
+    text-align: center;
+    padding: 10px 5px;
+  }
+}
