@@ -28,7 +28,7 @@
     "@ionic/pro": "1.0.17",
     "angularfire2": "^5.0.0-rc.6",
     "cordova": "^8.0.0",
-    "cordova-android": "^7.1.0",
+    "cordova-android": "7.1.0",
     "cordova-plugin-device": "^2.0.1",
     "cordova-plugin-googleplus": "^5.2.1",
     "cordova-plugin-ionic-keyboard": "^2.0.5",

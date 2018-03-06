@@ -55,6 +55,7 @@ export class LoginGatePage {
         // Add user to local storage
         this.storage.setItem('user', {
           name: user.displayName,
+          id: user.userId,
           email: user.email,
           picture: user.imageUrl
         })
