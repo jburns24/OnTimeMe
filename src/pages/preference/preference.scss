@@ -1,3 +1,13 @@
 page-preference {
+    .page-content {
+        background: #56CA96;
 
-}
+        ion-avatar img {
+            width: 50px !important;
+            height: 50px !important;
+            border-radius: 50%;
+            text-align: right;
+        }
+    }
+}   
+
