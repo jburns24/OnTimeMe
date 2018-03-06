@@ -28,25 +28,19 @@ export class PreferencePage {
   showRadioAlert(){
     let alert = this.alertCrl.create();
     alert.setTitle('Select Transportation Mode');
-
-    alert.addInput({
-      type: 'radio',
-      label: 'Car',
-      value: 'Car',
-      checked: true
-    });
-    alert.addInput({
-      type: 'radio',
-      label: 'Bike',
-      value: 'Bike',
-      checked: false
-    });
-    alert.addInput({
-      type: 'radio',
-      label: 'Walk',
-      value: 'Walk',
-      checked: false
-    });
+    // Add new transportation mode here
+    const modeArray = ['Car', 'Bike', 'Walk'];
+    // Iterate thru modeArray and create inputs for each element
+    modeArray.forEach( mode => {
+      alert.addInput({
+        type: 'radio',
+        label: mode,
+        value: mode,
+        // Boolean; if user mode != array element then set
+        // checked to false, else checked is set to true.
+        checked: this.transMode == mode
+      });
+    })
 
     alert.addButton('Cancel');
     alert.addButton({
