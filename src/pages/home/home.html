@@ -7,23 +7,26 @@
     <ion-title>Home</ion-title>
   </ion-navbar>
 </ion-header>
-  <div class="home-hello">
+  <!-- <div class="home-hello"> -->
     <br>
     <br>
-  <h1 class="logo">Be On Time...</h1>
-<!--		<img src="https://vergecampus.com/wp-content/uploads/2016/08/Be_on_time.jpg" /> -->
-      <br>
-  <div class="text-align: center;">
-  <ion-item no-lines style="background-color:transparent"><ion-avatar item-start><img src="{{picture}}"></ion-avatar> <h1>Hello {{user}}!</h1></ion-item>
-    <p>Email: {{email}}</p>
-  </div>
-
-  </div>
-    <div text-center>
-    <!--<div class="text-align: center;">-->
-    <button ion-button (click)='logout()'>Logout</button>
+    <h1 class="logo">Be On Time...</h1>
+    <br>
+    <div class="text-align: center;">
+      <ion-item no-lines style="background-color:transparent" *ngIf="user">
+        <ion-avatar item-left>
+          <img src="{{picture}}">
+        </ion-avatar>
+        <h2>Hello {{user}}!</h2>
+        <h3>{{email}}</h3>
+      </ion-item>
+    <!-- <ion-item no-lines style="background-color:transparent">
+      <ion-avatar item-start><img src="{{picture}}"></ion-avatar>
+      <ion-avatar item-left>
+        <img src="{{picture}}">
+      </ion-avatar>
+      <h1>Hello {{user}}!</h1>
+    </ion-item> -->
+    <!-- <p>Email: {{email}}</p> -->
     </div>
-  <br>
-  <br>
-  <button ion-button class="logout-btn" (click)='logout()'>Logout</button>
 </ion-content>
