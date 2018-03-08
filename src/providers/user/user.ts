@@ -1,17 +1,25 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { NativeStorage } from '@ionic-native/native-storage';
 
-/*
-  Generated class for the UserProvider provider.
-
-  See https://angular.io/guide/dependency-injection for more info on providers
-  and Angular DI.
-*/
 @Injectable()
 export class UserProvider {
+  name: any;
+  email: any;
+  picture: any;
+  id: any;
 
-  constructor(public http: HttpClient) {
-    console.log('Hello UserProvider Provider');
+  constructor(private storage: NativeStorage) {
   }
 
+  getUserInfo(){
+    this.storage.getItem('user').then((data) => {
+      this.name = data.name;
+      this.email = data.email;
+      this.picture = data.picture;
+      this.id = data.id
+      console.log("user is: ", data)
+    }, (error) => {
+      console.log(error);
+    });
+  }
 }
