@@ -1,36 +1,22 @@
 <ion-content class="home-content" padding>
-<ion-header>
-  <ion-navbar>
+  <ion-header>
+    <ion-navbar>
     <button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
     <ion-title>Home</ion-title>
-  </ion-navbar>
-</ion-header>
-    <br>
-    <br>
-    <h1 class="logo">Be On Time...</h1>
-    <br>
-    <div class="text-align: center;">
-      <!-- ############# UNTIL AFTER THE SHOW AND TELL KEEP THIS ####### -->
-      <!-- Take off the class=center for this block to restore to:
-           avatar(left) and userinfo(right) -->
-      <ion-item class="center" no-lines style="background-color:transparent">
-        <ion-avatar item-left >
-          <img src="{{picture}}" class="center">
-        </ion-avatar>
-        <h2>Hello {{user}}!</h2>
-        <!-- <p>{{email}}</p> -->
-      </ion-item>
-      <p>{{email}}</p>
-      <!-- ############################################################ -->
-    <!-- <ion-item no-lines style="background-color:transparent">
-      <ion-avatar item-start><img src="{{picture}}"></ion-avatar>
-      <ion-avatar item-left>
-        <img src="{{picture}}">
-      </ion-avatar>
-      <h1>Hello {{user}}!</h1>
-    </ion-item> -->
-    <!-- <p>Email: {{email}}</p> -->
-    </div>
+    </ion-navbar>
+  </ion-header>
+
+  <br>
+  <br>
+  <h1 class="logo">Be On Time...</h1>
+  <br>
+  <ion-item no-lines style="background-color:transparent">
+    <ion-avatar item-left >
+      <img src="{{picture}}" class="center">
+    </ion-avatar>
+    <h2>Hello {{user}}!</h2>
+    <h4>{{email}}</h4>
+  </ion-item>
 </ion-content>

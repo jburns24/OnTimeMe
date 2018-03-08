@@ -14,6 +14,7 @@ import { HomePage } from '../pages/home/home';
 import { LoginGatePage } from '../pages/login-gate/login-gate';
 import { PreferencePage } from '../pages/preference/preference';
 import { TabsPage } from '../pages/tabs/tabs';
+import { UserProvider } from '../providers/user/user';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import { TabsPage } from '../pages/tabs/tabs';
     SplashScreen,
     GooglePlus,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-    NativeStorage
+    NativeStorage,
+    UserProvider
   ]
 })
 export class AppModule {}

@@ -85,5 +85,5 @@
     </plugin>
     <plugin name="cordova-plugin-nativestorage" spec="^2.3.1" />
     <plugin name="cordova-plugin-statusbar" spec="^2.4.1" />
-    <engine name="android" spec="~7.1.0" />
+    <engine name="android" spec="7.1.0" />
 </widget>

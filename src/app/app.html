@@ -11,7 +11,7 @@
 				<!-- Add items to the menu after this line  -->
 				<ion-icon [name]="p.icon" item-left></ion-icon>
 				{{p.title}}
-				<!-- Add items to the menu before this line	 -->
+
 			</ion-item>
 			<br>
 			<ion-item (click)="logout()">
@@ -19,8 +19,8 @@
 			Sign Out
 			</ion-item>
 		</ion-list>
+		<!-- Add items to the menu before this line	 -->
 	</ion-content>
-
 </ion-menu>
 
 <ion-nav id="nav" [root]="rootPage" #content swipe-back-enabled="false"></ion-nav>
