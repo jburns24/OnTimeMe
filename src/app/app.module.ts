@@ -15,6 +15,7 @@ import { LoginGatePage } from '../pages/login-gate/login-gate';
 import { PreferencePage } from '../pages/preference/preference';
 import { TabsPage } from '../pages/tabs/tabs';
 import { UserProvider } from '../providers/user/user';
+import { GoogleCalenderProvider } from '../providers/google-calender/google-calender';
 
 @NgModule({
   declarations: [
@@ -46,7 +47,8 @@ import { UserProvider } from '../providers/user/user';
     GooglePlus,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     NativeStorage,
-    UserProvider
+    UserProvider,
+    GoogleCalenderProvider
   ]
 })
 export class AppModule {}
