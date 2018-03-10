@@ -14,7 +14,7 @@ export class HomePage {
 
   constructor(
     private menu: MenuController,
-    private user: UserProvider
+    private user: UserProvider,
     private googleCalendar: GoogleCalender){
       // After we login and land on the home page, enable the menu for
       // current user
