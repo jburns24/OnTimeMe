@@ -6,7 +6,7 @@ import { GoogleCalender} from '../../providers/google-calender/google-calender';
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html',
-  providers: [GoogleCalender]
+  //providers: [GoogleCalender]
 })
 
 export class HomePage {

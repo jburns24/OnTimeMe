@@ -25,7 +25,7 @@ export class GoogleCalender {
         .subscribe(data => {
           // we've got back the raw data, now generate the core schedule data
           // and save the data for later reference
-          this.data = data;
+          this.data = data['results'];
           console.log(data);
           resolve(this.data);
           console.log("After data resolved:", this.data);
