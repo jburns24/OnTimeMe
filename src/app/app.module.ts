@@ -6,6 +6,7 @@ import { MyApp } from './app.component';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { NativeStorage } from '@ionic-native/native-storage';
+import { DateTimePipe } from '../pipes/date-time/date-time'
 
 // Pages
 import { AboutPage } from '../pages/about/about';
@@ -24,7 +25,8 @@ import { UserProvider } from '../providers/user/user';
     HomePage,
     TabsPage,
     LoginGatePage,
-    PreferencePage
+    PreferencePage,
+    DateTimePipe
   ],
   imports: [
     BrowserModule,
