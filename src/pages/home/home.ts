@@ -11,6 +11,7 @@ import { GoogleCalender} from '../../providers/google-calender/google-calender';
 
 export class HomePage {
   people: any;
+  events: any;
 
   constructor(
     private menu: MenuController,
@@ -24,6 +25,19 @@ export class HomePage {
       this.user.getUserInfo();
 
       this.loadPeople();
+
+      // Calendar testing
+      this.getList();
+  }
+
+  getList(){
+    console.log("GET LIST IS CALLLEEEDD!!!!!!!!!!!!!!!");
+    this.googleCalendar.getList().then( (list) => {
+      this.events = list;
+      console.log("Home::getList(): Successfully implemented calendar api", this.events);
+    }, (error) => {
+      console.log("Home::getList(): error:", error);
+    });
   }
 
   loadPeople(){
