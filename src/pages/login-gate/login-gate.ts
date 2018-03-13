@@ -36,17 +36,19 @@ export class LoginGatePage {
     // Begin google plus login process
     this.googlePlus.login(
       {
-        'scopes': 'https://www.googleapis.com/auth/admin.directory.resource.calendar',
+        'scopes': 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/userinfo.profile',
         'webClientId': '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com'
       }).then((user) => {
         // Dismiss the loading after login successful
         this.loading.dismiss();
+        console.log(user);
         // Add user to native storage, 'user' is the reference name.
         this.storage.setItem('user', {
           name: user.displayName,
           id: user.userId,
           email: user.email,
-          picture: user.imageUrl
+          picture: user.imageUrl,
+          authToken: user.accessToken
         }).then(() => {
           // If user added successfully then go on to home page
           this.navCtrl.setRoot(HomePage);

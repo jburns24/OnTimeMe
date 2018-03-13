@@ -1,4 +1,5 @@
 import { NgModule, ErrorHandler } from '@angular/core';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler} from 'ionic-angular';
 import { GooglePlus } from '@ionic-native/google-plus';
@@ -16,6 +17,7 @@ import { LoginGatePage } from '../pages/login-gate/login-gate';
 import { PreferencePage } from '../pages/preference/preference';
 import { TabsPage } from '../pages/tabs/tabs';
 import { UserProvider } from '../providers/user/user';
+import { GoogleCalender } from '../providers/google-calender/google-calender';
 
 @NgModule({
   declarations: [
@@ -30,6 +32,7 @@ import { UserProvider } from '../providers/user/user';
   ],
   imports: [
     BrowserModule,
+    HttpClientModule, 
     IonicModule.forRoot(MyApp)
   ],
   bootstrap: [IonicApp],
@@ -48,7 +51,9 @@ import { UserProvider } from '../providers/user/user';
     GooglePlus,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     NativeStorage,
-    UserProvider
+    UserProvider,
+    GoogleCalender,
+    HttpClient
   ]
 })
 export class AppModule {}
