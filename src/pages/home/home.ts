@@ -22,17 +22,24 @@ export class HomePage {
       this.enableMenu();
       // Once we land here call the getUserInfo() method to update
       // user info.
-      this.user.getUserInfo();
+
+      // because localStorage.getItem() returns a promis that must
+      // propigate up to all dependent methods. getUserInfo() was not
+      // returning a promise so that meant that there was a possibility
+      // for a race condition when accessng the authToken.
+      this.user.getUserInfo().then(() => {
+        this.getList(this.user.authToken);
+      });
 
       this.loadPeople();
 
       // Calendar testing
-      this.getList();
+      //this.getList(this.user.authToken);
   }
 
-  getList(){
+  getList(authToken: string){
     console.log("GET LIST IS CALLLEEEDD!!!!!!!!!!!!!!!");
-    this.googleCalendar.getList().then( (list) => {
+    this.googleCalendar.getList(authToken).then( (list) => {
       this.events = list;
       console.log("Home::getList(): Successfully implemented calendar api", this.events);
     }, (error) => {
