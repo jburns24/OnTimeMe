@@ -30,11 +30,6 @@ export class HomePage {
       this.user.getUserInfo().then(() => {
         this.getList(this.user.authToken);
       });
-
-      this.loadPeople();
-
-      // Calendar testing
-      //this.getList(this.user.authToken);
   }
 
   getList(authToken: string){
@@ -44,15 +39,6 @@ export class HomePage {
       console.log("Home::getList(): Successfully implemented calendar api", this.events);
     }, (error) => {
       console.log("Home::getList(): error:", error);
-    });
-  }
-
-  loadPeople(){
-    this.googleCalendar.load().then( (data) => {
-      this.people = data;
-      console.log("Home::Successfully implemented the api", this.people);
-    }, (error) => {
-      console.log("Home::loadPeople(): error:", error);
     });
   }
 

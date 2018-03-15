@@ -114,6 +114,7 @@ export class MyApp {
   // users logged on? is in the app.component.ts file.
   logout () {
     this.googlePlus.trySilentLogin({
+      'scopes': 'https://www.googleapis.com/auth/calendar.readonly',
       'webClientId': '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com'
     }).then ((res) => {
       this.googlePlus.logout().then((response) => {

@@ -36,7 +36,7 @@ export class LoginGatePage {
     // Begin google plus login process
     this.googlePlus.login(
       {
-        'scopes': 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/userinfo.profile',
+        'scopes': 'https://www.googleapis.com/auth/calendar.readonly',
         'webClientId': '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com'
       }).then((user) => {
         // Dismiss the loading after login successful
@@ -73,7 +73,7 @@ export class LoginGatePage {
     });
     alert.present();
   }
-  
+
   // Disable menu in the login gate
   disableMenu(){
     this.menu.enable(false);
