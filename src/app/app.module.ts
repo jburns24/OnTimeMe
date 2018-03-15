@@ -18,6 +18,7 @@ import { PreferencePage } from '../pages/preference/preference';
 import { TabsPage } from '../pages/tabs/tabs';
 import { UserProvider } from '../providers/user/user';
 import { GoogleCalender } from '../providers/google-calender/google-calender';
+import { EventProvider } from '../providers/event/event';
 
 @NgModule({
   declarations: [
@@ -53,7 +54,8 @@ import { GoogleCalender } from '../providers/google-calender/google-calender';
     NativeStorage,
     UserProvider,
     GoogleCalender,
-    HttpClient
+    HttpClient,
+    EventProvider
   ]
 })
 export class AppModule {}
