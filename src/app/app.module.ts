@@ -17,7 +17,8 @@ import { LoginGatePage } from '../pages/login-gate/login-gate';
 import { PreferencePage } from '../pages/preference/preference';
 import { TabsPage } from '../pages/tabs/tabs';
 import { UserProvider } from '../providers/user/user';
-import { GoogleCalender } from '../providers/google-calender/google-calender';
+import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
+import { Events } from '../providers/events/events';
 
 @NgModule({
   declarations: [
@@ -28,11 +29,11 @@ import { GoogleCalender } from '../providers/google-calender/google-calender';
     TabsPage,
     LoginGatePage,
     PreferencePage,
-    DateTimePipe
+    DateTimePipe,
   ],
   imports: [
     BrowserModule,
-    HttpClientModule, 
+    HttpClientModule,
     IonicModule.forRoot(MyApp)
   ],
   bootstrap: [IonicApp],
@@ -52,8 +53,9 @@ import { GoogleCalender } from '../providers/google-calender/google-calender';
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     NativeStorage,
     UserProvider,
-    GoogleCalender,
-    HttpClient
+    GoogleCalendar,
+    HttpClient,
+    Events
   ]
 })
 export class AppModule {}

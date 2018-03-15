@@ -64,6 +64,10 @@ export class MyApp {
       // Here you can do any higher level native things you might need.
       this.statusBar.styleDefault();
 
+      // Try to login users silently each time the user enters the app
+      // without loggin out. This will keep our oauth token valid.
+      this.trySilentLogin();
+
       /*** This is where the logic is implemented for checking user log ins ***/
       this.storage.getItem('user') // Try to get item from local storage and...
       .then( (data) => {
@@ -109,29 +113,28 @@ export class MyApp {
     this.nav.setRoot(page.component);
   }
 
+  trySilentLogin(){
+    this.googlePlus.trySilentLogin({
+      'scopes': 'https://www.googleapis.com/auth/calendar.readonly',
+      'webClientId': '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com'
+    }).then ((res) => {
+      console.log("App_comp::trySilentLogin(): successful!");
+    }, (error) => {
+      console.log ("App_comp::trySilentLogin(): failed!", error);
+    });
+  }
+
   // When user logs-out, we must delete the users local profile, to
   // allow our app to know that no user's are logged on. The check for
   // users logged on? is in the app.component.ts file.
   logout () {
-    this.googlePlus.trySilentLogin({
-      'webClientId': '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com'
-    }).then ((res) => {
-      this.googlePlus.logout().then((response) => {
-        this.storage.remove('user');
-        this.nav.setRoot(LoginGatePage);
-        console.log("successful logout");
-      }, (error) => {
-        this.googlePlus.disconnect().then ((res) => {
-          this.storage.remove('user');
-          this.nav.setRoot(LoginGatePage);
-          console.log("Successfully disconnected");
-        }, (err) => {
-          console.log("disconnect error", err);
-        });
-        console.log ("Logout error", error);
-      });
+    this.trySilentLogin();
+    this.googlePlus.logout().then((response) => {
+      this.storage.remove('user');
+      this.nav.setRoot(LoginGatePage);
+      console.log("successful logout");
     }, (error) => {
-      console.log ("trySilentLogin failed", error);
+      console.log ("Logout error", error);
     });
   }
 }

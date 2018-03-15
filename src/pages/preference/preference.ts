@@ -17,8 +17,6 @@ export class PreferencePage {
     private alertCrl: AlertController,
     private storage: NativeStorage,
     private user: UserProvider) {
-      // Call getMode to get the current selected or default
-      // transportation mode each time the preference page is opened.
       this.getMode();
   }
 
@@ -33,8 +31,6 @@ export class PreferencePage {
         type: 'radio',
         label: mode,
         value: mode,
-        // Boolean; if user mode != array element then set
-        // checked to false, else checked is set to true.
         checked: this.transMode == mode
       });
     })
@@ -43,19 +39,7 @@ export class PreferencePage {
     alert.addButton({
       text: 'OK',
       handler: data => {
-        // Get the current user id and mode. Store it into the native storage
-        // as a key value pair
         this.storage.setItem(this.user.id, data);
-
-        //////////////// DEBUG: check the value /////////////////
-        this.storage.getItem(this.user.id).then( (mode) => {
-          console.log("Preference::setItem(): user id:",
-            this.user.id, "mode:", mode);
-        });
-        /////////////////////////////////////////////////////////
-
-        // After mode is set call getMode to allow the current user to see
-        // the selected mode.
         this.getMode();
       }
     });
