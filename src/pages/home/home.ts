@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { MenuController } from 'ionic-angular';
 import { UserProvider } from '../../providers/user/user';
-import { GoogleCalender} from '../../providers/google-calender/google-calender';
+import { GoogleCalendar} from '../../providers/google-calendar/google-calendar';
 
 @Component({
   selector: 'page-home',
@@ -16,7 +16,7 @@ export class HomePage {
   constructor(
     private menu: MenuController,
     private user: UserProvider,
-    private googleCalendar: GoogleCalender){
+    private googleCalendar: GoogleCalendar){
       // After we login and land on the home page, enable the menu for
       // current user
       this.enableMenu();

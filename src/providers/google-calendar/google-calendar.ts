@@ -3,14 +3,13 @@ import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 @Injectable()
-export class GoogleCalender {
+export class GoogleCalendar {
   data: any;
   events: any;
   calendarUrl: any =  'https://www.googleapis.com/calendar/v3';
   eventList: any = '/calendars/primary/events';
 
   constructor(public http: HttpClient) {
-    console.log('Hello GoogleCalenderProvider Provider');
   }
 
   getList(authToken: string){
@@ -32,6 +31,8 @@ export class GoogleCalender {
     // Don't have data yet
     return new Promise(resolve => {
       this.http.get(this.calendarUrl + this.eventList, httpOptions).subscribe(data => {
+        this.data = data['summary'];
+        console.log("Google-calendar::getList(): summary is:", this.data);
         console.log("Google-calendar::getList(): list is:", data);
         resolve(this.data);
       }, (error) => {
