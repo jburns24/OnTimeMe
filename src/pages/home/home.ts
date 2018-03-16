@@ -28,19 +28,30 @@ export class HomePage {
       // returning a promise so that meant that there was a possibility
       // for a race condition when accessng the authToken.
       this.user.getUserInfo().then(() => {
-        this.getList(this.user.authToken);
+        // this.getList(this.user.authToken);
+        this.getRefreshToken(this.user.serverAuthCode);
       });
   }
 
-  getList(authToken: string){
-    console.log("GET LIST IS CALLLEEEDD!!!!!!!!!!!!!!!");
-    this.googleCalendar.getList(authToken).then( (list) => {
+  getRefreshToken(serverAuthCode: any){
+    console.log("GET REFRESH TOKEN IS CALLLEEEDD!!!!!!!!!!!!!!!");
+    this.googleCalendar.getRefreshToken(serverAuthCode).then( (list) => {
       this.events = list;
       console.log("Home::getList(): Successfully implemented calendar api", this.events);
     }, (error) => {
       console.log("Home::getList(): error:", error);
     });
   }
+
+  // getList(authToken: string){
+  //   console.log("GET LIST IS CALLLEEEDD!!!!!!!!!!!!!!!");
+  //   this.googleCalendar.getList(authToken).then( (list) => {
+  //     this.events = list;
+  //     console.log("Home::getList(): Successfully implemented calendar api", this.events);
+  //   }, (error) => {
+  //     console.log("Home::getList(): error:", error);
+  //   });
+  // }
 
   enableMenu(){
     this.menu.enable(true);

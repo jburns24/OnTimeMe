@@ -9,7 +9,7 @@ export class UserProvider {
   id: any;
   authToken: string;
   isLoggedIn: boolean = false;
-  serverAuthCode: string;
+  serverAuthCode: any;
 
   constructor(private storage: NativeStorage) {
   }
