@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
 export class GoogleCalendar {
   data: any;
   events: any;
-  calendarUrl: any =  'https://www.googleapis.com/calendar/v3';
+  calendarUrl: any = 'https://www.googleapis.com/calendar/v3';
   eventList: any = '/calendars/primary/events';
 
   constructor(public http: HttpClient) {

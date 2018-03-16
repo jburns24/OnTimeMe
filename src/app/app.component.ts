@@ -21,7 +21,6 @@ import {
   Loading
 } from 'ionic-angular';
 
-
 @Component({
   templateUrl: 'app.html'
 })
@@ -64,14 +63,13 @@ export class MyApp {
       // Here you can do any higher level native things you might need.
       this.statusBar.styleDefault();
 
-      // Try to login users silently each time the user enters the app
-      // without loggin out. This will keep our oauth token valid.
-      this.trySilentLogin();
-
       /*** This is where the logic is implemented for checking user log ins ***/
       this.storage.getItem('user') // Try to get item from local storage and...
       .then( (data) => {
         // Succeed, profile exists...allow that person to access his/her data.
+        if (data.isLoggedIn == true){
+          this.trySilentLogin();
+        };
         this.nav.setRoot(HomePage);
         this.splashScreen.hide();
       }, (error) => {
@@ -117,7 +115,7 @@ export class MyApp {
     this.googlePlus.trySilentLogin({
       'scopes': 'https://www.googleapis.com/auth/calendar.readonly',
       'webClientId': '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com'
-    }).then ((res) => {
+    }).then ((succ) => {
       console.log("App_comp::trySilentLogin(): successful!");
     }, (error) => {
       console.log ("App_comp::trySilentLogin(): failed!", error);

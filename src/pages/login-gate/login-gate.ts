@@ -37,7 +37,8 @@ export class LoginGatePage {
     this.googlePlus.login(
       {
         'scopes': 'https://www.googleapis.com/auth/calendar.readonly',
-        'webClientId': '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com'
+        'webClientId': '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com',
+        'offline': true
       }).then((user) => {
         // Dismiss the loading after login successful
         this.loading.dismiss();
@@ -48,7 +49,9 @@ export class LoginGatePage {
           id: user.userId,
           email: user.email,
           picture: user.imageUrl,
-          authToken: user.accessToken
+          authToken: user.accessToken,
+          serverAuthCode: user.serverAuthCode,
+          isLoggedIn: true
         }).then(() => {
           // If user added successfully then go on to home page
           this.navCtrl.setRoot(HomePage);
