@@ -44,7 +44,7 @@ export class HomePage {
 
   getList(authToken: any){
     console.log("HOME::GET LIST IS CALLLEEEDD!!!!!!!!!!!!!!!");
-    this.googleCalendar.getList(authToken).then( (list) => {
+    return this.googleCalendar.getList(authToken).then( (list) => {
       this.events = list;
       console.log("Home::getList(): Successfully implemented calendar api", this.events);
     }, (error) => {
