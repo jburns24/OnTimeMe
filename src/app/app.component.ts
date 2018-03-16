@@ -73,13 +73,17 @@ export class MyApp {
         // user being logged in. This is mainly for when user didn't log out
         // and you need to re-init() stuff.
         if (data.isLoggedIn == true){
-          this.trySilentLogin();
+          this.trySilentLogin().then(() => {
+            // Succeed, profile exists...allow that person to access his/her data
+            this.nav.setRoot(HomePage);
+            this.splashScreen.hide();
+          }, (err) => {
+            console.log("Silent Login Failed", err);
+          });
           //this.googleCalendar.dummy();
         };
-        // Succeed, profile exists...allow that person to access his/her data
-        this.nav.setRoot(HomePage);
-        this.splashScreen.hide();
       }, (error) => {
+        console.log("App.comp::initializeApp() user object was not found at login.");
         // Failed, user not logged on, ask him/her to log in
         this.nav.setRoot(LoginGatePage);
         this.splashScreen.hide();
@@ -119,7 +123,7 @@ export class MyApp {
   }
 
   trySilentLogin(){
-    this.googlePlus.trySilentLogin({
+    return this.googlePlus.trySilentLogin({
       'scopes': 'https://www.googleapis.com/auth/calendar.readonly',
       'webClientId': '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com'
     }).then ((succ) => {
@@ -133,14 +137,21 @@ export class MyApp {
   // allow our app to know that no user's are logged on. The check for
   // users logged on? is in the app.component.ts file.
   logout () {
-    this.trySilentLogin();
-    this.googlePlus.logout().then((response) => {
-      this.storage.remove('user');
-      this.storage.remove('refreshToken');
-      this.nav.setRoot(LoginGatePage);
-      console.log("successful logout");
-    }, (error) => {
-      console.log ("Logout error", error);
+    return this.trySilentLogin().then(() => {
+      this.googlePlus.logout().then((response) => {
+        this.storage.remove('user').then(() => {
+          this.storage.remove('refreshToken').then(() =>{
+            this.nav.setRoot(LoginGatePage);
+          }, (err) => {
+            console.log("removing refreshToken errored", err);
+          });
+        }, (error) => {
+          console.log("removing user errored, ", error);
+        });
+        console.log("successful logout");
+      }, (error) => {
+        console.log ("Logout error", error);
+      });
     });
   }
 }

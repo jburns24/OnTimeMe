@@ -63,10 +63,11 @@ export class GoogleCalendar {
       this.http.post(this.authUrl, httpOptions, { params }).subscribe((data) => {
         this.refreshToken = data['access_token'];
         this.user.getUserInfo().then(() => {
-          this.storage.setItem('refreshToken', { token: this.refreshToken });
-          this.storage.getItem('refreshToken').then((user) => {
-            let RT = user.token;
-            console.log("Google-calendar:: successfully stored RT", RT);
+          this.storage.setItem('refreshToken', { token: this.refreshToken }).then(() => {
+            this.storage.getItem('refreshToken').then((user) => {
+              let RT = user.token;
+              console.log("Google-calendar:: successfully stored RT", RT);
+            });
           });
         });
         resolve(this.refreshToken);
