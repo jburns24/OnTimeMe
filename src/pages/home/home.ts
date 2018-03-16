@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { MenuController } from 'ionic-angular';
 import { UserProvider } from '../../providers/user/user';
 import { GoogleCalendar} from '../../providers/google-calendar/google-calendar';
+import { Events } from '../../providers/events/events'
 
 @Component({
   selector: 'page-home',
@@ -17,7 +18,8 @@ export class HomePage {
   constructor(
     private menu: MenuController,
     private user: UserProvider,
-    private googleCalendar: GoogleCalendar){
+    private googleCalendar: GoogleCalendar,
+    private event: Events){
       // After we login and land on the home page, enable the menu for
       // current user
       this.enableMenu();
@@ -47,6 +49,16 @@ export class HomePage {
     return this.googleCalendar.getList(authToken).then( (list) => {
       this.events = list;
       console.log("Home::getList(): Successfully implemented calendar api", this.events);
+      this.event.storeTodaysEvents(JSON.stringify(this.events)).then(() => {
+        console.log('home::getList() successfully saved todays events');
+        this.event.getTodaysEvents().then((events) =>{
+          console.log('successfully got user events ', events);
+        }, (err) => {
+          console.log('home::getList() failed to get saved events', err);
+        });
+      }, (err) => {
+        console.log('home::getList() failed to save events ', err);
+      });
     }, (error) => {
       console.log("Home::getList(): error:", error);
     });

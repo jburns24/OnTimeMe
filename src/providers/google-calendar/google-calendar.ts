@@ -106,6 +106,7 @@ export class GoogleCalendar {
     });
   }
 
+  //  Takes a user authToken executes a google Event List api call and returns the response
   getList(authToken: string){
     //  This was taken from the angular 2 documenation on how to set HttpHeaders
     const httpOptions = {
@@ -115,6 +116,12 @@ export class GoogleCalendar {
       })
     };
 
+
+    // Gets RFC3339 formatted date strings to pass to calendar api to limit results to today.
+    let today = new Date(Date.now()).toISOString();
+    let tomorrow = new Date(Date.now() + 86400000).toISOString();
+    let urlParams = '?timeMax='+ tomorrow + '&timeMin=' + today;
+
     if (this.events) {
       // if events already exists, promise will resolve and promise can
       // be call from outside function to obtain data.
@@ -123,11 +130,11 @@ export class GoogleCalendar {
 
     // Don't have data yet
     return new Promise(resolve => {
-      this.http.get(this.calendarUrl + this.eventList, httpOptions).subscribe(data => {
-        this.data = data['items'];
-        console.log("Google-calendar::getList(): summary is:", this.data);
-        console.log("Google-calendar::getList(): list is:", data);
-        resolve(this.data);
+      this.http.get(this.calendarUrl + this.eventList + urlParams, httpOptions).subscribe(data => {
+        // this.data = data['items'];
+        // console.log("Google-calendar::getList(): summary is:", this.data);
+        // console.log("Google-calendar::getList(): list is:", data);
+        resolve(data);
       }, (error) => {
         console.log(error);
       });
