@@ -10,6 +10,7 @@ export class UserProvider {
   authToken: string;
   isLoggedIn: boolean = false;
   serverAuthCode: any;
+  refreshToken: any;
 
   constructor(private storage: NativeStorage) {
   }
@@ -22,8 +23,8 @@ export class UserProvider {
       this.id = data.id,
       this.authToken = data.authToken,
       this.serverAuthCode = data.serverAuthCode,
-      this.isLoggedIn = data.isLoggedIn
-      console.log("user is: ", data)
+      this.isLoggedIn = data.isLoggedIn,
+      console.log("User::getUserInfo(): user is: ", data)
     }, (error) => {
       console.log(error);
     });

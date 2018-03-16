@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { UserProvider } from '../user/user';
+import { NativeStorage } from '@ionic-native/native-storage';
 
 @Injectable()
 export class GoogleCalendar {
@@ -12,24 +13,52 @@ export class GoogleCalendar {
 
   // Testing refresh token
   code: any;
-  refreshTokenUrl: any = 'https://www.googleapis.com/oauth2/v4/token';
+  authUrl: any = 'https://www.googleapis.com/oauth2/v4/token';
   secret: any = 'QqOIOYrrK3eyLpZwkFvwZ6x9';
   redirectUri: any = 'http://localhost:8080';
   clientId: any = '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com';
+  refreshToken: any;
+  //serverAuthCode: any;
 
-  constructor(public http: HttpClient, private user: UserProvider) {
-  }
+  constructor(public http: HttpClient,
+    private storage: NativeStorage,
+    private user: UserProvider) {
 
-  getRefreshToken(serverAuthCode: any){
-    console.log("serverAuthCode is:", serverAuthCode);
-    if (this.events) {
-   //     // if events already exists, promise will resolve and promise can
-   //     // be call from outside function to obtain data.
-        return Promise.resolve(this.data);
     }
 
-   // Don't have data yet
-    return new Promise(resolve => {
+  init(serverAuthCode: any){
+    this.getRefreshTokenId(serverAuthCode);
+  }
+
+  getRefreshToken(refreshTokenId: any){
+    // return new Promise(resolve => {
+      console.log("Google-calendar:: The refreshTokenId is:", refreshTokenId);
+      const httpOptions = {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/x-www-form-urlencoded'
+        })
+      };
+
+      const params = {
+        'refresh_token': refreshTokenId,
+        'client_id': this.clientId,
+        'client_secret': this.secret,
+        'grant_type': 'refresh_token'
+      }
+      this.http.post(this.authUrl, httpOptions, { params }).subscribe((data) => {
+        this.refreshToken = data['access_token'];
+        // resolve(this.refreshToken);
+        console.log("Google-calendar::getRefreshToken(): success, got RT!", this.refreshToken);
+        console.log("Google-calendar::getRefreshToken(): id:", data);
+      }, (error) => {
+        console.log("Google-calendar::getRefreshToken(): failed!", error);
+      });
+    // });
+  }
+
+  getRefreshTokenId(serverAuthCode: any){
+    console.log("Google-calendar:: serverAuthCode is:", serverAuthCode);
+    // return new Promise(resolve => {
       const httpOptions = {
         headers: new HttpHeaders({
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -43,18 +72,15 @@ export class GoogleCalendar {
         'redirect_uri': this.redirectUri,
         'grant_type': 'authorization_code'
       }
-
-      console.log("serverAuthCode is:", serverAuthCode);
-      // If code exist and timer is not done
-      this.http.post(this.refreshTokenUrl, httpOptions, { params }).subscribe((data) => {
-        console.log("Google-calendar::getRefreshToken(): magically worked!");
-        console.log("Google-calendar::getRefreshToken(): data:", data);
-        this.data = data;
-        resolve(this.data);
+      this.http.post(this.authUrl, httpOptions, { params }).subscribe((data) => {
+        console.log("Google-calendar::getRefreshTokenId(): magically worked!");
+         this.getRefreshToken(data['refresh_token']);
+        // resolve(this.refreshToken);
+        console.log("Google-calendar::getRefreshTokenId(): id:", data);
       }, (error) => {
-        console.log("Google-calendar::getRefreshToken(): failed!", error);
+        console.log("Google-calendar::getRefreshTokenId(): failed!", error);
       });
-    });
+    // });
   }
 
   // getList(authToken: string){

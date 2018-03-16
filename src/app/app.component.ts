@@ -13,6 +13,7 @@ import { HomePage } from '../pages/home/home';
 import { PreferencePage } from '../pages/preference/preference';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { GooglePlus } from '@ionic-native/google-plus';
+import { UserProvider } from '../providers/user/user';
 import {
   Platform,
   MenuController,
@@ -40,7 +41,8 @@ export class MyApp {
     private loadingCtrl: LoadingController,
     private storage: NativeStorage,
     private alertCrl: AlertController,
-    private googlePlus: GooglePlus
+    private googlePlus: GooglePlus,
+    private user: UserProvider
   ){
     // This function will initialize the app upon opening the app.
     // Anything you want initialized, do it here!!!!

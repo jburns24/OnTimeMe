@@ -12,6 +12,8 @@ import { GoogleCalendar} from '../../providers/google-calendar/google-calendar';
 export class HomePage {
   people: any;
   events: any;
+  refreshTokenId: any;
+  authToken: any;
 
   constructor(
     private menu: MenuController,
@@ -28,22 +30,35 @@ export class HomePage {
       // returning a promise so that meant that there was a possibility
       // for a race condition when accessng the authToken.
       this.user.getUserInfo().then(() => {
-        // this.getList(this.user.authToken);
-        this.getRefreshToken(this.user.serverAuthCode);
+        this.googleCalendar.init(this.user.serverAuthCode);
       });
+        // this.getRefreshTokenId(this.user.serverAuthCode);
+        // this.getRefreshToken(this.refreshTokenId);
+      //});
+      // this.getList(this.authToken);
   }
 
-  getRefreshToken(serverAuthCode: any){
-    console.log("GET REFRESH TOKEN IS CALLLEEEDD!!!!!!!!!!!!!!!");
-    this.googleCalendar.getRefreshToken(serverAuthCode).then( (list) => {
-      this.events = list;
-      console.log("Home::getList(): Successfully implemented calendar api", this.events);
-    }, (error) => {
-      console.log("Home::getList(): error:", error);
-    });
-  }
+  // getRefreshTokenId(serverAuthCode: any){
+  //   console.log("GET REFRESH TOKEN ID IS CALLLEEEDD!!!!!!!!!!!!!!!");
+  //   this.googleCalendar.getRefreshTokenId(serverAuthCode).then( (refreshTokenId) => {
+  //     this.refreshTokenId = refreshTokenId;
+  //     console.log("Home::getRT(): success at getting RT_id", this.refreshTokenId);
+  //   }, (error) => {
+  //     console.log("Home::getRT(): error:", error);
+  //   });
+  // }
+  //
+  // getRefreshToken(refreshTokenId: any){
+  //   console.log("GET REFRESH TOKEN IS CALLLEEEDD!!!!!!!!!!!!!!!");
+  //   this.googleCalendar.getRefreshToken(refreshTokenId).then( (refreshToken) => {
+  //     this.authToken = refreshToken;
+  //     console.log("Home::getRT(): success at getting RT", this.authToken);
+  //   }, (error) => {
+  //     console.log("Home::getRT(): error:", error);
+  //   });
+  // }
 
-  // getList(authToken: string){
+  // getList(authToken: any){
   //   console.log("GET LIST IS CALLLEEEDD!!!!!!!!!!!!!!!");
   //   this.googleCalendar.getList(authToken).then( (list) => {
   //     this.events = list;
