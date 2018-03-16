@@ -13,7 +13,7 @@ import { HomePage } from '../pages/home/home';
 import { PreferencePage } from '../pages/preference/preference';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { GooglePlus } from '@ionic-native/google-plus';
-import { UserProvider } from '../providers/user/user';
+import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
 import {
   Platform,
   MenuController,
@@ -42,7 +42,7 @@ export class MyApp {
     private storage: NativeStorage,
     private alertCrl: AlertController,
     private googlePlus: GooglePlus,
-    private user: UserProvider
+    private googleCalendar: GoogleCalendar
   ){
     // This function will initialize the app upon opening the app.
     // Anything you want initialized, do it here!!!!
@@ -68,10 +68,15 @@ export class MyApp {
       /*** This is where the logic is implemented for checking user log ins ***/
       this.storage.getItem('user') // Try to get item from local storage and...
       .then( (data) => {
-        // Succeed, profile exists...allow that person to access his/her data.
+        // Logic checks if users are logged in...this is the place
+        // to do all your init() and dummy calls if these calls depends on
+        // user being logged in. This is mainly for when user didn't log out
+        // and you need to re-init() stuff.
         if (data.isLoggedIn == true){
           this.trySilentLogin();
+          //this.googleCalendar.dummy();
         };
+        // Succeed, profile exists...allow that person to access his/her data
         this.nav.setRoot(HomePage);
         this.splashScreen.hide();
       }, (error) => {
@@ -131,6 +136,7 @@ export class MyApp {
     this.trySilentLogin();
     this.googlePlus.logout().then((response) => {
       this.storage.remove('user');
+      this.storage.remove('refreshToken');
       this.nav.setRoot(LoginGatePage);
       console.log("successful logout");
     }, (error) => {

@@ -22,10 +22,23 @@ export class GoogleCalendar {
   constructor(public http: HttpClient,
     private storage: NativeStorage,
     private user: UserProvider) {
-
+      this.storage.getItem('refreshToken').then ((RT) => {
+        this.refreshToken = RT.token;
+      }, (error) => {
+        console.log("Google-calendar::Constructor: refreshToken not set:", error);
+      });
     }
 
+  // Dummy method: does nothing helps re-initalize this provider for when
+  // users exit without logging out. 
+  dummy(){}
+
   init(serverAuthCode: any){
+    // If we already have refresh token, resolve the promise
+    if (this.refreshToken){
+      return Promise.resolve(this.refreshToken);
+    }
+    // Else, must be a fresh login...
     return new Promise(resolve => {
       //console.log("GOOGLE-CALENDAR::init(): Checking the this.refreshToken: ", this.refreshToken);
       resolve(this.getRefreshTokenId(serverAuthCode));
@@ -49,6 +62,13 @@ export class GoogleCalendar {
       }
       this.http.post(this.authUrl, httpOptions, { params }).subscribe((data) => {
         this.refreshToken = data['access_token'];
+        this.user.getUserInfo().then(() => {
+          this.storage.setItem('refreshToken', { token: this.refreshToken });
+          this.storage.getItem('refreshToken').then((user) => {
+            let RT = user.token;
+            console.log("Google-calendar:: successfully stored RT", RT);
+          });
+        });
         resolve(this.refreshToken);
         console.log("Google-calendar::getRefreshToken(): SUCCESS!!! Refresh token is:",
         this.refreshToken);

@@ -6,7 +6,6 @@ import { GoogleCalendar} from '../../providers/google-calendar/google-calendar';
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html',
-  //providers: [GoogleCalender]
 })
 
 export class HomePage {
@@ -33,6 +32,7 @@ export class HomePage {
         this.googleCalendar.init(this.user.serverAuthCode).then(() => {
           console.log("HOME::CONSTRUCTOR: checking the refresh token:",
           this.googleCalendar.refreshToken);
+          // The bottom code is bound to change...
           this.getList(this.googleCalendar.refreshToken);
         });
       });
@@ -41,26 +41,6 @@ export class HomePage {
       //});
       // this.getList(this.authToken);
   }
-
-  // getRefreshTokenId(serverAuthCode: any){
-  //   console.log("GET REFRESH TOKEN ID IS CALLLEEEDD!!!!!!!!!!!!!!!");
-  //   this.googleCalendar.getRefreshTokenId(serverAuthCode).then( (refreshTokenId) => {
-  //     this.refreshTokenId = refreshTokenId;
-  //     console.log("Home::getRT(): success at getting RT_id", this.refreshTokenId);
-  //   }, (error) => {
-  //     console.log("Home::getRT(): error:", error);
-  //   });
-  // }
-  //
-  // getRefreshToken(refreshTokenId: any){
-  //   console.log("GET REFRESH TOKEN IS CALLLEEEDD!!!!!!!!!!!!!!!");
-  //   this.googleCalendar.getRefreshToken(refreshTokenId).then( (refreshToken) => {
-  //     this.authToken = refreshToken;
-  //     console.log("Home::getRT(): success at getting RT", this.authToken);
-  //   }, (error) => {
-  //     console.log("Home::getRT(): error:", error);
-  //   });
-  // }
 
   getList(authToken: any){
     console.log("HOME::GET LIST IS CALLLEEEDD!!!!!!!!!!!!!!!");
