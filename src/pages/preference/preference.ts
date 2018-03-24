@@ -39,8 +39,9 @@ export class PreferencePage {
     alert.addButton({
       text: 'OK',
       handler: data => {
-        this.storage.setItem(this.user.id, data);
-        this.getMode();
+        this.storage.setItem(this.user.id, { mode: data }).then(() => {
+          this.getMode();
+        });
       }
     });
     alert.present();
@@ -49,8 +50,8 @@ export class PreferencePage {
   getMode(){
     // If this succeeds, then there exists a key value pair that contains:
     // <key: user_id>, <value: user-selected mode>.
-    this.storage.getItem(this.user.id).then((mode) => {
-      this.transMode = mode;
+    return this.storage.getItem(this.user.id).then((user) => {
+      this.transMode = user.mode;
       console.log("Preference::getMode(): success!");
       console.log("==> curUser.id:", this.user.id, "mode:", this.transMode);
     }, (error) => {

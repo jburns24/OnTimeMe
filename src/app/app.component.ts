@@ -13,6 +13,7 @@ import { HomePage } from '../pages/home/home';
 import { PreferencePage } from '../pages/preference/preference';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { GooglePlus } from '@ionic-native/google-plus';
+import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
 import {
   Platform,
   MenuController,
@@ -20,7 +21,6 @@ import {
   LoadingController,
   Loading
 } from 'ionic-angular';
-
 
 @Component({
   templateUrl: 'app.html'
@@ -41,7 +41,8 @@ export class MyApp {
     private loadingCtrl: LoadingController,
     private storage: NativeStorage,
     private alertCrl: AlertController,
-    private googlePlus: GooglePlus
+    private googlePlus: GooglePlus,
+    private googleCalendar: GoogleCalendar
   ){
     // This function will initialize the app upon opening the app.
     // Anything you want initialized, do it here!!!!
@@ -64,17 +65,25 @@ export class MyApp {
       // Here you can do any higher level native things you might need.
       this.statusBar.styleDefault();
 
-      // Try to login users silently each time the user enters the app
-      // without loggin out. This will keep our oauth token valid.
-      this.trySilentLogin();
-
       /*** This is where the logic is implemented for checking user log ins ***/
       this.storage.getItem('user') // Try to get item from local storage and...
       .then( (data) => {
-        // Succeed, profile exists...allow that person to access his/her data.
-        this.nav.setRoot(HomePage);
-        this.splashScreen.hide();
+        // Logic checks if users are logged in...this is the place
+        // to do all your init() and dummy calls if these calls depends on
+        // user being logged in. This is mainly for when user didn't log out
+        // and you need to re-init() stuff.
+        if (data.isLoggedIn == true){
+          this.trySilentLogin().then(() => {
+            // Succeed, profile exists...allow that person to access his/her data
+            this.nav.setRoot(HomePage);
+            this.splashScreen.hide();
+          }, (err) => {
+            console.log("Silent Login Failed", err);
+          });
+          //this.googleCalendar.dummy();
+        };
       }, (error) => {
+        console.log("App.comp::initializeApp() user object was not found at login.");
         // Failed, user not logged on, ask him/her to log in
         this.nav.setRoot(LoginGatePage);
         this.splashScreen.hide();
@@ -114,10 +123,10 @@ export class MyApp {
   }
 
   trySilentLogin(){
-    this.googlePlus.trySilentLogin({
+    return this.googlePlus.trySilentLogin({
       'scopes': 'https://www.googleapis.com/auth/calendar.readonly',
       'webClientId': '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com'
-    }).then ((res) => {
+    }).then ((succ) => {
       console.log("App_comp::trySilentLogin(): successful!");
     }, (error) => {
       console.log ("App_comp::trySilentLogin(): failed!", error);
@@ -128,13 +137,21 @@ export class MyApp {
   // allow our app to know that no user's are logged on. The check for
   // users logged on? is in the app.component.ts file.
   logout () {
-    this.trySilentLogin();
-    this.googlePlus.logout().then((response) => {
-      this.storage.remove('user');
-      this.nav.setRoot(LoginGatePage);
-      console.log("successful logout");
-    }, (error) => {
-      console.log ("Logout error", error);
+    return this.trySilentLogin().then(() => {
+      this.googlePlus.logout().then((response) => {
+        this.storage.remove('user').then(() => {
+          this.storage.remove('refreshToken').then(() =>{
+            this.nav.setRoot(LoginGatePage);
+          }, (err) => {
+            console.log("removing refreshToken errored", err);
+          });
+        }, (error) => {
+          console.log("removing user errored, ", error);
+        });
+        console.log("successful logout");
+      }, (error) => {
+        console.log ("Logout error", error);
+      });
     });
   }
 }
