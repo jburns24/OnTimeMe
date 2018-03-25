@@ -19,7 +19,7 @@ export class HoursMinutesSecondsPipe implements PipeTransform {
 
     let timeString ="";
     args.hours ? timeString += hours + " hrs " : true;
-    args.minutes ? timeString += minutes + " mins " : true;
+    args.minutes ? timeString += (minutes - (60 * hours))+ " mins " : true;
     args.seconds ? timeString += seconds + " secs " : true;
 
     return timeString;

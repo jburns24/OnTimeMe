@@ -15,6 +15,7 @@ export class HomePage {
   refreshTokenId: any;
   authToken: any;
   eventList: any;
+  TodayEPOC: number;
   
 
   constructor(
@@ -55,6 +56,7 @@ export class HomePage {
         console.log('home::getList() successfully saved todays events');
         this.event.getTodaysEvents().then((events) =>{
           this.eventList = events;
+          this.TodayEPOC = Date.now() / 1000;
           console.log('successfully got user events ', events);
         }, (err) => {
           console.log('home::getList() failed to get saved events', err);

@@ -21,7 +21,8 @@
   </ion-item>
   <ion-list>
     <ion-item *ngFor="let event of eventList">
-      <p>{{ (event.endTime - event.startTime) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true} }}</p>
+      <p [style.font-size.vw]="'3.4'">{{ event.summary }}</p>
+      <p [style.color]="'green'">{{ (event.startTime - TodayEPOC) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true} }}</p>
     </ion-item>
   </ion-list>
   <!-- <ion-list>
