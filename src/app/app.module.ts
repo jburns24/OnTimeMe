@@ -7,7 +7,8 @@ import { MyApp } from './app.component';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { NativeStorage } from '@ionic-native/native-storage';
-import { DateTimePipe } from '../pipes/date-time/date-time'
+import { DateTimePipe } from '../pipes/date-time/date-time';
+import { HoursMinutesSecondsPipe } from '../pipes/hours-minutes-seconds/hours-minutes-seconds';
 
 // Pages
 import { AboutPage } from '../pages/about/about';
@@ -20,6 +21,7 @@ import { UserProvider } from '../providers/user/user';
 import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
 import { Events } from '../providers/events/events';
 
+
 @NgModule({
   declarations: [
     MyApp,
@@ -30,6 +32,7 @@ import { Events } from '../providers/events/events';
     LoginGatePage,
     PreferencePage,
     DateTimePipe,
+    HoursMinutesSecondsPipe,
   ],
   imports: [
     BrowserModule,
