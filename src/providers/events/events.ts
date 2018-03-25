@@ -2,13 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { UserProvider } from '../user/user';
 import { NativeStorage } from '@ionic-native/native-storage';
+// import { HoursMinutesSecondsPipe } from '../../pipes/hours-minutes-seconds/hours-minutes-seconds'
 //import { GoogleCalendar } from '../google-calendar/google-calendar';
 
 
 @Injectable()
 export class Events {
 
-  constructor(public http: HttpClient, private user: UserProvider, private storage: NativeStorage
+  constructor(public http: HttpClient, private user: UserProvider, private storage: NativeStorage,
   /*private googleCalendar: GoogleCalendar*/) {
   }
 
@@ -23,11 +24,14 @@ export class Events {
     for (let event of events) {
       let start = event['start'];
       let end = event['end'];
+      let beginTime = Date.parse(start['dateTime']) / 1000;
+      let finishTime = Date.parse(end['dateTime']) / 1000;
+
       let new_event = {
         id: event['id'],
         summary: event['summary'],
-        startTime: Date.parse(start['dateTime']),
-        endTime: Date.parse(end['dateTime'])
+        startTime: beginTime,
+        endTime: finishTime
       };
       todaysEventList.push(new_event);
     }
@@ -49,15 +53,18 @@ export class Events {
   }
 
   getTodaysEvents() {
-    return this.user.getUserInfo().then(() => {
-      this.storage.getItem(this.user.id + 'events').then((eventList) => {
-        let events = eventList['eventList'];
-        console.log("got the event list!!", events);
+    return new Promise (resolve => {
+      this.user.getUserInfo().then(() => {
+        this.storage.getItem(this.user.id + 'events').then((eventList) => {
+          let events = eventList['eventList'];
+          console.log("got the event list!!", events);
+          resolve(events);
+        }, (err) => {
+          console.log('failed to get users events object ', err);
+        });
       }, (err) => {
-        console.log('failed to get users events object ', err);
+        console.log('events::getTodaysEvents() failed to fetch events ', err);
       });
-    }, (err) => {
-      console.log('events::getTodaysEvents() failed to fetch events ', err);
     });
   }
 }

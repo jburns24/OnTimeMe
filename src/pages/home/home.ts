@@ -14,6 +14,8 @@ export class HomePage {
   events: any;
   refreshTokenId: any;
   authToken: any;
+  eventList: any;
+  
 
   constructor(
     private menu: MenuController,
@@ -52,6 +54,7 @@ export class HomePage {
       this.event.storeTodaysEvents(JSON.stringify(this.events)).then(() => {
         console.log('home::getList() successfully saved todays events');
         this.event.getTodaysEvents().then((events) =>{
+          this.eventList = events;
           console.log('successfully got user events ', events);
         }, (err) => {
           console.log('home::getList() failed to get saved events', err);
