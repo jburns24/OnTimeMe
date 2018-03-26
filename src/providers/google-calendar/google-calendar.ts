@@ -120,7 +120,7 @@ export class GoogleCalendar {
     // Gets RFC3339 formatted date strings to pass to calendar api to limit results to today.
     let today = new Date(Date.now()).toISOString();
     let tomorrow = new Date(Date.now() + 86400000).toISOString();
-    let urlParams = '?timeMax='+ tomorrow + '&timeMin=' + today;
+    let urlParams = '?timeMax='+ tomorrow + '&timeMin=' + today + '&orderBy=startTime&singleEvents=true';
 
     if (this.events) {
       // if events already exists, promise will resolve and promise can
