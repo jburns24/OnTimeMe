@@ -30,6 +30,7 @@ export class Events {
       let new_event = {
         id: event['id'],
         summary: event['summary'],
+        location: event['location'],
         startTime: beginTime,
         endTime: finishTime
       };
@@ -52,13 +53,34 @@ export class Events {
     }); 
   }
 
+  /**
+   *  Gets todays events and marks event.ongoing if the event is happening now
+   */
   getTodaysEvents() {
     return new Promise (resolve => {
       this.user.getUserInfo().then(() => {
         this.storage.getItem(this.user.id + 'events').then((eventList) => {
           let events = eventList['eventList'];
           console.log("got the event list!!", events);
-          resolve(events);
+          let modEventList = [];
+          let now = Date.now() / 1000;
+          for (let event of events) {
+            let ongoing = 0;
+            if (now >= event['startTime']) {
+              ongoing = 1;
+            }
+            let new_event = {
+              id: event['id'],
+              summary: event['summary'],
+              location: event['location'],
+              startTime: event['startTime'],
+              endTime: event['endTime'],
+              happening: ongoing,
+            };
+            modEventList.push(new_event);
+          }
+          console.log("modified event list is ", modEventList);
+          resolve(modEventList);
         }, (err) => {
           console.log('failed to get users events object ', err);
         });
