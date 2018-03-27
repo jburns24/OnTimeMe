@@ -84,6 +84,6 @@
         <variable name="REVERSED_CLIENT_ID" value="com.googleusercontent.apps.311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j" />
     </plugin>
     <plugin name="cordova-plugin-statusbar" spec="^2.4.1" />
-    <engine name="android" spec="~7.1.0" />
     <plugin name="cordova-plugin-nativestorage" spec="^2.3.1" />
+    <engine name="android" spec="~7.1.0" />
 </widget>
