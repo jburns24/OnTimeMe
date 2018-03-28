@@ -22,11 +22,11 @@ export class GoogleCalendar {
   constructor(public http: HttpClient,
     private storage: NativeStorage,
     private user: UserProvider) {
-      this.storage.getItem('refreshToken').then ((RT) => {
-        this.refreshToken = RT.token;
-      }, (error) => {
-        console.log("Google-calendar::Constructor: refreshToken not set:", error);
-      });
+      // this.storage.getItem('refreshToken').then ((RT) => {
+      //   this.refreshToken = RT.token;
+      // }, (error) => {
+      //   console.log("Google-calendar::Constructor: refreshToken not set:", error);
+      // });
     }
 
   // Dummy method: does nothing helps re-initalize this provider for when
@@ -34,16 +34,32 @@ export class GoogleCalendar {
   dummy(){}
 
   init(serverAuthCode: any){
-    // If we already have refresh token, resolve the promise
-    if (this.refreshToken){
-      return Promise.resolve(this.refreshToken);
-    }
-    // Else, must be a fresh login...
-    return new Promise(resolve => {
+    return this.storage.getItem('refreshToken').then ((RT) => {
+      this.refreshToken = RT.token;
+    }, (error) => {
+      console.log("Google-calendar::init: refreshToken not set:", error);
+      // Else, must be a fresh login...
+      return new Promise(resolve => {
       //console.log("GOOGLE-CALENDAR::init(): Checking the this.refreshToken: ", this.refreshToken);
-      resolve(this.getRefreshTokenId(serverAuthCode));
+        resolve(this.getRefreshTokenId(serverAuthCode));
+      });
     });
   }
+
+  // init(serverAuthCode: any){
+  //   // If we already have refresh token, resolve the promise
+  //   if (this.refreshToken){
+  //     return Promise.resolve(this.refreshToken);
+  //   }
+  //   else{
+  //     console.log("We dont have refreshToken");
+  //     // Else, must be a fresh login...
+  //     return new Promise(resolve => {
+  //       //console.log("GOOGLE-CALENDAR::init(): Checking the this.refreshToken: ", this.refreshToken);
+  //       resolve(this.getRefreshTokenId(serverAuthCode));
+  //     });
+  //   }
+  // }
 
   getRefreshToken(refreshTokenId: any){
     return new Promise(resolve => {

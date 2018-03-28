@@ -13,6 +13,7 @@ import { HomePage } from '../pages/home/home';
 import { PreferencePage } from '../pages/preference/preference';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { GooglePlus } from '@ionic-native/google-plus';
+import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
 import {
   Platform,
   MenuController,
@@ -40,7 +41,8 @@ export class MyApp {
     private loadingCtrl: LoadingController,
     private storage: NativeStorage,
     private alertCrl: AlertController,
-    private googlePlus: GooglePlus
+    private googlePlus: GooglePlus, 
+    private googleCalendar: GoogleCalendar
   ){
     // This function will initialize the app upon opening the app.
     // Anything you want initialized, do it here!!!!
@@ -78,7 +80,6 @@ export class MyApp {
           }, (err) => {
             console.log("Silent Login Failed", err);
           });
-          //this.googleCalendar.dummy();
         };
       }, (error) => {
         console.log("App.comp::initializeApp() user object was not found at login.");
@@ -139,7 +140,15 @@ export class MyApp {
       this.googlePlus.logout().then((response) => {
         this.storage.remove('user').then(() => {
           this.storage.remove('refreshToken').then(() =>{
+            this.googleCalendar.refreshToken = null;
+            console.log("refreshToken is successfully removed from native storage.");
             this.nav.setRoot(LoginGatePage);
+            // DEBUGGING: this part below
+            this.storage.getItem('refreshToken').then((res) => {
+              console.log("trying to get refresh token after it has been removed", (res));
+            }, (error) => {
+              console.log("This is what we want, refresh token cannot be found after it gets deleted.", error);
+            });
           }, (err) => {
             console.log("removing refreshToken errored", err);
           });
