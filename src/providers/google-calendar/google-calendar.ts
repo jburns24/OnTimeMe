@@ -22,32 +22,24 @@ export class GoogleCalendar {
   constructor(public http: HttpClient,
     private storage: NativeStorage,
     private user: UserProvider) {
-      this.storage.getItem('refreshToken').then ((RT) => {
-        this.refreshToken = RT.token;
-      }, (error) => {
-        console.log("Google-calendar::Constructor: refreshToken not set:", error);
-      });
     }
-
-  // Dummy method: does nothing helps re-initalize this provider for when
-  // users exit without logging out. 
-  dummy(){}
 
   init(serverAuthCode: any){
-    // If we already have refresh token, resolve the promise
-    if (this.refreshToken){
-      return Promise.resolve(this.refreshToken);
-    }
-    // Else, must be a fresh login...
-    return new Promise(resolve => {
-      //console.log("GOOGLE-CALENDAR::init(): Checking the this.refreshToken: ", this.refreshToken);
-      resolve(this.getRefreshTokenId(serverAuthCode));
+    return this.storage.getItem('refreshToken').then ((RT) => {
+      // If success then set the refresh token
+      this.refreshToken = RT.token;
+    }, (error) => {
+      console.log("Google-calendar::init: refreshToken not set:", error);
+      // Else, must be a fresh login...
+      return new Promise(resolve => {
+        resolve(this.getRefreshTokenId(serverAuthCode));
+      });
     });
   }
 
   getRefreshToken(refreshTokenId: any){
     return new Promise(resolve => {
-      console.log("Google-calendar::getRT(): The refreshTokenId is:", refreshTokenId);
+      //console.log("Google-calendar::getRT(): The refreshTokenId is:", refreshTokenId);
       const httpOptions = {
         headers: new HttpHeaders({
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -66,14 +58,11 @@ export class GoogleCalendar {
           this.storage.setItem('refreshToken', { token: this.refreshToken }).then(() => {
             this.storage.getItem('refreshToken').then((user) => {
               let RT = user.token;
-              console.log("Google-calendar:: successfully stored RT", RT);
+              //console.log("Google-calendar:: successfully stored RT", RT);
             });
           });
         });
         resolve(this.refreshToken);
-        console.log("Google-calendar::getRefreshToken(): SUCCESS!!! Refresh token is:",
-        this.refreshToken);
-        console.log("Google-calendar::getRefreshToken(): refresh token metadata:", data);
       }, (error) => {
         console.log("Google-calendar::getRefreshToken(): failed!", error);
       });
@@ -81,7 +70,6 @@ export class GoogleCalendar {
   }
 
   getRefreshTokenId(serverAuthCode: any){
-    console.log("Google-calendar::getRTID(): serverAuthCode is:", serverAuthCode);
     return new Promise(resolve => {
       const httpOptions = {
         headers: new HttpHeaders({
@@ -97,9 +85,7 @@ export class GoogleCalendar {
         'grant_type': 'authorization_code'
       }
       this.http.post(this.authUrl, httpOptions, { params }).subscribe((data) => {
-        console.log("Google-calendar::getRefreshTokenId(): magically worked!");
-          resolve(this.getRefreshToken(data['refresh_token']));
-        console.log("Google-calendar::getRefreshTokenId(): id:", data);
+        resolve(this.getRefreshToken(data['refresh_token']));
       }, (error) => {
         console.log("Google-calendar::getRefreshTokenId(): failed!", error);
       });
@@ -116,7 +102,6 @@ export class GoogleCalendar {
       })
     };
 
-
     // Gets RFC3339 formatted date strings to pass to calendar api to limit results to today.
     let today = new Date(Date.now()).toISOString();
     let tomorrow = new Date(Date.now() + 86400000).toISOString();
@@ -132,8 +117,6 @@ export class GoogleCalendar {
     return new Promise(resolve => {
       this.http.get(this.calendarUrl + this.eventList + urlParams, httpOptions).subscribe(data => {
         // this.data = data['items'];
-        // console.log("Google-calendar::getList(): summary is:", this.data);
-        // console.log("Google-calendar::getList(): list is:", data);
         resolve(data);
       }, (error) => {
         console.log(error);
