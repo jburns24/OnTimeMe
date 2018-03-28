@@ -35,23 +35,16 @@ export class HomePage {
       // for a race condition when accessng the authToken.
       this.user.getUserInfo().then(() => {
         this.googleCalendar.init(this.user.serverAuthCode).then(() => {
-          console.log("HOME::CONSTRUCTOR: checking the refresh token:",
-          this.googleCalendar.refreshToken);
-          // The bottom code is bound to change...
+          // console.log("HOME::CONSTRUCTOR: checking the refresh token:",
+          // this.googleCalendar.refreshToken);
           this.getList(this.googleCalendar.refreshToken);
         });
       });
-        // this.getRefreshTokenId(this.user.serverAuthCode);
-        // this.getRefreshToken(this.refreshTokenId);
-      //});
-      // this.getList(this.authToken);
   }
 
   getList(authToken: any){
-    console.log("HOME::GET LIST IS CALLLEEEDD!!!!!!!!!!!!!!!");
     return this.googleCalendar.getList(authToken).then( (list) => {
       this.events = list;
-      console.log("Home::getList(): Successfully implemented calendar api", this.events);
       this.event.storeTodaysEvents(JSON.stringify(this.events)).then(() => {
         console.log('home::getList() successfully saved todays events');
         this.event.getTodaysEvents().then((events) =>{

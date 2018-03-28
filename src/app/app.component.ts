@@ -142,6 +142,7 @@ export class MyApp {
           this.storage.remove('refreshToken').then(() =>{
             this.googleCalendar.refreshToken = null;
             console.log("refreshToken is successfully removed from native storage.");
+            console.log("refreshToken should now be null", this.googleCalendar.refreshToken);
             this.nav.setRoot(LoginGatePage);
             // DEBUGGING: this part below
             this.storage.getItem('refreshToken').then((res) => {
@@ -149,6 +150,7 @@ export class MyApp {
             }, (error) => {
               console.log("This is what we want, refresh token cannot be found after it gets deleted.", error);
             });
+            /////////////// DEBUGGING ENDS ////////////////////////
           }, (err) => {
             console.log("removing refreshToken errored", err);
           });
