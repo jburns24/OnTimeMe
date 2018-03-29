@@ -3,6 +3,7 @@ import { MenuController } from 'ionic-angular';
 import { UserProvider } from '../../providers/user/user';
 import { GoogleCalendar} from '../../providers/google-calendar/google-calendar';
 import { Events } from '../../providers/events/events'
+import { RealTimeClockProvider } from '../../providers/real-time-clock/real-time-clock'
 
 @Component({
   selector: 'page-home',
@@ -15,10 +16,12 @@ export class HomePage {
   refreshTokenId: any;
   authToken: any;
   eventList: any;
-  TodayEPOC: number;
+  todaysEpoch = Date.now();
+  epochNow;
   
 
   constructor(
+    private realTimeClock: RealTimeClockProvider,
     private menu: MenuController,
     private user: UserProvider,
     private googleCalendar: GoogleCalendar,
@@ -49,7 +52,7 @@ export class HomePage {
         console.log('home::getList() successfully saved todays events');
         this.event.getTodaysEvents().then((events) =>{
           this.eventList = events;
-          this.TodayEPOC = Date.now() / 1000;
+          this.epochNow = this.realTimeClock.getEpochTime().do(() => ++this.todaysEpoch);      
           console.log('successfully got user events ', events);
         }, (err) => {
           console.log('home::getList() failed to get saved events', err);

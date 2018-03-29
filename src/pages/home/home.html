@@ -21,10 +21,10 @@
   </ion-item>
   <ion-list>
     <ion-item *ngFor="let event of eventList">
-      <p [style.font-size.vw]="'5.4'">{{ event.summary }}</p>
-      <p [style.color]="event.happening ? 'red' : 'green'">
+      <p item-left [style.font-size.vw]="'4.9'">{{ event.summary }}</p>
+      <p item-right [style.color]="event.happening ? 'red' : 'green'">
         {{ 
-          event.happening ? "Ongoing" : ((event.startTime - TodayEPOC) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true}) 
+          event.happening ? "Ongoing" : ((event.startTime - (epochNow | async)) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: false}) 
         }}
       </p>
     </ion-item>
