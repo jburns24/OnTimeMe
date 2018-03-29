@@ -21,6 +21,7 @@ import { UserProvider } from '../providers/user/user';
 import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
 import { Events } from '../providers/events/events';
 import { MapProvider } from '../providers/map/map';
+import { RealTimeClockProvider } from '../providers/real-time-clock/real-time-clock';
 
 
 @NgModule({
@@ -60,7 +61,8 @@ import { MapProvider } from '../providers/map/map';
     GoogleCalendar,
     HttpClient,
     Events,
-    MapProvider
+    MapProvider,
+    RealTimeClockProvider
   ]
 })
 export class AppModule {}
