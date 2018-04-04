@@ -2,7 +2,10 @@ import { Component } from '@angular/core';
 import { MenuController } from 'ionic-angular';
 import { UserProvider } from '../../providers/user/user';
 import { GoogleCalendar} from '../../providers/google-calendar/google-calendar';
-import { Events } from '../../providers/events/events'
+import { Events } from '../../providers/events/events';
+import { Map } from '../../providers/map/map';
+
+
 
 @Component({
   selector: 'page-home',
@@ -16,13 +19,14 @@ export class HomePage {
   authToken: any;
   eventList: any;
   TodayEPOC: number;
-  
+
 
   constructor(
     private menu: MenuController,
     private user: UserProvider,
     private googleCalendar: GoogleCalendar,
-    private event: Events){
+    private event: Events,
+    private map: Map){
       // After we login and land on the home page, enable the menu for
       // current user
       this.enableMenu();
@@ -40,6 +44,8 @@ export class HomePage {
           this.getList(this.googleCalendar.refreshToken);
         });
       });
+
+      this.map.getDistance();
   }
 
   getList(authToken: any){

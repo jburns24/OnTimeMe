@@ -20,7 +20,7 @@ import { TabsPage } from '../pages/tabs/tabs';
 import { UserProvider } from '../providers/user/user';
 import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
 import { Events } from '../providers/events/events';
-import { MapProvider } from '../providers/map/map';
+import { Map } from '../providers/map/map';
 
 
 @NgModule({
@@ -60,7 +60,7 @@ import { MapProvider } from '../providers/map/map';
     GoogleCalendar,
     HttpClient,
     Events,
-    MapProvider
+    Map
   ]
 })
 export class AppModule {}
