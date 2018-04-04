@@ -4,6 +4,7 @@ import { UserProvider } from '../../providers/user/user';
 import { GoogleCalendar} from '../../providers/google-calendar/google-calendar';
 import { Events } from '../../providers/events/events'
 import { RealTimeClockProvider } from '../../providers/real-time-clock/real-time-clock'
+import { LocationTracker } from '../../providers/location-tracker/location-tracker'
 
 @Component({
   selector: 'page-home',
@@ -25,10 +26,12 @@ export class HomePage {
     private menu: MenuController,
     private user: UserProvider,
     private googleCalendar: GoogleCalendar,
-    private event: Events){
+    private event: Events,
+    private locationTracker: LocationTracker){
       // After we login and land on the home page, enable the menu for
       // current user
       this.enableMenu();
+      this.locationTracker.startTracking();
       // Once we land here call the getUserInfo() method to update
       // user info.
 

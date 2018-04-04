@@ -14,6 +14,7 @@ import { PreferencePage } from '../pages/preference/preference';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { GooglePlus } from '@ionic-native/google-plus';
 import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
+import { LocationTracker } from '../providers/location-tracker/location-tracker'
 import {
   Platform,
   MenuController,
@@ -42,7 +43,8 @@ export class MyApp {
     private storage: NativeStorage,
     private alertCrl: AlertController,
     private googlePlus: GooglePlus, 
-    private googleCalendar: GoogleCalendar
+    private googleCalendar: GoogleCalendar,
+    private locationTracker: LocationTracker
   ){
     // This function will initialize the app upon opening the app.
     // Anything you want initialized, do it here!!!!
@@ -136,6 +138,7 @@ export class MyApp {
   // allow our app to know that no user's are logged on. The check for
   // users logged on? is in the app.component.ts file.
   logout () {
+    this.locationTracker.stopTracking();
     return this.trySilentLogin().then(() => {
       this.googlePlus.logout().then((response) => {
         this.storage.remove('user').then(() => {
