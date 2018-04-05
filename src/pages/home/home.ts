@@ -45,14 +45,13 @@ export class HomePage {
           this.eventList = events;
           this.TodayEPOC = Date.now() / 1000;
           this.location = events[0].location;
-          // DELETE WHEN DONE TESTING
-          console.log('Home::getList(): got the event location:', this.location);
-          this.map.getDistance(this.location).then ( (suc) => {
+          this.map.getPreferenceMode().then((mode) => {
+            this.map.getDistance(this.location, mode).then ( (suc) => {
             console.log('Home::getList(): successfully got distance:', suc);
-          }, (error) => {
-            console.log('Home::getList(): failed to get distance:', error);
+            }, (error) => {
+              console.log('Home::getList(): failed to get distance:', error);
+            });
           });
-          ///////////////////////////////
           console.log('Home::getList(): successfully got user events ', events);
         }, (err) => {
           console.log('Home::getList(): failed to get saved events', err);

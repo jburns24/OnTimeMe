@@ -24,7 +24,7 @@ export class PreferencePage {
     let alert = this.alertCrl.create();
     alert.setTitle('Select Transportation Mode');
     // Add new transportation mode here
-    const modeArray = ['Car', 'Bike', 'Walk'];
+    const modeArray = ['car', 'bicycling', 'walking'];
     // Iterate thru modeArray and create inputs for each element
     modeArray.forEach( mode => {
       alert.addInput({
