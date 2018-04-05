@@ -9,26 +9,35 @@ import { Injectable } from '@angular/core';
 */
 @Injectable()
 export class Map {
-  apiKey: any = '&key=AIzaSyC_VYR8OeR5oXOwzX--70vdgdFGoAAC8-w';
-  distanceUrl: any = 'https://maps.googleapis.com/maps/api/distancematrix/json?';
-  origin: any = 'San+Francisco';
-  destination: any = 'Seattle';
-  originParam: any = 'origins=' + this.origin;
-  destParam: any = '&destinations=' + this.destination;
-
   constructor(public http: HttpClient) {
   }
 
-  getDistance(){
+  getDistance(destinationParam: string){
     return new Promise( resolve => {
-      this.http.get(this.distanceUrl+this.originParam+this.destParam)
+      // Convert the location string to strings that maps api will take
+      let takeAwaySpace = destinationParam;
+      let takeAwayComma = takeAwaySpace.split(' ').join('+');
+      let destination = takeAwayComma.split(',').join('');
+      // NOTE: DELETE THIS WHEN DONE
+      console.log("Maps::getDistance(): checking destination string:", destination);
+      /////////////////////////
+      let distanceUrl = 'https://maps.googleapis.com/maps/api/distancematrix/json?';
+      let origin = 'San+Francisco';
+      let originParam = 'origins=' + origin;
+      let destParam = '&destinations=' + destination;
+      let mode = 'bicycling';
+      let modeParam = '&mode=' + mode;
+      let apiKey = '&key=AIzaSyC_VYR8OeR5oXOwzX--70vdgdFGoAAC8-w';
+
+      // Make the map api call
+      this.http.get(distanceUrl+originParam+destParam+modeParam+apiKey)
       .subscribe(data => {
         resolve(data);
         console.log("Maps::Success: Distance object is:", data);
       }, (error) => {
+        resolve(error);
         console.log("Maps::Failed: failed to get distance:", error);
       });
     });
   }
-
 }

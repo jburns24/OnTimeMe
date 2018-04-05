@@ -19,6 +19,7 @@ export class HomePage {
   authToken: any;
   eventList: any;
   TodayEPOC: number;
+  location: any;
 
 
   constructor(
@@ -27,25 +28,12 @@ export class HomePage {
     private googleCalendar: GoogleCalendar,
     private event: Events,
     private map: Map){
-      // After we login and land on the home page, enable the menu for
-      // current user
       this.enableMenu();
-      // Once we land here call the getUserInfo() method to update
-      // user info.
-
-      // because localStorage.getItem() returns a promis that must
-      // propigate up to all dependent methods. getUserInfo() was not
-      // returning a promise so that meant that there was a possibility
-      // for a race condition when accessng the authToken.
       this.user.getUserInfo().then(() => {
         this.googleCalendar.init(this.user.serverAuthCode).then(() => {
-          // console.log("HOME::CONSTRUCTOR: checking the refresh token:",
-          // this.googleCalendar.refreshToken);
           this.getList(this.googleCalendar.refreshToken);
         });
       });
-
-      this.map.getDistance();
   }
 
   getList(authToken: any){
@@ -56,12 +44,21 @@ export class HomePage {
         this.event.getTodaysEvents().then((events) =>{
           this.eventList = events;
           this.TodayEPOC = Date.now() / 1000;
-          console.log('successfully got user events ', events);
+          this.location = events[0].location;
+          // DELETE WHEN DONE TESTING
+          console.log('Home::getList(): got the event location:', this.location);
+          this.map.getDistance(this.location).then ( (suc) => {
+            console.log('Home::getList(): successfully got distance:', suc);
+          }, (error) => {
+            console.log('Home::getList(): failed to get distance:', error);
+          });
+          ///////////////////////////////
+          console.log('Home::getList(): successfully got user events ', events);
         }, (err) => {
-          console.log('home::getList() failed to get saved events', err);
+          console.log('Home::getList(): failed to get saved events', err);
         });
       }, (err) => {
-        console.log('home::getList() failed to save events ', err);
+        console.log('Home::getList(): failed to save events ', err);
       });
     }, (error) => {
       console.log("Home::getList(): error:", error);
