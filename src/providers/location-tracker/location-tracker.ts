@@ -22,15 +22,17 @@ export class LocationTracker {
    
     let config = {
       desiredAccuracy: 0,
+      notificationTitle: 'OnTimMe Background Tracking',
+      notificationText: 'Keeping you on time',
       stationaryRadius: 20,
       distanceFilter: 10,
-      debug: true, // means app uses local notifications to notify when backgrounded location updates happen.
-      interval: 2000
+      debug: false, // means app uses local notifications to notify when backgrounded location updates happen.
+      interval: 10000
     };
    
     this.backgroundGeolocation.configure(config).subscribe((location) => {
    
-      console.log('BackgroundGeolocation:  ' + location.latitude + ',' + location.longitude);
+      //console.log('BackgroundGeolocation:  ' + location.latitude + ',' + location.longitude);
    
       // Run update inside of Angular's zone
       this.zone.run(() => {
@@ -58,7 +60,7 @@ export class LocationTracker {
   //  The casting is needed so TypeScript doesnt yell at us. 
   this.watch = this.geolocation.watchPosition(options).filter((p: any) => p.code === undefined).subscribe((position: Geoposition) => {
    
-    console.log(position);
+    //console.log(position);
    
     // Run update inside of Angular's zone
     this.zone.run(() => {
@@ -73,8 +75,11 @@ export class LocationTracker {
   stopTracking() {
     console.log('stopTracking');
  
-    this.backgroundGeolocation.finish();
-    this.watch.unsubscribe();
+    return this.backgroundGeolocation.stop().then(() => {
+      if (typeof this.watch !== 'undefined') {
+        this.watch.unsubscribe();
+      }
+    });
   }
  
 }

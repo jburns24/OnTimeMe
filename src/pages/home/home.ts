@@ -27,11 +27,10 @@ export class HomePage {
     private user: UserProvider,
     private googleCalendar: GoogleCalendar,
     private event: Events,
-    private locationTracker: LocationTracker){
+    public locationTracker: LocationTracker){
       // After we login and land on the home page, enable the menu for
       // current user
       this.enableMenu();
-      this.locationTracker.startTracking();
       // Once we land here call the getUserInfo() method to update
       // user info.
 
@@ -43,8 +42,16 @@ export class HomePage {
         this.googleCalendar.init(this.user.serverAuthCode).then(() => {
           // console.log("HOME::CONSTRUCTOR: checking the refresh token:",
           // this.googleCalendar.refreshToken);
-          this.getList(this.googleCalendar.refreshToken);
+          this.getList(this.googleCalendar.refreshToken).then(() => {
+            this.locationTracker.startTracking();
+          }, (err) => {
+            console.log("home::getList() error", err);
+          });
+        }, (err) => {
+          console.log("gogoleClaendar init() error", err);
         });
+      }, (err) => {
+        console.log("GetUserInfor error", err);
       });
   }
 

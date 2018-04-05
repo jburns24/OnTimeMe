@@ -3,6 +3,8 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler} from 'ionic-angular';
 import { GooglePlus } from '@ionic-native/google-plus';
+import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
+import { Geolocation } from '@ionic-native/geolocation';
 import { MyApp } from './app.component';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -58,6 +60,8 @@ import { LocationTracker } from '../providers/location-tracker/location-tracker'
     GooglePlus,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     NativeStorage,
+    BackgroundGeolocation,
+    Geolocation,
     UserProvider,
     GoogleCalendar,
     HttpClient,

@@ -138,7 +138,7 @@ export class MyApp {
   // allow our app to know that no user's are logged on. The check for
   // users logged on? is in the app.component.ts file.
   logout () {
-    this.locationTracker.stopTracking();
+    //this.locationTracker.stopTracking();
     return this.trySilentLogin().then(() => {
       this.googlePlus.logout().then((response) => {
         this.storage.remove('user').then(() => {
@@ -146,12 +146,15 @@ export class MyApp {
             this.googleCalendar.refreshToken = null;
             console.log("refreshToken is successfully removed from native storage.");
             console.log("refreshToken should now be null", this.googleCalendar.refreshToken);
-            this.nav.setRoot(LoginGatePage);
-            // DEBUGGING: this part below
-            this.storage.getItem('refreshToken').then((res) => {
-              console.log("trying to get refresh token after it has been removed", (res));
-            }, (error) => {
-              console.log("This is what we want, refresh token cannot be found after it gets deleted.", error);
+            this.nav.setRoot(LoginGatePage).then(() =>{
+              // DEBUGGING: this part below
+              this.locationTracker.stopTracking().then(() =>{
+                this.storage.getItem('refreshToken').then((res) => {
+                  console.log("trying to get refresh token after it has been removed", (res));
+                }, (error) => {
+                  console.log("This is what we want, refresh token cannot be found after it gets deleted.", error);
+                });
+              });
             });
             /////////////// DEBUGGING ENDS ////////////////////////
           }, (err) => {
