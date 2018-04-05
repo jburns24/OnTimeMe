@@ -24,7 +24,7 @@ export class PreferencePage {
     let alert = this.alertCrl.create();
     alert.setTitle('Select Transportation Mode');
     // Add new transportation mode here
-    const modeArray = ['car', 'bicycling', 'walking'];
+    const modeArray = ['driving', 'bicycling', 'walking'];
     // Iterate thru modeArray and create inputs for each element
     modeArray.forEach( mode => {
       alert.addInput({
@@ -59,8 +59,8 @@ export class PreferencePage {
         // storage. Let's make one with a default value "Car".
         console.log("Preference::getMode(): no user found in native storage!");
         console.log("==> setting mode to \"car\" and mapping it to user");
-        this.storage.setItem(this.user.id, "Car");
-        this.transMode = "Car";
+        this.storage.setItem(this.user.id, 'driving');
+        this.transMode = 'driving';
     });
   }
 }

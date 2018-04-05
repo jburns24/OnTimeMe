@@ -46,10 +46,14 @@ export class HomePage {
           this.TodayEPOC = Date.now() / 1000;
           this.location = events[0].location;
           this.map.getPreferenceMode().then((mode) => {
-            this.map.getDistance(this.location, mode).then ( (suc) => {
-            console.log('Home::getList(): successfully got distance:', suc);
-            }, (error) => {
-              console.log('Home::getList(): failed to get distance:', error);
+            this.map.getCurrentPosition().then((position) => {
+              let origin = position;
+              console.log('Home::getList: origin is:', origin);
+              this.map.getDistance(this.location, mode, origin).then ( (suc) => {
+                console.log('Home::getList(): successfully got distance:', suc);
+              }, (error) => {
+                console.log('Home::getList(): failed to get distance:', error);
+              });
             });
           });
           console.log('Home::getList(): successfully got user events ', events);

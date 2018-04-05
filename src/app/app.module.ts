@@ -9,6 +9,8 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { DateTimePipe } from '../pipes/date-time/date-time';
 import { HoursMinutesSecondsPipe } from '../pipes/hours-minutes-seconds/hours-minutes-seconds';
+import { Geolocation } from '@ionic-native/geolocation';
+import { Map } from '../providers/map/map';
 
 // Pages
 import { AboutPage } from '../pages/about/about';
@@ -20,7 +22,7 @@ import { TabsPage } from '../pages/tabs/tabs';
 import { UserProvider } from '../providers/user/user';
 import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
 import { Events } from '../providers/events/events';
-import { Map } from '../providers/map/map';
+
 
 
 @NgModule({
@@ -54,13 +56,14 @@ import { Map } from '../providers/map/map';
     StatusBar,
     SplashScreen,
     GooglePlus,
-    {provide: ErrorHandler, useClass: IonicErrorHandler},
     NativeStorage,
     UserProvider,
     GoogleCalendar,
     HttpClient,
     Events,
-    Map
+    Map,
+    Geolocation,
+    {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })
 export class AppModule {}

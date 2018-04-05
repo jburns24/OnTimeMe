@@ -3,7 +3,6 @@ import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { UserProvider } from '../user/user';
 import { NativeStorage } from '@ionic-native/native-storage';
-import { Map } from '../map/map';
 
 @Injectable()
 export class GoogleCalendar {
@@ -22,8 +21,7 @@ export class GoogleCalendar {
 
   constructor(public http: HttpClient,
     private storage: NativeStorage,
-    private user: UserProvider,
-    private map: Map) {
+    private user: UserProvider) {
     }
 
   init(serverAuthCode: any){
@@ -58,10 +56,6 @@ export class GoogleCalendar {
         this.refreshToken = data['access_token'];
         this.user.getUserInfo().then(() => {
           this.storage.setItem('refreshToken', { token: this.refreshToken }).then(() => {
-            this.storage.getItem('refreshToken').then((user) => {
-              let RT = user.token;
-              //console.log("Google-calendar:: successfully stored RT", RT);
-            });
           });
         });
         resolve(this.refreshToken);
