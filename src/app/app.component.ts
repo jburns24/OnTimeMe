@@ -65,7 +65,7 @@ export class MyApp {
     .then(() => {
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
-      this.statusBar.styleDefault();
+      this.statusBar.styleBlackOpaque();
 
       /*** This is where the logic is implemented for checking user log ins ***/
       this.storage.getItem('user') // Try to get item from local storage and...
