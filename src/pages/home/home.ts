@@ -57,36 +57,47 @@ export class HomePage {
   }
 // lat+","+long
   getList(authToken: any){
-    return this.googleCalendar.getList(authToken).then( (list) => {
-      this.events = list;
-      this.event.storeTodaysEvents(JSON.stringify(this.events)).then(() => {
-        console.log('home::getList() successfully saved todays events');
-        this.event.getTodaysEvents().then((events) =>{
-          this.eventList = events;
-          this.epochNow = this.realTimeClock.getEpochTime().do(() => ++this.todaysEpoch);      
-          console.log('successfully got user events ', events);
-          this.location = events[0].location;
-          this.map.getPreferenceMode().then((mode) => {
-            let origin = this.locationTracker.lat + ',' + this.locationTracker.lng;
-            this.map.getDistance(this.location, mode, origin).then ( (suc) => {
-              console.log('Home::getList(): successfully got distance:', suc);
-            }, (error) => {
-              console.log('Home::getList(): failed to get distance:', error);
+    return new Promise (resolve => {
+      this.googleCalendar.getList(authToken).then( (list) => {
+        this.events = list;
+        this.event.storeTodaysEvents(JSON.stringify(this.events)).then(() => {
+          console.log('home::getList() successfully saved todays events');
+          this.event.getTodaysEvents().then((events) =>{
+            this.eventList = events;
+            this.epochNow = this.realTimeClock.getEpochTime().do(() => ++this.todaysEpoch);   
+            console.log('successfully got user events ', events);
+            this.location = events[0].location;
+            this.map.getPreferenceMode().then((mode) => {
+              let origin = this.locationTracker.lat + ',' + this.locationTracker.lng;
+              this.map.getDistance(this.location, mode, origin).then ( (suc) => {
+                console.log('Home::getList(): successfully got distance:', suc);
+              }, (error) => {
+                console.log('Home::getList(): failed to get distance:', error);
+              });
             });
+            console.log('Home::getList(): successfully got user events ', events);
+          }, (err) => {
+            console.log('Home::getList(): failed to get saved events', err);
           });
-          console.log('Home::getList(): successfully got user events ', events);
         }, (err) => {
-          console.log('Home::getList(): failed to get saved events', err);
+          console.log('Home::getList(): failed to save events ', err);
         });
-      }, (err) => {
-        console.log('Home::getList(): failed to save events ', err);
+      }, (error) => {
+        console.log("Home::getList(): error:", error);
       });
-    }, (error) => {
-      console.log("Home::getList(): error:", error);
+      resolve(this.event);
     });
   }
 
   enableMenu(){
     this.menu.enable(true);
   }
+
+  doRefresh(refresher){
+    this.getList(this.googleCalendar.refreshToken).then(() => {
+      refresher.complete();
+    }, (err) => {
+      console.log("home::getList() error", err);
+    });
+};
 }

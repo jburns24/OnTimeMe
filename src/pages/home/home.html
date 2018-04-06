@@ -1,4 +1,7 @@
 <ion-content class="home-content" padding>
+  <ion-refresher (ionRefresh)="doRefresh($event)">
+      <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <ion-header>
     <ion-navbar>
     <button ion-button menuToggle>
@@ -24,7 +27,7 @@
       <p item-left [style.font-size.vw]="'4.9'">{{ event.summary }}</p>
       <p item-right [style.color]="event.happening ? 'red' : 'green'">
         {{ 
-          event.happening ? "Ongoing" : ((event.startTime - (epochNow | async)) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: false}) 
+          event.happening ? "Ongoing" : ((event.startTime - (epochNow | async)) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true}) 
         }}
       </p>
     </ion-item>
