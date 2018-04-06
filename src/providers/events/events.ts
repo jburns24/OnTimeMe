@@ -44,13 +44,13 @@ export class Events {
     return user.getUserInfo().then(() => {
       let event_key = user.id + 'events';
       this.storage.setItem(event_key, event_list_object).then(() => {
-        console.log('events saved to user!!');
+        console.log('Events::events saved to user!!');
       }, (err) => {
-        console.log('events::storeTodaysEvents failed to store events ', err);
+        console.log('Events::storeTodaysEvents failed to store events ', err);
       });
     }, (err) => {
-      console.log('events::storeTodaysEvents failed to get user ', err);
-    }); 
+      console.log('Events::storeTodaysEvents failed to get user ', err);
+    });
   }
 
   /**

@@ -1,10 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-/**
- * Generated class for the HoursMinutesSecondsPipe pipe.
- * 
- * @source  https://www.youtube.com/watch?v=Z1g1iroNHK0
- */
 @Pipe({
   name: 'hoursMinutesSeconds',
 })
