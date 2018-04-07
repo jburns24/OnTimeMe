@@ -1,8 +1,24 @@
 #!/bin/bash
 
+############ COLORS #################
+YELLOW="\033[1;33m"                 #
+RED="\033[0;31m"                    #
+END="\033[0m"                       #
+GREEN="\e[32m"                      #       
+#####################################
+
+echo -e $YELLOW"Executing cp signing/debug-signing.properties platforms/android/..."$END
+
 cp signing/debug-signing.properties platforms/android/
 
+echo " "
+echo -e $YELLOW"Executing npm install..."$END
+echo " "
 npm install
+
+echo ""
+echo -e $YELLOW"Checking to see if ' android:allowBackup=\"false\" ' is set..."$END
+echo ""
 
 # look to see if android:allowBack="false" is in the application tag
 command1=`grep -r "application" platforms/android/app/src/main/AndroidManifest.xml | grep -c "android:allowBackup=\"false\""`
@@ -13,10 +29,19 @@ manLocation="platforms/android/app/src/main/AndroidManifest.xml"
 # else add the entry to that tag
 if [ "$command1" == 1 ]
 then
-  echo "Found \"android:allowBackup\"...Doing nothing!"
+  echo -e $GREEN"Found \"android:allowBackup\"...Doing nothing!"$END
+  echo " "
+  echo -e $YELLOW"Done with script! Have fun coding!"$END
 else
-  echo "\"android:allowBackup\" Not Found In AndroidManifest.xml..."
-  echo "Appending it to the <application> tag..."
+  echo ""
+  echo -e $RED"\"android:allowBackup\" Not Found In AndroidManifest.xml..."$END
+  echo -e $RED"Appending it to the <application> tag..."$END
   sed -ie 's/<\<application\>/& android:allowBackup=\"false\"/' $manLocation
-  echo "Done..."
+  echo " "
+  echo -e $GREEN"Done appending!"$END
+  echo ""
+  echo -e $YELLOW"Removing temp file \"AndroidManifest.xmle\" created..."$END
+  rm platforms/android/app/src/main/AndroidManifest.xmle
+  echo ""
+  echo -e $YELLOW"Done with script! Have fun coding!"$END
 fi
