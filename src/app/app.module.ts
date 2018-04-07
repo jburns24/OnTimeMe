@@ -1,14 +1,17 @@
-import { NgModule, ErrorHandler } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
-import { IonicApp, IonicModule, IonicErrorHandler} from 'ionic-angular';
+import { IonicApp, IonicModule} from 'ionic-angular';
 import { GooglePlus } from '@ionic-native/google-plus';
+import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
+import { Geolocation } from '@ionic-native/geolocation';
 import { MyApp } from './app.component';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { DateTimePipe } from '../pipes/date-time/date-time';
 import { HoursMinutesSecondsPipe } from '../pipes/hours-minutes-seconds/hours-minutes-seconds';
+import { Map } from '../providers/map/map';
 
 // Pages
 import { AboutPage } from '../pages/about/about';
@@ -20,8 +23,8 @@ import { TabsPage } from '../pages/tabs/tabs';
 import { UserProvider } from '../providers/user/user';
 import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
 import { Events } from '../providers/events/events';
-import { MapProvider } from '../providers/map/map';
 import { RealTimeClockProvider } from '../providers/real-time-clock/real-time-clock';
+import { LocationTracker } from '../providers/location-tracker/location-tracker';
 
 
 @NgModule({
@@ -55,14 +58,16 @@ import { RealTimeClockProvider } from '../providers/real-time-clock/real-time-cl
     StatusBar,
     SplashScreen,
     GooglePlus,
-    {provide: ErrorHandler, useClass: IonicErrorHandler},
     NativeStorage,
+    BackgroundGeolocation,
+    Geolocation,
     UserProvider,
     GoogleCalendar,
     HttpClient,
     Events,
-    MapProvider,
-    RealTimeClockProvider
+    Map,
+    RealTimeClockProvider,
+    LocationTracker
   ]
 })
 export class AppModule {}

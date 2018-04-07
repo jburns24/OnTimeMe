@@ -1,4 +1,7 @@
 <ion-content class="home-content" padding>
+  <ion-refresher (ionRefresh)="doRefresh($event)">
+      <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <ion-header>
     <ion-navbar>
     <button ion-button menuToggle>
@@ -24,18 +27,10 @@
       <p item-left [style.font-size.vw]="'4.9'">{{ event.summary }}</p>
       <p item-right [style.color]="event.happening ? 'red' : 'green'">
         {{ 
-          event.happening ? "Ongoing" : ((event.startTime - (epochNow | async)) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: false}) 
+          event.happening ? "Ongoing" : ((event.startTime - (epochNow | async)) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true}) 
         }}
       </p>
     </ion-item>
   </ion-list>
-  <!-- <ion-list>
-    <ion-item *ngFor="let person of people">
-      <ion-avatar item-left>
-        <img src="{{person.picture.thumbnail}}">
-      </ion-avatar>
-      <h2>{{person.name.first}} {{person.name.last}}</h2>
-      <p>{{person.email}}</p>
-    </ion-item>
-  </ion-list> -->
+
 </ion-content>

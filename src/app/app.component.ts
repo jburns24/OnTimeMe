@@ -14,6 +14,7 @@ import { PreferencePage } from '../pages/preference/preference';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { GooglePlus } from '@ionic-native/google-plus';
 import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
+import { LocationTracker } from '../providers/location-tracker/location-tracker'
 import {
   Platform,
   MenuController,
@@ -42,7 +43,8 @@ export class MyApp {
     private storage: NativeStorage,
     private alertCrl: AlertController,
     private googlePlus: GooglePlus, 
-    private googleCalendar: GoogleCalendar
+    private googleCalendar: GoogleCalendar,
+    private locationTracker: LocationTracker
   ){
     // This function will initialize the app upon opening the app.
     // Anything you want initialized, do it here!!!!
@@ -63,7 +65,7 @@ export class MyApp {
     .then(() => {
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
-      this.statusBar.styleDefault();
+      this.statusBar.styleBlackOpaque();
 
       /*** This is where the logic is implemented for checking user log ins ***/
       this.storage.getItem('user') // Try to get item from local storage and...
@@ -136,6 +138,7 @@ export class MyApp {
   // allow our app to know that no user's are logged on. The check for
   // users logged on? is in the app.component.ts file.
   logout () {
+    //this.locationTracker.stopTracking();
     return this.trySilentLogin().then(() => {
       this.googlePlus.logout().then((response) => {
         this.storage.remove('user').then(() => {
@@ -143,12 +146,15 @@ export class MyApp {
             this.googleCalendar.refreshToken = null;
             console.log("refreshToken is successfully removed from native storage.");
             console.log("refreshToken should now be null", this.googleCalendar.refreshToken);
-            this.nav.setRoot(LoginGatePage);
-            // DEBUGGING: this part below
-            this.storage.getItem('refreshToken').then((res) => {
-              console.log("trying to get refresh token after it has been removed", (res));
-            }, (error) => {
-              console.log("This is what we want, refresh token cannot be found after it gets deleted.", error);
+            this.nav.setRoot(LoginGatePage).then(() =>{
+              // DEBUGGING: this part below
+              this.locationTracker.stopTracking().then(() =>{
+                this.storage.getItem('refreshToken').then((res) => {
+                  console.log("trying to get refresh token after it has been removed", (res));
+                }, (error) => {
+                  console.log("This is what we want, refresh token cannot be found after it gets deleted.", error);
+                });
+              });
             });
             /////////////// DEBUGGING ENDS ////////////////////////
           }, (err) => {
