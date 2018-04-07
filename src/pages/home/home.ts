@@ -7,6 +7,7 @@ import { RealTimeClockProvider } from '../../providers/real-time-clock/real-time
 import { LocationTracker } from '../../providers/location-tracker/location-tracker'
 import { Events } from '../../providers/events/events';
 import { Map } from '../../providers/map/map';
+import { Observable } from 'rxjs/Observable';
 
 
 
@@ -22,9 +23,13 @@ export class HomePage {
   authToken: any;
   eventList: any;
   todaysEpoch = Date.now();
-  location:any;
-  epochNow;
-  
+  location: any;
+  // observables: Array<Observable<number>> = [];
+  // eventsSize: any;
+  // observers: any[];
+  // time: Array<number> = [];
+  // subscription: any;
+  epochNow: any;
 
   constructor(
     private realTimeClock: RealTimeClockProvider,
@@ -33,15 +38,11 @@ export class HomePage {
     private googleCalendar: GoogleCalendar,
     private event: Events,
     public locationTracker: LocationTracker,
-      // After we login and land on the home page, enable the menu for
-      // current user
     private map: Map){
       this.enableMenu();
       this.locationTracker.startTracking().then(() => {
         this.user.getUserInfo().then(() => {
           this.googleCalendar.init(this.user.serverAuthCode).then(() => {
-            // console.log("HOME::CONSTRUCTOR: checking the refresh token:",
-            // this.googleCalendar.refreshToken);
             this.getList(this.googleCalendar.refreshToken).then(() => {
             }, (err) => {
               console.log("home::getList() error", err);
@@ -53,9 +54,10 @@ export class HomePage {
           console.log("GetUserInfor error", err);
         });
       });
-
+      //this.epochNow = this.realTimeClock.getEpochTime().do(() => ++this.todaysEpoch);
+      //this.epochNow.subscribe((t) => this.epochNow = t);
   }
-// lat+","+long
+
   getList(authToken: any){
     return new Promise (resolve => {
       this.googleCalendar.getList(authToken).then( (list) => {
@@ -64,8 +66,29 @@ export class HomePage {
           console.log('home::getList() successfully saved todays events');
           this.event.getTodaysEvents().then((events) =>{
             this.eventList = events;
-            this.epochNow = this.realTimeClock.getEpochTime().do(() => ++this.todaysEpoch);   
-            console.log('successfully got user events ', events);
+            this.epochNow = this.realTimeClock.getEpochTime().do(() => ++this.todaysEpoch);
+            this.epochNow = this.epochNow.share();
+            // this.eventsSize = this.eventList.length;
+            // this.observers = new Array(this.eventsSize);
+            // //let counter = 0;
+            // for (let i = 0; i < this.eventsSize; i++){
+            //   this.observables[i] = this.realTimeClock.getEpochTime().do(() => ++this.todaysEpoch);
+            //   this.observables[i].share();
+            //   this.subscription = this.observables[i].subscribe(
+            //     value => this.time[i] = value
+            //   );
+            //   //this.observables[i] = this.epochNow;
+            //   //for(let i = 0; i < this.eventsSize; i++){
+            //     //this.epochNow.subscribe(this.observers[i]);
+            //     console.log("This time : ", this.time[i]);
+            //     console.log("supscription : ", this.subscription);
+            //     console.log("event is :", this.eventsSize);
+            //     console.log("Observers:", this.observables[i]);
+                //counter += 1;
+              //};
+            //};
+
+            console.log('successfully got user events ', this.eventList);
             this.location = events[0].location;
             this.map.getPreferenceMode().then((mode) => {
               let origin = this.locationTracker.lat + ',' + this.locationTracker.lng;
