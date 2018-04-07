@@ -1,0 +1,22 @@
+#!/bin/bash
+
+cp signing/debug-signing.properties platforms/android/
+
+npm install
+
+# look to see if android:allowBack="false" is in the application tag
+command1=`grep -r "application" platforms/android/app/src/main/AndroidManifest.xml | grep -c "android:allowBackup=\"false\""`
+
+manLocation="platforms/android/app/src/main/AndroidManifest.xml"
+
+# if "android:allowBackup="false" is found then leave it alone 
+# else add the entry to that tag
+if [ "$command1" == 1 ]
+then
+  echo "Found \"android:allowBackup\"...Doing nothing!"
+else
+  echo "\"android:allowBackup\" Not Found In AndroidManifest.xml..."
+  echo "Appending it to the <application> tag..."
+  sed -ie 's/<\<application\>/& android:allowBackup=\"false\"/' $manLocation
+  echo "Done..."
+fi

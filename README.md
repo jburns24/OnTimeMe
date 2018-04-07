@@ -1,4 +1,4 @@
 # OnTimeMe
 
-run these from ontimeme home directory
-```cp signing/debug-signing.properties platforms/android/```
+Execute this script from ontimeme home directory: 
+```run_me_first```
