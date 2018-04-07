@@ -7,9 +7,6 @@ import { RealTimeClockProvider } from '../../providers/real-time-clock/real-time
 import { LocationTracker } from '../../providers/location-tracker/location-tracker'
 import { Events } from '../../providers/events/events';
 import { Map } from '../../providers/map/map';
-import { Observable } from 'rxjs/Observable';
-
-
 
 @Component({
   selector: 'page-home',
@@ -24,11 +21,6 @@ export class HomePage {
   eventList: any;
   todaysEpoch = Date.now();
   location: any;
-  // observables: Array<Observable<number>> = [];
-  // eventsSize: any;
-  // observers: any[];
-  // time: Array<number> = [];
-  // subscription: any;
   epochNow: any;
 
   constructor(
@@ -54,8 +46,6 @@ export class HomePage {
           console.log("GetUserInfor error", err);
         });
       });
-      //this.epochNow = this.realTimeClock.getEpochTime().do(() => ++this.todaysEpoch);
-      //this.epochNow.subscribe((t) => this.epochNow = t);
   }
 
   getList(authToken: any){
@@ -68,26 +58,6 @@ export class HomePage {
             this.eventList = events;
             this.epochNow = this.realTimeClock.getEpochTime().do(() => ++this.todaysEpoch);
             this.epochNow = this.epochNow.share();
-            // this.eventsSize = this.eventList.length;
-            // this.observers = new Array(this.eventsSize);
-            // //let counter = 0;
-            // for (let i = 0; i < this.eventsSize; i++){
-            //   this.observables[i] = this.realTimeClock.getEpochTime().do(() => ++this.todaysEpoch);
-            //   this.observables[i].share();
-            //   this.subscription = this.observables[i].subscribe(
-            //     value => this.time[i] = value
-            //   );
-            //   //this.observables[i] = this.epochNow;
-            //   //for(let i = 0; i < this.eventsSize; i++){
-            //     //this.epochNow.subscribe(this.observers[i]);
-            //     console.log("This time : ", this.time[i]);
-            //     console.log("supscription : ", this.subscription);
-            //     console.log("event is :", this.eventsSize);
-            //     console.log("Observers:", this.observables[i]);
-                //counter += 1;
-              //};
-            //};
-
             console.log('successfully got user events ', this.eventList);
             this.location = events[0].location;
             this.map.getPreferenceMode().then((mode) => {

@@ -22,11 +22,6 @@
     <h2>Hello {{user.name}}!</h2>
     <h4>{{user.email}}</h4>
   </ion-item>
-  <!-- <h2>
-    {{
-      event.happening ? "Ongoing" : ((event.startTime - (observables[0] | async)) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true})
-    }}
-  </h2> -->
   <ion-list>
     <ion-item *ngFor="let event of eventList; index as i">
       <p item-left [style.font-size.vw]="'4.9'">{{ event.summary }}</p>
