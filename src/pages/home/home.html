@@ -23,11 +23,11 @@
     <h4>{{user.email}}</h4>
   </ion-item>
   <ion-list>
-    <ion-item *ngFor="let event of eventList">
+    <ion-item *ngFor="let event of eventList; index as i">
       <p item-left [style.font-size.vw]="'4.9'">{{ event.summary }}</p>
-      <p item-right [style.color]="event.happening ? 'red' : 'green'">
-        {{ 
-          event.happening ? "Ongoing" : ((event.startTime - (epochNow | async)) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true}) 
+      <p item-right [style.color]="(((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? 'red' : 'green'">
+        {{
+          (((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? "Ongoing" : (((event.startTime - event.trip_duration) - (epochNow | async)) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true})
         }}
       </p>
     </ion-item>
