@@ -58,16 +58,6 @@ export class HomePage {
             this.eventList = events;
             this.epochNow = this.realTimeClock.getEpochTime().do(() => ++this.todaysEpoch);
             this.epochNow = this.epochNow.share();
-            console.log('successfully got user events ', this.eventList);
-            this.location = events[0].location;
-            this.map.getPreferenceMode().then((mode) => {
-              let origin = this.locationTracker.lat + ',' + this.locationTracker.lng;
-              this.map.getDistance(this.location, mode, origin).then ( (suc) => {
-                console.log('Home::getList(): successfully got distance:', suc);
-              }, (error) => {
-                console.log('Home::getList(): failed to get distance:', error);
-              });
-            });
             console.log('Home::getList(): successfully got user events ', events);
           }, (err) => {
             console.log('Home::getList(): failed to get saved events', err);
