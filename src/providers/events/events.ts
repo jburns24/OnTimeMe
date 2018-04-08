@@ -67,10 +67,10 @@ export class Events {
    *  id: Unique google eventId 
    *  summary: User defined summary of event
    *  location: String address of event 
-   *  startTime: EPOCH start time
-   *  entTime:  EPOCH end time
+   *  startTime: EPOCH start time in seconds
+   *  entTime:  EPOCH end time in seconds
    *  happening: bit value indication event is ongoing or not
-   *  trip_duration:  miliseconds till event
+   *  trip_duration:  miliseconds till event in seconds
    */
   getTodaysEvents() {
     return new Promise (resolve => {
