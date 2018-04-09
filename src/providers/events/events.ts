@@ -45,11 +45,10 @@ export class Events {
       todaysEventList.push(new_event);
     }
 
-    let user = this.user;
     let event_list_object = {
       eventList: todaysEventList
     };
-    return user.getUserInfo().then(() => {
+    return this.user.getUserInfo().then((user) => {
       let event_key = user.id + 'events';
       this.storage.setItem(event_key, event_list_object).then(() => {
         console.log('Events::events saved to user!!');
@@ -63,10 +62,10 @@ export class Events {
 
   /**
    *  Returns an array of events, each event will have all of these
-   * 
-   *  id: Unique google eventId 
+   *
+   *  id: Unique google eventId
    *  summary: User defined summary of event
-   *  location: String address of event 
+   *  location: String address of event
    *  startTime: EPOCH start time in seconds
    *  entTime:  EPOCH end time in seconds
    *  happening: bit value indication event is ongoing or not
@@ -77,15 +76,15 @@ export class Events {
       this.now = Date.now() / 1000;
       this.modEventList = [];
       this.eventListWithTrip = [];
-      this.user.getUserInfo().then(() => {
-        this.storage.getItem(this.user.id + 'events').then((eventList) => {
+      this.user.getUserInfo().then((user) => {
+        this.storage.getItem(user.id + 'events').then((eventList) => {
           let events = eventList['eventList'];
           console.log("got the event list!!", events);
           this.map.getPreferenceMode().then((mode) => {
-            this.mode = mode;       
+            this.mode = mode;
             for (let event of events) {
               let ongoing = 0;
-              // Skipping any event that does not have a location. 
+              // Skipping any event that does not have a location.
               if(typeof event['location'] === 'undefined') {
                 continue;
               }

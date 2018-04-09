@@ -14,7 +14,9 @@ import { Transportation } from '../../providers/transportation-mode/transportati
 })
 
 export class HomePage {
-  people: any;
+  userName: any;
+  userPicture: any;
+  userEmail: any;
   events: any;
   refreshTokenId: any;
   authToken: any;
@@ -22,6 +24,7 @@ export class HomePage {
   todaysEpoch = Date.now();
   location: any;
   epochNow: any;
+  transMode: any;
 
   constructor(
     private realTimeClock: RealTimeClockProvider,
@@ -33,25 +36,55 @@ export class HomePage {
     private trans: Transportation,
     private storage: NativeStorage){
       this.enableMenu();
+      this.init();
       this.checkMode();
-      //this.start();
+  }
+
+  init(){
+    this.user.getUserInfo().then((user) => {
+      this.userName = user.name;
+      this.userPicture = user.picture;
+      this.userEmail = user.email;
+      console.log("Home::init(): done initializing user profile,");
+    }, (error) => {
+      console.log("Home::intit(): error cant get user info,", error);
+    });
   }
 
   checkMode(){
-    this.user.getUserInfo().then(() => {
-      this.storage.getItem(this.user.id).then((user) => {
-        console.log("Home::checkMode(): mode already set:", user.mode);
+    this.user.getUserInfo().then((user) => {
+      this.storage.getItem(user.id).then((curUser) => {
+        this.transMode = curUser.mode;
+        this.start();
+        console.log("Home::checkMode(): mode already set:", curUser.mode);
       }, (error) => {
         console.log("Home::checkMode(): mode not set yet:", error);
-        this.trans.showRadioAlert();
+        let nullMode = undefined;
+        this.trans.showRadioAlert(nullMode).then((mode) => {
+          this.transMode = mode;
+          this.start();
+          console.log("Home::checkMode(): promise returned:", this.transMode);
+        }, (error) => {
+          console.log("Home::checkMode(): promise returned error,", error);
+        });
       });
+    });
+  }
+
+  showRadioAlert(){
+    this.trans.showRadioAlert(this.transMode).then((mode) => {
+      this.transMode = mode;
+      this.start();
+      console.log("Home::showRadioAlert(): promise returned:", this.transMode);
+    }, (error) => {
+      console.log("Home::showRadioAlert(): promise returned error,", error);
     });
   }
 
   start(){
     this.locationTracker.startTracking().then(() => {
-      this.user.getUserInfo().then(() => {
-        this.googleCalendar.init(this.user.serverAuthCode).then(() => {
+      this.user.getUserInfo().then((user) => {
+        this.googleCalendar.init(user.serverAuthCode).then(() => {
           this.getList(this.googleCalendar.refreshToken).then(() => {
           }, (err) => {
             console.log("home::getList() error", err);

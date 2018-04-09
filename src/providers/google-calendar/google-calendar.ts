@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { UserProvider } from '../user/user';
 import { NativeStorage } from '@ionic-native/native-storage';
 
 @Injectable()
@@ -20,47 +19,16 @@ export class GoogleCalendar {
   refreshToken: any;
 
   constructor(public http: HttpClient,
-    private storage: NativeStorage,
-    private user: UserProvider) {
+    private storage: NativeStorage) {
     }
 
   init(serverAuthCode: any){
     return this.storage.getItem('refreshToken').then ((RT) => {
-      // If success then set the refresh token
       this.refreshToken = RT.token;
     }, (error) => {
       console.log("Google-calendar::init: refreshToken not set:", error);
-      // Else, must be a fresh login...
       return new Promise(resolve => {
         resolve(this.getRefreshTokenId(serverAuthCode));
-      });
-    });
-  }
-
-  getRefreshToken(refreshTokenId: any){
-    return new Promise(resolve => {
-      //console.log("Google-calendar::getRT(): The refreshTokenId is:", refreshTokenId);
-      const httpOptions = {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/x-www-form-urlencoded'
-        })
-      };
-
-      const params = {
-        'refresh_token': refreshTokenId,
-        'client_id': this.clientId,
-        'client_secret': this.secret,
-        'grant_type': 'refresh_token'
-      }
-      this.http.post(this.authUrl, httpOptions, { params }).subscribe((data) => {
-        this.refreshToken = data['access_token'];
-        this.user.getUserInfo().then(() => {
-          this.storage.setItem('refreshToken', { token: this.refreshToken }).then(() => {
-          });
-        });
-        resolve(this.refreshToken);
-      }, (error) => {
-        console.log("Google-calendar::getRefreshToken(): failed!", error);
       });
     });
   }
@@ -84,6 +52,30 @@ export class GoogleCalendar {
         resolve(this.getRefreshToken(data['refresh_token']));
       }, (error) => {
         console.log("Google-calendar::getRefreshTokenId(): failed!", error);
+      });
+    });
+  }
+  
+  getRefreshToken(refreshTokenId: any){
+    return new Promise(resolve => {
+      const httpOptions = {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/x-www-form-urlencoded'
+        })
+      };
+
+      const params = {
+        'refresh_token': refreshTokenId,
+        'client_id': this.clientId,
+        'client_secret': this.secret,
+        'grant_type': 'refresh_token'
+      }
+      this.http.post(this.authUrl, httpOptions, { params }).subscribe((data) => {
+        this.refreshToken = data['access_token'];
+        this.storage.setItem('refreshToken', { token: this.refreshToken });
+        resolve(this.refreshToken);
+      }, (error) => {
+        console.log("Google-calendar::getRefreshToken(): failed!", error);
       });
     });
   }

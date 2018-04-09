@@ -1,7 +1,7 @@
-import { NgModule } from '@angular/core';
+import { NgModule, ErrorHandler } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
-import { IonicApp, IonicModule} from 'ionic-angular';
+import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { GooglePlus } from '@ionic-native/google-plus';
 import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
 import { Geolocation } from '@ionic-native/geolocation';
@@ -18,13 +18,11 @@ import { Events } from '../providers/events/events';
 import { RealTimeClockProvider } from '../providers/real-time-clock/real-time-clock';
 import { LocationTracker } from '../providers/location-tracker/location-tracker';
 import { Transportation } from '../providers/transportation-mode/transportation-mode';
-
 // Pages
 import { AboutPage } from '../pages/about/about';
 import { ContactPage } from '../pages/contact/contact';
 import { HomePage } from '../pages/home/home';
 import { LoginGatePage } from '../pages/login-gate/login-gate';
-import { Preference } from '../pages/preference/preference';
 import { TabsPage } from '../pages/tabs/tabs';
 
 
@@ -37,7 +35,6 @@ import { TabsPage } from '../pages/tabs/tabs';
     HomePage,
     TabsPage,
     LoginGatePage,
-    Preference,
     DateTimePipe,
     HoursMinutesSecondsPipe,
   ],
@@ -54,7 +51,6 @@ import { TabsPage } from '../pages/tabs/tabs';
     HomePage,
     TabsPage,
     LoginGatePage,
-    Preference
   ],
   providers: [
     StatusBar,
@@ -70,7 +66,8 @@ import { TabsPage } from '../pages/tabs/tabs';
     Map,
     RealTimeClockProvider,
     LocationTracker,
-    Transportation
+    Transportation,
+    {provide: ErrorHandler, useClass: IonicErrorHandler},
   ]
 })
 export class AppModule {}

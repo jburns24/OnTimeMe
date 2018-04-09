@@ -43,9 +43,9 @@ export class Map {
   getPreferenceMode(){
     return new Promise(resolve => {
       this.user.getUserInfo().then((user) => {
-        this.storage.getItem(this.user.id).then((userId) => {
+        this.storage.getItem(user.id).then((userId) => {
           console.log("Map::getMode(): success!");
-          console.log("==> curUser.id:", this.user.id, "mode:", userId.mode);
+          console.log("==> curUser.id:", user.id, "mode:", userId.mode);
           this.mode = userId.mode;
           resolve(this.mode);
         }, (error) => {
