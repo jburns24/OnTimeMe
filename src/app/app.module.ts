@@ -12,19 +12,21 @@ import { NativeStorage } from '@ionic-native/native-storage';
 import { DateTimePipe } from '../pipes/date-time/date-time';
 import { HoursMinutesSecondsPipe } from '../pipes/hours-minutes-seconds/hours-minutes-seconds';
 import { Map } from '../providers/map/map';
+import { UserProvider } from '../providers/user/user';
+import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
+import { Events } from '../providers/events/events';
+import { RealTimeClockProvider } from '../providers/real-time-clock/real-time-clock';
+import { LocationTracker } from '../providers/location-tracker/location-tracker';
+import { Transportation } from '../providers/transportation-mode/transportation-mode';
 
 // Pages
 import { AboutPage } from '../pages/about/about';
 import { ContactPage } from '../pages/contact/contact';
 import { HomePage } from '../pages/home/home';
 import { LoginGatePage } from '../pages/login-gate/login-gate';
-import { PreferencePage } from '../pages/preference/preference';
+import { Preference } from '../pages/preference/preference';
 import { TabsPage } from '../pages/tabs/tabs';
-import { UserProvider } from '../providers/user/user';
-import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
-import { Events } from '../providers/events/events';
-import { RealTimeClockProvider } from '../providers/real-time-clock/real-time-clock';
-import { LocationTracker } from '../providers/location-tracker/location-tracker';
+
 
 
 @NgModule({
@@ -35,7 +37,7 @@ import { LocationTracker } from '../providers/location-tracker/location-tracker'
     HomePage,
     TabsPage,
     LoginGatePage,
-    PreferencePage,
+    Preference,
     DateTimePipe,
     HoursMinutesSecondsPipe,
   ],
@@ -52,7 +54,7 @@ import { LocationTracker } from '../providers/location-tracker/location-tracker'
     HomePage,
     TabsPage,
     LoginGatePage,
-    PreferencePage
+    Preference
   ],
   providers: [
     StatusBar,
@@ -67,7 +69,8 @@ import { LocationTracker } from '../providers/location-tracker/location-tracker'
     Events,
     Map,
     RealTimeClockProvider,
-    LocationTracker
+    LocationTracker,
+    Transportation
   ]
 })
 export class AppModule {}

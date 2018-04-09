@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
-import { PreferencePage } from './preference';
+import { Preference } from './preference';
 
 @NgModule({
   declarations: [
-    PreferencePage,
+    Preference,
   ],
   imports: [
-    IonicPageModule.forChild(PreferencePage),
+    IonicPageModule.forChild(Preference),
   ],
 })
-export class PreferencePageModule {}
+export class PreferenceModule {}

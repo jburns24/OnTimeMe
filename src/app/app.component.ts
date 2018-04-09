@@ -10,7 +10,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { AlertController } from 'ionic-angular/components/alert/alert-controller';
 import { LoginGatePage } from '../pages/login-gate/login-gate';
 import { HomePage } from '../pages/home/home';
-import { PreferencePage } from '../pages/preference/preference';
+import { Preference } from '../pages/preference/preference';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { GooglePlus } from '@ionic-native/google-plus';
 import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
@@ -42,7 +42,7 @@ export class MyApp {
     private loadingCtrl: LoadingController,
     private storage: NativeStorage,
     private alertCrl: AlertController,
-    private googlePlus: GooglePlus, 
+    private googlePlus: GooglePlus,
     private googleCalendar: GoogleCalendar,
     private locationTracker: LocationTracker
   ){
@@ -53,7 +53,7 @@ export class MyApp {
     // Set our app's pages in the left menu; Add new pages here!!!
     this.pages = [
       { title: 'Home', component: HomePage, icon:'home' },
-      { title: 'Preference', component: PreferencePage, icon:'md-settings'}
+      { title: 'Preference', component: Preference, icon:'md-settings'}
     ];
 
     // Set the app to land on the login page as soon as launch

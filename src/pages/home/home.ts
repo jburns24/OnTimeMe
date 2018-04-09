@@ -2,11 +2,11 @@ import { Component } from '@angular/core';
 import { MenuController } from 'ionic-angular';
 import { UserProvider } from '../../providers/user/user';
 import { GoogleCalendar} from '../../providers/google-calendar/google-calendar';
-
+import { NativeStorage } from '@ionic-native/native-storage';
 import { RealTimeClockProvider } from '../../providers/real-time-clock/real-time-clock'
 import { LocationTracker } from '../../providers/location-tracker/location-tracker'
 import { Events } from '../../providers/events/events';
-import { Map } from '../../providers/map/map';
+import { Transportation } from '../../providers/transportation-mode/transportation-mode';
 
 @Component({
   selector: 'page-home',
@@ -30,22 +30,39 @@ export class HomePage {
     private googleCalendar: GoogleCalendar,
     private event: Events,
     public locationTracker: LocationTracker,
-    private map: Map){
+    private trans: Transportation,
+    private storage: NativeStorage){
       this.enableMenu();
-      this.locationTracker.startTracking().then(() => {
-        this.user.getUserInfo().then(() => {
-          this.googleCalendar.init(this.user.serverAuthCode).then(() => {
-            this.getList(this.googleCalendar.refreshToken).then(() => {
-            }, (err) => {
-              console.log("home::getList() error", err);
-            });
+      this.checkMode();
+      //this.start();
+  }
+
+  checkMode(){
+    this.user.getUserInfo().then(() => {
+      this.storage.getItem(this.user.id).then((user) => {
+        console.log("Home::checkMode(): mode already set:", user.mode);
+      }, (error) => {
+        console.log("Home::checkMode(): mode not set yet:", error);
+        this.trans.showRadioAlert();
+      });
+    });
+  }
+
+  start(){
+    this.locationTracker.startTracking().then(() => {
+      this.user.getUserInfo().then(() => {
+        this.googleCalendar.init(this.user.serverAuthCode).then(() => {
+          this.getList(this.googleCalendar.refreshToken).then(() => {
           }, (err) => {
-            console.log("gogoleClaendar init() error", err);
+            console.log("home::getList() error", err);
           });
         }, (err) => {
-          console.log("GetUserInfor error", err);
+          console.log("gogoleClaendar init() error", err);
         });
+      }, (err) => {
+        console.log("GetUserInfor error", err);
       });
+    });
   }
 
   getList(authToken: any){
@@ -82,5 +99,5 @@ export class HomePage {
     }, (err) => {
       console.log("home::getList() error", err);
     });
-};
+  }
 }
