@@ -19,6 +19,8 @@ import { Geolocation } from '@ionic-native/geolocation';
 
 @Injectable()
 export class Map {
+  mode: any;
+
   constructor(public http: HttpClient,
     private storage: NativeStorage,
     private user: UserProvider,
@@ -54,13 +56,16 @@ export class Map {
   // calls native storage to get the user preference mode.
   getPreferenceMode(){
     return new Promise(resolve => {
+      this.mode = 'driving';
       this.user.getUserInfo().then((user) => {
         this.storage.getItem(this.user.id).then((userId) => {
           console.log("Map::getMode(): success!");
           console.log("==> curUser.id:", this.user.id, "mode:", userId.mode);
-          resolve(userId.mode);
+          this.mode = userId.mode;
+          resolve(this.mode);
         }, (error) => {
             console.log("Map::getMode(): no user found in native storage!", error);
+            resolve(this.mode);
         });
       });
     });
