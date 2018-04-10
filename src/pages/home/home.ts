@@ -27,11 +27,13 @@ export class HomePage {
   location: any;
   epochNow: any;
   transMode: any;
-  updated: any;
+  lastUpdateTime: any;
   connected: Subscription;
   disconnected: Subscription;
   onToast: any;
   offToast: any;
+  enableFunctionality: boolean;
+  lastMode: any;
 
   constructor(
     private realTimeClock: RealTimeClockProvider,
@@ -45,31 +47,38 @@ export class HomePage {
     private toast: ToastController,
     private network: Network,
     private navCtrl: NavController){
-      // this.enableMenu();
-      // this.init();
-      // this.checkMode();
   }
 
+  /*
+   * Using ion-views to control the flow of things. Much easier, also keeps
+   * updated values in tact. Use subscribe to subscribe to an observable so
+   * that the time-lived is longer. Promise will only return 1 time.
+   */
+  ///////////////////////// ION-VIEW BEGINS ////////////////////////////////////
   ionViewWillEnter(){
     console.log("ionViewWillEnter");
     this.enableMenu();
     this.init();
     this.checkMode();
-
   }
 
   ionViewWillLeave(){
     this.connected.unsubscribe();
     this.disconnected.unsubscribe();
   }
-  // Testing
-  // Subscribing to observable provide a stream for as long as we've subscribed
-  // to an event. Promises return a value in a .then(), but only once.
+
   ionViewDidEnter(){
     console.log("ionViewDidEnter");
+    if (!this.enableFunctionality){
+      this.storage.getItem('lastKnown').then((data) => {
+        this.lastMode = data.mode;
+        this.lastUpdateTime = data.time;
+      });
+    }
+
     this.disconnected = this.network.onDisconnect().subscribe(data => {
       console.log("Home::ionViewDidEnter(): disconncted from internet,", data);
-      this.onDisconnectUpdate(data.type);
+      this.onDisconnectUpdate();
     }, (error) => {
       console.log("Home::ionViewDidEnter(): error on disconnect,", error);
     });
@@ -77,6 +86,9 @@ export class HomePage {
     this.connected = this.network.onConnect().subscribe(data =>{
       console.log("Home::ionViewDidEnter(): connected to internet,", data);
       this.offToast.dismiss();
+      this.offToast.onDidDismiss(() => {
+        this.enableFunctionality = true;
+      });
       this.onConnectUpdate(data.type);
     }, (error) => {
       console.log("Home::ionViewDidEnter(): error,", error);
@@ -89,11 +101,13 @@ export class HomePage {
       message: 'You are now ' + connectionState + ' via '+ networkType,
       duration: 5000
     });
-
+    this.onToast.onDidDismiss(() => {
+      this.checkMode();
+    });
     this.onToast.present();
   }
 
-  onDisconnectUpdate(connectionState: string){
+  onDisconnectUpdate(){
     let networkType = this.network.type;
     this.offToast = this.toast.create({
       message: 'You are offline. Time estimates may not be accurate. The above shows your last update.',
@@ -101,10 +115,9 @@ export class HomePage {
       dismissOnPageChange: false,
       showCloseButton: false
     });
-
     this.offToast.present();
   }
-  /////////////////////////// End of testing ////////////////////////////////////
+  /////////////////////////// End of ION-VIEW //////////////////////////////////
 
   init(){
     this.user.getUserInfo().then((user) => {
@@ -152,15 +165,15 @@ export class HomePage {
       this.user.getUserInfo().then((user) => {
         this.googleCalendar.init(user.serverAuthCode).then(() => {
           this.getList(this.googleCalendar.refreshToken).then(() => {
-            if (GoogleCalendar._connection){
+            if (this.enableFunctionality){
               let date = new Date().toISOString();
               this.storage.setItem('updated', {time: date}).then(() => {
                 this.storage.getItem('updated').then((update) => {
-                  this.updated = update.time;
+                  this.lastUpdateTime = update.time;
                 });
-                console.log("Home::doRefresh(): successfully stored update time,", date);
+                console.log("Home::start(): successfully stored update time,", date);
               }, (error) => {
-                console.log("Home::doRefresh(): failed to store update time,", error);
+                console.log("Home::start(): failed to store update time,", error);
               });
             };
           }, (err) => {
@@ -178,6 +191,11 @@ export class HomePage {
   getList(authToken: any){
     return new Promise (resolve => {
       this.googleCalendar.getList(authToken).then( (list) => {
+        console.log("list is ", list);
+        if (list == 1){
+          this.enableFunctionality = false;
+          return;
+        };
         this.events = list;
         this.event.storeTodaysEvents(JSON.stringify(this.events)).then(() => {
           console.log('home::getList() successfully saved todays events');
@@ -205,10 +223,10 @@ export class HomePage {
 
   doRefresh(refresher){
     this.getList(this.googleCalendar.refreshToken).then(() => {
-      if (GoogleCalendar._connection){
+      if (this.enableFunctionality){
         this.storage.setItem('updated', {time:Date.now()}).then(() => {
           this.storage.getItem('updated').then((update) => {
-            this.updated = update.time;
+            this.lastUpdateTime = update.time;
             refresher.complete();
           });
           console.log("Home::doRefresh(): successfully stored update time.");

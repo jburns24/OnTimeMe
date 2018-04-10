@@ -18,7 +18,6 @@ export class GoogleCalendar {
   redirectUri: any = 'http://localhost:8080';
   clientId: any = '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com';
   refreshToken: any;
-  static _connection: any = 1;
 
   constructor(public http: HttpClient,
     private storage: NativeStorage,
@@ -84,7 +83,7 @@ export class GoogleCalendar {
   }
 
   //  Takes a user authToken executes a google Event List api call and returns the response
-  getList(authToken: string){
+  getList(authToken: string) : Promise<any>{
     //  This was taken from the angular 2 documenation on how to set HttpHeaders
     const httpOptions = {
       headers: new HttpHeaders({
@@ -110,7 +109,8 @@ export class GoogleCalendar {
         resolve(data);
       }, (error) => {
         console.log("Google-calendar::cannot get list:", error);
-        return Promise.resolve(this.lastKnown());
+        //resolve(1);
+        resolve(this.lastKnown());
       });
     });
   }
@@ -131,7 +131,7 @@ export class GoogleCalendar {
               console.log("Google-calendar::lastKnown(): successfully stored last_known:");
               this.storage.getItem('lastKnown').then((lastKnown) =>{
                 console.log("Google-calendar::lastKnown(): get last known is:", lastKnown);
-                GoogleCalendar._connection == 0;
+                resolve(1);
               });
             }, (error) => {
               console.log("Google-calendar::lastKnown(): failed to store last known,", error);
