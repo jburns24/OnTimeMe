@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { MenuController } from 'ionic-angular';
+import { MenuController, ToastController, NavController } from 'ionic-angular';
 import { UserProvider } from '../../providers/user/user';
 import { GoogleCalendar} from '../../providers/google-calendar/google-calendar';
 import { NativeStorage } from '@ionic-native/native-storage';
@@ -7,6 +7,8 @@ import { RealTimeClockProvider } from '../../providers/real-time-clock/real-time
 import { LocationTracker } from '../../providers/location-tracker/location-tracker'
 import { Events } from '../../providers/events/events';
 import { Transportation } from '../../providers/transportation-mode/transportation-mode';
+import { Network } from '@ionic-native/network';
+import { Subscription} from 'rxjs/Subscription';
 
 @Component({
   selector: 'page-home',
@@ -25,6 +27,11 @@ export class HomePage {
   location: any;
   epochNow: any;
   transMode: any;
+  updated: any;
+  connected: Subscription;
+  disconnected: Subscription;
+  onToast: any;
+  offToast: any;
 
   constructor(
     private realTimeClock: RealTimeClockProvider,
@@ -34,11 +41,70 @@ export class HomePage {
     private event: Events,
     public locationTracker: LocationTracker,
     private trans: Transportation,
-    private storage: NativeStorage){
-      this.enableMenu();
-      this.init();
-      this.checkMode();
+    private storage: NativeStorage,
+    private toast: ToastController,
+    private network: Network,
+    private navCtrl: NavController){
+      // this.enableMenu();
+      // this.init();
+      // this.checkMode();
   }
+
+  ionViewWillEnter(){
+    console.log("ionViewWillEnter");
+    this.enableMenu();
+    this.init();
+    this.checkMode();
+
+  }
+
+  ionViewWillLeave(){
+    this.connected.unsubscribe();
+    this.disconnected.unsubscribe();
+  }
+  // Testing
+  // Subscribing to observable provide a stream for as long as we've subscribed
+  // to an event. Promises return a value in a .then(), but only once.
+  ionViewDidEnter(){
+    console.log("ionViewDidEnter");
+    this.disconnected = this.network.onDisconnect().subscribe(data => {
+      console.log("Home::ionViewDidEnter(): disconncted from internet,", data);
+      this.onDisconnectUpdate(data.type);
+    }, (error) => {
+      console.log("Home::ionViewDidEnter(): error on disconnect,", error);
+    });
+
+    this.connected = this.network.onConnect().subscribe(data =>{
+      console.log("Home::ionViewDidEnter(): connected to internet,", data);
+      this.offToast.dismiss();
+      this.onConnectUpdate(data.type);
+    }, (error) => {
+      console.log("Home::ionViewDidEnter(): error,", error);
+    });
+  }
+
+  onConnectUpdate(connectionState: string){
+    let networkType = this.network.type;
+    this.onToast = this.toast.create({
+      message: 'You are now ' + connectionState + ' via '+ networkType,
+      duration: 5000
+    });
+
+    this.onToast.present();
+  }
+
+  onDisconnectUpdate(connectionState: string){
+    let networkType = this.network.type;
+    this.offToast = this.toast.create({
+      message: 'You are offline. Time estimates may not be accurate. The above shows your last update.',
+      position: 'bottom',
+      dismissOnPageChange: false,
+      showCloseButton: false
+    });
+
+    this.offToast.present();
+  }
+  /////////////////////////// End of testing ////////////////////////////////////
 
   init(){
     this.user.getUserInfo().then((user) => {
@@ -86,6 +152,17 @@ export class HomePage {
       this.user.getUserInfo().then((user) => {
         this.googleCalendar.init(user.serverAuthCode).then(() => {
           this.getList(this.googleCalendar.refreshToken).then(() => {
+            if (GoogleCalendar._connection){
+              let date = new Date().toISOString();
+              this.storage.setItem('updated', {time: date}).then(() => {
+                this.storage.getItem('updated').then((update) => {
+                  this.updated = update.time;
+                });
+                console.log("Home::doRefresh(): successfully stored update time,", date);
+              }, (error) => {
+                console.log("Home::doRefresh(): failed to store update time,", error);
+              });
+            };
           }, (err) => {
             console.log("home::getList() error", err);
           });
@@ -128,6 +205,17 @@ export class HomePage {
 
   doRefresh(refresher){
     this.getList(this.googleCalendar.refreshToken).then(() => {
+      if (GoogleCalendar._connection){
+        this.storage.setItem('updated', {time:Date.now()}).then(() => {
+          this.storage.getItem('updated').then((update) => {
+            this.updated = update.time;
+            refresher.complete();
+          });
+          console.log("Home::doRefresh(): successfully stored update time.");
+        }, (error) => {
+          console.log("Home::doRefresh(): failed to store update time,", error);
+        });
+      };
       refresher.complete();
     }, (err) => {
       console.log("home::getList() error", err);

@@ -49,8 +49,7 @@ export class Map {
           this.mode = userId.mode;
           resolve(this.mode);
         }, (error) => {
-            console.log("Map::getMode(): no user found in native storage!", error);
-            resolve(this.mode);
+          console.log("Map::getMode(): no user found in native storage!", error);
         });
       });
     });

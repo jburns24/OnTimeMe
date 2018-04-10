@@ -22,9 +22,10 @@
     <h2>Hello {{userName}}!</h2>
     <h4>{{userEmail}}</h4>
   </ion-item>
-      <button ion-button block class="mode_bttn" (click)="showRadioAlert()">
-    	   Transportation Mode: {{transMode}}
-      </button>
+  <button ion-button block class="mode_bttn" (click)="showRadioAlert()">
+     Transportation Mode: {{transMode}}
+  </button>
+  <p> Last updated: {{(_updated)}} </p>
   <ion-list>
     <ion-item *ngFor="let event of eventList">
       <p item-left [style.font-size.vw]="'4.9'">{{ event.summary }}</p>

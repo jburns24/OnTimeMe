@@ -18,6 +18,7 @@ import { Events } from '../providers/events/events';
 import { RealTimeClockProvider } from '../providers/real-time-clock/real-time-clock';
 import { LocationTracker } from '../providers/location-tracker/location-tracker';
 import { Transportation } from '../providers/transportation-mode/transportation-mode';
+import { Network } from '@ionic-native/network';
 // Pages
 import { AboutPage } from '../pages/about/about';
 import { ContactPage } from '../pages/contact/contact';
@@ -67,7 +68,8 @@ import { TabsPage } from '../pages/tabs/tabs';
     RealTimeClockProvider,
     LocationTracker,
     Transportation,
-    {provide: ErrorHandler, useClass: IonicErrorHandler},
+    Network,
+    {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })
 export class AppModule {}
