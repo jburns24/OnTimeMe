@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { MenuController, ToastController, NavController } from 'ionic-angular';
+import { MenuController, ToastController } from 'ionic-angular';
 import { UserProvider } from '../../providers/user/user';
 import { GoogleCalendar} from '../../providers/google-calendar/google-calendar';
 import { NativeStorage } from '@ionic-native/native-storage';
@@ -32,8 +32,10 @@ export class HomePage {
   disconnected: Subscription;
   onToast: any;
   offToast: any;
-  enableFunctionality: boolean;
   lastMode: any;
+  // Use this flag to protect critical section
+  // when device is offline
+  enableFunctionality: boolean;
 
   constructor(
     private realTimeClock: RealTimeClockProvider,
@@ -45,8 +47,8 @@ export class HomePage {
     private trans: Transportation,
     private storage: NativeStorage,
     private toast: ToastController,
-    private network: Network,
-    private navCtrl: NavController){
+    private network: Network){
+
   }
 
   /*
@@ -57,31 +59,13 @@ export class HomePage {
   ///////////////////////// ION-VIEW BEGINS ////////////////////////////////////
   ionViewWillEnter(){
     console.log("ionViewWillEnter");
-    this.enableMenu();
-    this.init();
-    this.checkMode();
-  }
-
-  ionViewWillLeave(){
-    this.connected.unsubscribe();
-    this.disconnected.unsubscribe();
-  }
-
-  ionViewDidEnter(){
-    console.log("ionViewDidEnter");
-    if (!this.enableFunctionality){
-      this.storage.getItem('lastKnown').then((data) => {
-        this.lastMode = data.mode;
-        this.lastUpdateTime = data.time;
-      });
-    }
-
-    this.disconnected = this.network.onDisconnect().subscribe(data => {
-      console.log("Home::ionViewDidEnter(): disconncted from internet,", data);
+    // First, check to see if we have internet connection. Use the network plugin
+    // type to check this. We are looking for 'none'
+    if(this.network.type == 'none'){
+      this.enableFunctionality = false;
+      console.log("Home::ionViewWillEnter(): we are offline, enable =", this.enableFunctionality);
       this.onDisconnectUpdate();
-    }, (error) => {
-      console.log("Home::ionViewDidEnter(): error on disconnect,", error);
-    });
+    };
 
     this.connected = this.network.onConnect().subscribe(data =>{
       console.log("Home::ionViewDidEnter(): connected to internet,", data);
@@ -93,6 +77,50 @@ export class HomePage {
     }, (error) => {
       console.log("Home::ionViewDidEnter(): error,", error);
     });
+    // if (!this.enableFunctionality){
+    //   console.log("Home::constructor(): enable is false");
+    //   let date = new Date().toISOString();
+    //   this.user.getUserInfo().then((user) => {
+    //     this.storage.getItem(user.id).then(curUser => {
+    //       this.storage.setItem('lastKnown', {mode: curUser.mode, time: date}).then(() => {
+    //         this.storage.getItem('lastKnown').then((last) => {
+    //           this.lastMode = last.mode;
+    //           this.lastUpdateTime = last.time;
+    //         });
+    //       });
+    //     });
+    //   });
+    // }
+    this.enableMenu();
+    this.init();
+    this.checkMode();
+    console.log("-->>enableFunctionality:", this.enableFunctionality);
+  }
+
+  ionViewDidLeave(){
+    this.offToast.dismiss();
+  }
+
+  ionViewDidEnter(){
+    console.log("ionViewDidEnter", this.network.type);
+    this.disconnected = this.network.onDisconnect().subscribe(data => {
+      console.log("Home::ionViewDidEnter(): disconncted from internet,", data);
+      this.enableFunctionality = false;
+      this.onDisconnectUpdate();
+    }, (error) => {
+      console.log("Home::ionViewDidEnter(): error on disconnect,", error);
+    });
+
+    // this.connected = this.network.onConnect().subscribe(data =>{
+    //   console.log("Home::ionViewDidEnter(): connected to internet,", data);
+    //   this.offToast.dismiss();
+    //   this.offToast.onDidDismiss(() => {
+    //     this.enableFunctionality = true;
+    //   });
+    //   this.onConnectUpdate(data.type);
+    // }, (error) => {
+    //   console.log("Home::ionViewDidEnter(): error,", error);
+    // });
   }
 
   onConnectUpdate(connectionState: string){
@@ -108,7 +136,11 @@ export class HomePage {
   }
 
   onDisconnectUpdate(){
-    let networkType = this.network.type;
+    this.storage.getItem('lastKnown').then((data) => {
+      this.lastMode = data.mode;
+      this.lastUpdateTime = data.time;
+    });
+
     this.offToast = this.toast.create({
       message: 'You are offline. Time estimates may not be accurate. The above shows your last update.',
       position: 'bottom',
@@ -169,11 +201,14 @@ export class HomePage {
               let date = new Date().toISOString();
               this.storage.setItem('updated', {time: date}).then(() => {
                 this.storage.getItem('updated').then((update) => {
-                  this.lastUpdateTime = update.time;
+                  this.storage.setItem('lastKnown', {mode: this.transMode, time: update.time})
+                  .then(() => {
+                    this.storage.getItem('lastKnown').then((last) => {
+                      this.lastMode = last.mode;
+                      this.lastUpdateTime = last.time;
+                    });
+                  });
                 });
-                console.log("Home::start(): successfully stored update time,", date);
-              }, (error) => {
-                console.log("Home::start(): failed to store update time,", error);
               });
             };
           }, (err) => {
@@ -196,6 +231,7 @@ export class HomePage {
           this.enableFunctionality = false;
           return;
         };
+        this.enableFunctionality = true;
         this.events = list;
         this.event.storeTodaysEvents(JSON.stringify(this.events)).then(() => {
           console.log('home::getList() successfully saved todays events');
@@ -224,14 +260,16 @@ export class HomePage {
   doRefresh(refresher){
     this.getList(this.googleCalendar.refreshToken).then(() => {
       if (this.enableFunctionality){
-        this.storage.setItem('updated', {time:Date.now()}).then(() => {
-          this.storage.getItem('updated').then((update) => {
-            this.lastUpdateTime = update.time;
-            refresher.complete();
+        let date = new Date().toISOString();
+        this.storage.setItem('lastKnown', {mode: this.transMode, time: date}).then(() => {
+          this.storage.getItem('lastKnown').then((last) => {
+            this.lastMode = last.mode;
+            this.lastUpdateTime = last.time;
           });
-          console.log("Home::doRefresh(): successfully stored update time.");
+          refresher.complete();
+          console.log("Home::doRefresh(): successfully stored lastKnown.");
         }, (error) => {
-          console.log("Home::doRefresh(): failed to store update time,", error);
+          console.log("Home::doRefresh(): failed to store lastKnown,", error);
         });
       };
       refresher.complete();

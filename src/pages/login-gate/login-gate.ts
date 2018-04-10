@@ -8,7 +8,8 @@ import {
   NavController,
   LoadingController,
   Loading,
-  MenuController
+  MenuController,
+  ToastController
 } from 'ionic-angular';
 
 @IonicPage()
@@ -21,7 +22,8 @@ export class LoginGatePage {
 
   constructor(public navCtrl: NavController, private alertCrl: AlertController,
     private loadingCtrl: LoadingController, private googlePlus: GooglePlus,
-    private menu: MenuController, private storage: NativeStorage) {
+    private menu: MenuController, private storage: NativeStorage,
+    private toast: ToastController) {
        // Diable menu in the login gate page
        this.disableMenu();
   }
@@ -62,7 +64,7 @@ export class LoginGatePage {
       }, (error) => {
         // If google log-in was unsuccessful, then output to console
         // show the error as well.
-        console.log(error);
+        console.log("Cannot login, ", error);
         this.loading.dismiss();
         this.showError(error);
       });
