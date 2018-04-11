@@ -156,6 +156,24 @@ export class HomePage {
     };
   }
 
+  start(){
+    this.locationTracker.startTracking().then(() => {
+      this.user.getUserInfo().then((user) => {
+        this.googleCalendar.init(user.serverAuthCode).then((refreshToken) => {
+          this.getList(refreshToken).then((list) => {
+            console.log("Home::start(): got list,", list);
+          }, (err) => {
+            console.log("home::getList() error", err);
+          });
+        }, (err) => {
+          console.log("gogoleClaendar init() error", err);
+        });
+      }, (err) => {
+        console.log("GetUserInfor error", err);
+      });
+    });
+  }
+
   showRadioAlert(){
     if (this.enableFunctionality){
       this.trans.showRadioAlert(this.lastMode).then((mode) => {
@@ -174,27 +192,10 @@ export class HomePage {
     };
   }
 
-  start(){
-    this.locationTracker.startTracking().then(() => {
-      this.user.getUserInfo().then((user) => {
-        this.googleCalendar.init(user.serverAuthCode).then(() => {
-          this.getList(this.googleCalendar.refreshToken).then(() => {
-          }, (err) => {
-            console.log("home::getList() error", err);
-          });
-        }, (err) => {
-          console.log("gogoleClaendar init() error", err);
-        });
-      }, (err) => {
-        console.log("GetUserInfor error", err);
-      });
-    });
-  }
-
   // Last knowns are stored in here while retrieving and storing event list.
-  getList(authToken: any){
+  getList(refreshToken: any){
     return new Promise (resolve => {
-      this.googleCalendar.getList(authToken).then( (list) => {
+      this.googleCalendar.getList(refreshToken).then( (list) => {
         console.log("list is ", list);
         this.events = list;
         this.event.storeTodaysEvents(JSON.stringify(this.events)).then(() => {
@@ -233,9 +234,11 @@ export class HomePage {
 
   doRefresh(refresher){
     if (this.enableFunctionality){
-      this.getList(this.googleCalendar.refreshToken).then(() => {
-        refresher.complete();
-      }, (err) => { console.log("home::getList() error", err) });
+      this.storage.getItem('refreshToken').then((refreshToken) => {
+        this.getList(refreshToken.token).then(() => {
+          refresher.complete();
+        }, (err) => { console.log("home::doRefresh(): error", err) });
+      }, (err2) => { console.log("Home::doRefresh(): failed to get token from native", err2) });
     } else {
       refresher.complete();
     };

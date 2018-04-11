@@ -12,7 +12,7 @@ import { LoginGatePage } from '../pages/login-gate/login-gate';
 import { HomePage } from '../pages/home/home';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { GooglePlus } from '@ionic-native/google-plus';
-import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
+//import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
 import { LocationTracker } from '../providers/location-tracker/location-tracker'
 import {
   Platform,
@@ -42,7 +42,7 @@ export class MyApp {
     private storage: NativeStorage,
     private alertCrl: AlertController,
     private googlePlus: GooglePlus,
-    private googleCalendar: GoogleCalendar,
+    //private googleCalendar: GoogleCalendar,
     private locationTracker: LocationTracker
   ){
     // This function will initialize the app upon opening the app.
@@ -139,9 +139,9 @@ export class MyApp {
       this.googlePlus.logout().then((response) => {
         this.storage.remove('user').then(() => {
           this.storage.remove('refreshToken').then(() =>{
-            this.googleCalendar.refreshToken = null;
+            //this.googleCalendar.refreshToken = null;
             console.log("refreshToken is successfully removed from native storage.");
-            console.log("refreshToken should now be null", this.googleCalendar.refreshToken);
+            //console.log("refreshToken should now be null", this.googleCalendar.refreshToken);
             this.nav.setRoot(LoginGatePage).then(() =>{
               // DEBUGGING: this part below
               this.locationTracker.stopTracking().then(() =>{

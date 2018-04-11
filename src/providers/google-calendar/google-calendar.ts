@@ -16,18 +16,18 @@ export class GoogleCalendar {
   secret: any = 'QqOIOYrrK3eyLpZwkFvwZ6x9';
   redirectUri: any = 'http://localhost:8080';
   clientId: any = '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com';
-  refreshToken: any;
 
   constructor(public http: HttpClient,
     private storage: NativeStorage) {
     }
 
-  init(serverAuthCode: any){
-    return this.storage.getItem('refreshToken').then ((RT) => {
-      this.refreshToken = RT.token;
-    }, (error) => {
-      console.log("Google-calendar::init: refreshToken not set:", error);
-      return new Promise(resolve => {
+  init(serverAuthCode: any) : Promise<any>{
+    return new Promise(resolve => {
+      this.storage.getItem('refreshToken').then((RT) => {
+        console.log("Google-calendar::init(): refreshToken already stored:,", RT.token);
+        resolve(RT.token);
+      }, (error) => {
+        console.log("Google-calendar::init(): refreshToken not set:", error);
         resolve(this.getRefreshTokenId(serverAuthCode));
       });
     });
@@ -49,6 +49,7 @@ export class GoogleCalendar {
         'grant_type': 'authorization_code'
       }
       this.http.post(this.authUrl, httpOptions, { params }).subscribe((data) => {
+        console.log("Google-calendar::getRefreshTokenId(): succesfully got RT_id", data);
         resolve(this.getRefreshToken(data['refresh_token']));
       }, (error) => {
         console.log("Google-calendar::getRefreshTokenId(): failed!", error);
@@ -71,9 +72,10 @@ export class GoogleCalendar {
         'grant_type': 'refresh_token'
       }
       this.http.post(this.authUrl, httpOptions, { params }).subscribe((data) => {
-        this.refreshToken = data['access_token'];
-        this.storage.setItem('refreshToken', { token: this.refreshToken });
-        resolve(this.refreshToken);
+        let refreshToken = data['access_token'];
+        this.storage.setItem('refreshToken', { token: refreshToken });
+        console.log("Google-calendar::getRefreshToken(): successfully got RT", refreshToken);
+        resolve(refreshToken);
       }, (error) => {
         console.log("Google-calendar::getRefreshToken(): failed!", error);
       });
@@ -81,12 +83,12 @@ export class GoogleCalendar {
   }
 
   //  Takes a user authToken executes a google Event List api call and returns the response
-  getList(authToken: string) : Promise<any>{
+  getList(refreshToken: string) : Promise<any>{
     //  This was taken from the angular 2 documenation on how to set HttpHeaders
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type':  'application/json',
-        'Authorization': 'Bearer ' + authToken
+        'Authorization': 'Bearer ' + refreshToken
       })
     };
 
