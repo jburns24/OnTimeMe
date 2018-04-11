@@ -107,8 +107,6 @@ export class GoogleCalendar {
         resolve(data);
       }, (error) => {
         console.log("Google-calendar::cannot get list:", error);
-        //resolve(1);
-        //resolve(this.lastKnown());
       });
     });
   }

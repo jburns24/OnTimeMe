@@ -35,8 +35,8 @@ export class Transportation {
             this.storage.setItem(user.id, { mode: data }).then(() => {
               console.log("Transportation::showRadioAlert(): successfully set mode");
               console.log("==> user.id:", user.id, "mode:", data);
-              this.storage.getItem(user.id).then((data) => {
-                this.mode = data.mode;
+              this.storage.getItem(user.id).then((user) => {
+                this.mode = user.mode;
                 resolve(this.mode);
               });
             }, (error) => {

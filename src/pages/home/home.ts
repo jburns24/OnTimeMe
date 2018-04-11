@@ -75,10 +75,7 @@ export class HomePage {
     this.checkMode();
     this.connected = this.network.onConnect().subscribe(data =>{
       console.log("Home::ionViewDidEnter(): connected to internet,", data);
-      this.offToast.dismiss();
-      this.offToast.onDidDismiss(() => {
-        this.enableFunctionality = true;
-      });
+      this.enableFunctionality = true;
       this.onConnectUpdate(data.type);
     }, (error) => {
       console.log("Home::ionViewDidEnter(): error,", error);
@@ -128,29 +125,30 @@ export class HomePage {
     });
   }
 
+  // DEBUG: Stores last known
   checkMode(){
     if (this.enableFunctionality){
       this.user.getUserInfo().then((user) => {
         this.storage.getItem(user.id).then((curUser) => {
-          let date = new Date().toISOString();
-          this.storage.setItem('lastKnown', {mode: curUser.mode, time: date}).then(() => {
-            this.storage.getItem('lastKnown').then((last) => {
-              this.lastMode = last.mode;
-              this.lastUpdateTime = last.time;
-              this.start();
-            });
-          });
-          console.log("Home::checkMode(): mode already set:", curUser.mode);
+          this.lastMode = curUser.mode;
+          // let date = new Date().toISOString();
+          // this.storage.setItem('lastKnown', {mode: curUser.mode, time: date}).then(() => {
+          //   this.storage.getItem('lastKnown').then((last) => {
+          //     this.lastMode = last.mode;
+          //     this.lastUpdateTime = last.time;
+            this.start();
+            // });
+          console.log("Home::checkMode(): mode already set:", this.lastMode);
         }, (error) => {
           console.log("Home::checkMode(): mode not set yet:", error);
           let nullMode = undefined;
           this.trans.showRadioAlert(nullMode).then((mode) => {
-            let date = new Date().toISOString();
+            // let date = new Date().toISOString();
             this.lastMode = mode;
-            this.lastUpdateTime = date;
-            this.storage.setItem('lastKnown', {mode: this.lastMode, time: date}).then(() => {
-              this.start();
-            });
+            // this.lastUpdateTime = date;
+            // this.storage.setItem('lastKnown', {mode: this.lastMode, time: date}).then(() => {
+            this.start();
+            // });
             console.log("Home::checkMode(): promise returned:", this.lastMode);
           }, (error) => {
             console.log("Home::checkMode(): promise returned error,", error);
@@ -168,6 +166,7 @@ export class HomePage {
     };
   }
 
+  // DEBUG: stores last known in function of transportation class
   showRadioAlert(){
     if (this.enableFunctionality){
       this.trans.showRadioAlert(this.lastMode).then((mode) => {
@@ -186,6 +185,7 @@ export class HomePage {
     };
   }
 
+  // DEBUG: Does not store lastKnown object
   start(){
     this.locationTracker.startTracking().then(() => {
       this.user.getUserInfo().then((user) => {
@@ -203,6 +203,7 @@ export class HomePage {
     });
   }
 
+  // DEBUG: Stores lastKnown object
   getList(authToken: any){
     return new Promise (resolve => {
       this.googleCalendar.getList(authToken).then( (list) => {
@@ -214,16 +215,23 @@ export class HomePage {
             this.eventList = events;
             this.epochNow = this.realTimeClock.getEpochTime().do(() => ++this.todaysEpoch);
             this.epochNow = this.epochNow.share();
+            // SUCCESSFULLY GOT LIST, This is the time when you need to store to last known
+            let date = new Date().toISOString();
+            this.user.getUserInfo().then((user) => {
+              this.storage.getItem(user.id).then((curUser) => {
+                this.storage.setItem('lastKnown', {mode: curUser.mode, time: date}).then(() => {
+                  this.storage.getItem('lastKnown').then((last) => {
+                    this.lastMode = last.mode;
+                    this.lastUpdateTime = last.time;
+                  }, (error) => { console.log("Home::getList():", error) });
+                }, (error) => { console.log("Home::getList():", error) });
+              }, (error) => { console.log("Home::getList():", error) });
+            }, (error) => { console.log("Home::getList():", error) });
+            /////////////////////////////////////////////////////////////////////////////
             console.log('Home::getList(): successfully got user events ', events);
-          }, (err) => {
-            console.log('Home::getList(): failed to get saved events', err);
-          });
-        }, (err) => {
-          console.log('Home::getList(): failed to save events ', err);
-        });
-      }, (error) => {
-        console.log("Home::getList(): error:", error);
-      });
+          }, (err) => { console.log('Home::getList(): failed to get saved events', err) });
+        }, (err) => { console.log('Home::getList(): failed to save events ', err) });
+      }, (error) => { console.log("Home::getList(): error:", error) });
       resolve(this.event);
     });
   }
@@ -236,23 +244,9 @@ export class HomePage {
     if (this.enableFunctionality){
       this.getList(this.googleCalendar.refreshToken).then(() => {
         refresher.complete();
-      }, (error) => {
-        console.log("Home::doRefresh(): failed to refresh,", error);
-      });
+      }, (err) => { console.log("home::getList() error", err) });
     } else {
       refresher.complete();
     };
-    // } else {
-    //   let date = new Date().toISOString();
-    //   this.storage.setItem('lastKnown', {mode: this.transMode, time: date}).then(() => {
-    //     this.storage.getItem('lastKnown').then((last) => {
-    //       this.lastMode = last.mode;
-    //       this.lastUpdateTime = last.time;
-    //       refresher.complete();
-    //     }, (error) => {
-    //       console.log("Home::doRefresh(): cannot get last known,", error);
-    //     });
-    //   });
-    // };
   }
 }
