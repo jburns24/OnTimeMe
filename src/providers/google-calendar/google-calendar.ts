@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { UserProvider } from '../user/user';
 import { NativeStorage } from '@ionic-native/native-storage';
 
 @Injectable()
@@ -20,47 +19,16 @@ export class GoogleCalendar {
   refreshToken: any;
 
   constructor(public http: HttpClient,
-    private storage: NativeStorage,
-    private user: UserProvider) {
+    private storage: NativeStorage) {
     }
 
   init(serverAuthCode: any){
     return this.storage.getItem('refreshToken').then ((RT) => {
-      // If success then set the refresh token
       this.refreshToken = RT.token;
     }, (error) => {
       console.log("Google-calendar::init: refreshToken not set:", error);
-      // Else, must be a fresh login...
       return new Promise(resolve => {
         resolve(this.getRefreshTokenId(serverAuthCode));
-      });
-    });
-  }
-
-  getRefreshToken(refreshTokenId: any){
-    return new Promise(resolve => {
-      //console.log("Google-calendar::getRT(): The refreshTokenId is:", refreshTokenId);
-      const httpOptions = {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/x-www-form-urlencoded'
-        })
-      };
-
-      const params = {
-        'refresh_token': refreshTokenId,
-        'client_id': this.clientId,
-        'client_secret': this.secret,
-        'grant_type': 'refresh_token'
-      }
-      this.http.post(this.authUrl, httpOptions, { params }).subscribe((data) => {
-        this.refreshToken = data['access_token'];
-        this.user.getUserInfo().then(() => {
-          this.storage.setItem('refreshToken', { token: this.refreshToken }).then(() => {
-          });
-        });
-        resolve(this.refreshToken);
-      }, (error) => {
-        console.log("Google-calendar::getRefreshToken(): failed!", error);
       });
     });
   }
@@ -88,8 +56,32 @@ export class GoogleCalendar {
     });
   }
 
+  getRefreshToken(refreshTokenId: any){
+    return new Promise(resolve => {
+      const httpOptions = {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/x-www-form-urlencoded'
+        })
+      };
+
+      const params = {
+        'refresh_token': refreshTokenId,
+        'client_id': this.clientId,
+        'client_secret': this.secret,
+        'grant_type': 'refresh_token'
+      }
+      this.http.post(this.authUrl, httpOptions, { params }).subscribe((data) => {
+        this.refreshToken = data['access_token'];
+        this.storage.setItem('refreshToken', { token: this.refreshToken });
+        resolve(this.refreshToken);
+      }, (error) => {
+        console.log("Google-calendar::getRefreshToken(): failed!", error);
+      });
+    });
+  }
+
   //  Takes a user authToken executes a google Event List api call and returns the response
-  getList(authToken: string){
+  getList(authToken: string) : Promise<any>{
     //  This was taken from the angular 2 documenation on how to set HttpHeaders
     const httpOptions = {
       headers: new HttpHeaders({
@@ -112,11 +104,43 @@ export class GoogleCalendar {
     // Don't have data yet
     return new Promise(resolve => {
       this.http.get(this.calendarUrl + this.eventList + urlParams, httpOptions).subscribe(data => {
-        // this.data = data['items'];
         resolve(data);
       }, (error) => {
-        console.log(error);
+        console.log("Google-calendar::cannot get list:", error);
       });
     });
   }
+
+  // lastKnown(){
+  //   return new Promise(resolve => {
+  //     // 1. Create an alert telling the users they need internet connection
+  //     // for such request.
+  //     // 2. If events exist then store the last known location, time-estimates
+  //     // from there, mode of transportation, and last update.
+  //     this.user.getUserInfo().then((user) => {
+  //       console.log("1. Google-calendar::lastKnown(): success");
+  //       this.storage.getItem(user.id).then((curUser) => {
+  //         console.log("2. Google-calendar::lastKnown(): success got mode");
+  //         this.storage.getItem('updated').then((update) => {
+  //           console.log("3. Google-calendar::lastKnown(): success got update");
+  //           this.storage.setItem('lastKnown', {mode: curUser.mode, time: update.time}).then(() =>{
+  //             console.log("Google-calendar::lastKnown(): successfully stored last_known:");
+  //             this.storage.getItem('lastKnown').then((lastKnown) =>{
+  //               console.log("Google-calendar::lastKnown(): get last known is:", lastKnown);
+  //               resolve(1);
+  //             });
+  //           }, (error) => {
+  //             console.log("Google-calendar::lastKnown(): failed to store last known,", error);
+  //           });
+  //         }, (error3) => {
+  //           console.log("3. Google-calendar::lastKnown(): failed to get update,", error3);
+  //         });
+  //       }, (error2) => {
+  //         console.log("2. Google-calendar::lastKnown(): failed to get mode,", error2);
+  //       });
+  //     }, (error1) => {
+  //       console.log("1, Google-calendar::lastKnown(): failed to get user info,", error1);
+  //     });
+  //   });
+  // }
 }

@@ -1,7 +1,7 @@
-import { NgModule } from '@angular/core';
+import { NgModule, ErrorHandler } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
-import { IonicApp, IonicModule} from 'ionic-angular';
+import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { GooglePlus } from '@ionic-native/google-plus';
 import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
 import { Geolocation } from '@ionic-native/geolocation';
@@ -12,19 +12,20 @@ import { NativeStorage } from '@ionic-native/native-storage';
 import { DateTimePipe } from '../pipes/date-time/date-time';
 import { HoursMinutesSecondsPipe } from '../pipes/hours-minutes-seconds/hours-minutes-seconds';
 import { Map } from '../providers/map/map';
-
-// Pages
-import { AboutPage } from '../pages/about/about';
-import { ContactPage } from '../pages/contact/contact';
-import { HomePage } from '../pages/home/home';
-import { LoginGatePage } from '../pages/login-gate/login-gate';
-import { PreferencePage } from '../pages/preference/preference';
-import { TabsPage } from '../pages/tabs/tabs';
 import { UserProvider } from '../providers/user/user';
 import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
 import { Events } from '../providers/events/events';
 import { RealTimeClockProvider } from '../providers/real-time-clock/real-time-clock';
 import { LocationTracker } from '../providers/location-tracker/location-tracker';
+import { Transportation } from '../providers/transportation-mode/transportation-mode';
+import { Network } from '@ionic-native/network';
+// Pages
+import { AboutPage } from '../pages/about/about';
+import { ContactPage } from '../pages/contact/contact';
+import { HomePage } from '../pages/home/home';
+import { LoginGatePage } from '../pages/login-gate/login-gate';
+import { TabsPage } from '../pages/tabs/tabs';
+
 
 
 @NgModule({
@@ -35,9 +36,8 @@ import { LocationTracker } from '../providers/location-tracker/location-tracker'
     HomePage,
     TabsPage,
     LoginGatePage,
-    PreferencePage,
     DateTimePipe,
-    HoursMinutesSecondsPipe,
+    HoursMinutesSecondsPipe
   ],
   imports: [
     BrowserModule,
@@ -52,7 +52,6 @@ import { LocationTracker } from '../providers/location-tracker/location-tracker'
     HomePage,
     TabsPage,
     LoginGatePage,
-    PreferencePage
   ],
   providers: [
     StatusBar,
@@ -67,7 +66,10 @@ import { LocationTracker } from '../providers/location-tracker/location-tracker'
     Events,
     Map,
     RealTimeClockProvider,
-    LocationTracker
+    LocationTracker,
+    Transportation,
+    Network,
+    {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })
 export class AppModule {}

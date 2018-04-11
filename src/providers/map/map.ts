@@ -1,26 +1,11 @@
-/**
- * Quick notes:
- *  We need to think about how we would like to store the data. Looks like
- *  we have some weaving to do. What about the other attributes for this object.
- *
- *  Thoughts: should we cache it and use just what's needed? What if the
- *            list is long? Or should we keep it in native storage? How
- *            are we managing native storage? Seems like it's growing...
- *            and continues to grow bigger.
- */
-
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { UserProvider } from '../user/user';
 import { Geolocation } from '@ionic-native/geolocation';
 
-
-
 @Injectable()
 export class Map {
-  mode: any;
-
   constructor(public http: HttpClient,
     private storage: NativeStorage,
     private user: UserProvider,
@@ -36,7 +21,7 @@ export class Map {
       let distanceUrl = 'https://maps.googleapis.com/maps/api/distancematrix/json?';
       let originParam = 'origins=' + origin;
       let destParam = '&destinations=' + destination;
-      console.log("THIS MODE :", mode);
+      console.log("MAP::THIS MODE :", mode);
       let modeParam = '&mode=' + mode;
       let apiKey = '&key=AIzaSyC_VYR8OeR5oXOwzX--70vdgdFGoAAC8-w';
 
@@ -56,22 +41,20 @@ export class Map {
   // calls native storage to get the user preference mode.
   getPreferenceMode(){
     return new Promise(resolve => {
-      this.mode = 'driving';
       this.user.getUserInfo().then((user) => {
-        this.storage.getItem(this.user.id).then((userId) => {
+        this.storage.getItem(user.id).then((userId) => {
           console.log("Map::getMode(): success!");
-          console.log("==> curUser.id:", this.user.id, "mode:", userId.mode);
-          this.mode = userId.mode;
-          resolve(this.mode);
+          console.log("==> curUser.id:", user.id, "mode:", userId.mode);
+          let mode = userId.mode;
+          resolve(mode);
         }, (error) => {
-            console.log("Map::getMode(): no user found in native storage!", error);
-            resolve(this.mode);
+          console.log("Map::getMode(): no user found in native storage!", error);
         });
       });
     });
   }
 
-  // Gets the current position of device, not really accurate. 
+  // Gets the current position of device, not really accurate.
   getCurrentPosition(): Promise<any> {
     return new Promise(resolve => {
       let options = {enableHighAccuracy: true, timeout: 10000};
