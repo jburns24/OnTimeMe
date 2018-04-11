@@ -125,30 +125,19 @@ export class HomePage {
     });
   }
 
-  // DEBUG: Stores last known
   checkMode(){
     if (this.enableFunctionality){
       this.user.getUserInfo().then((user) => {
         this.storage.getItem(user.id).then((curUser) => {
           this.lastMode = curUser.mode;
-          // let date = new Date().toISOString();
-          // this.storage.setItem('lastKnown', {mode: curUser.mode, time: date}).then(() => {
-          //   this.storage.getItem('lastKnown').then((last) => {
-          //     this.lastMode = last.mode;
-          //     this.lastUpdateTime = last.time;
             this.start();
-            // });
           console.log("Home::checkMode(): mode already set:", this.lastMode);
         }, (error) => {
           console.log("Home::checkMode(): mode not set yet:", error);
           let nullMode = undefined;
           this.trans.showRadioAlert(nullMode).then((mode) => {
-            // let date = new Date().toISOString();
             this.lastMode = mode;
-            // this.lastUpdateTime = date;
-            // this.storage.setItem('lastKnown', {mode: this.lastMode, time: date}).then(() => {
             this.start();
-            // });
             console.log("Home::checkMode(): promise returned:", this.lastMode);
           }, (error) => {
             console.log("Home::checkMode(): promise returned error,", error);
@@ -166,7 +155,6 @@ export class HomePage {
     };
   }
 
-  // DEBUG: stores last known in function of transportation class
   showRadioAlert(){
     if (this.enableFunctionality){
       this.trans.showRadioAlert(this.lastMode).then((mode) => {
@@ -185,7 +173,6 @@ export class HomePage {
     };
   }
 
-  // DEBUG: Does not store lastKnown object
   start(){
     this.locationTracker.startTracking().then(() => {
       this.user.getUserInfo().then((user) => {
@@ -203,7 +190,6 @@ export class HomePage {
     });
   }
 
-  // DEBUG: Stores lastKnown object
   getList(authToken: any){
     return new Promise (resolve => {
       this.googleCalendar.getList(authToken).then( (list) => {
@@ -216,7 +202,7 @@ export class HomePage {
             this.epochNow = this.realTimeClock.getEpochTime().do(() => ++this.todaysEpoch);
             this.epochNow = this.epochNow.share();
             // SUCCESSFULLY GOT LIST, This is the time when you need to store to last known
-            let date = new Date().toISOString();
+            let date = new Date();
             this.user.getUserInfo().then((user) => {
               this.storage.getItem(user.id).then((curUser) => {
                 this.storage.setItem('lastKnown', {mode: curUser.mode, time: date}).then(() => {

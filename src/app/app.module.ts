@@ -37,7 +37,7 @@ import { TabsPage } from '../pages/tabs/tabs';
     TabsPage,
     LoginGatePage,
     DateTimePipe,
-    HoursMinutesSecondsPipe,
+    HoursMinutesSecondsPipe
   ],
   imports: [
     BrowserModule,

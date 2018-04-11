@@ -22,7 +22,7 @@
     <h2>Hello {{userName}}!</h2>
     <h4>{{userEmail}}</h4>
   </ion-item>
-  <p> Last updated: {{(lastUpdateTime)}} </p>
+  <p> Last updated: {{(lastUpdateTime | date:'medium':'mediumTime')}} </p>
   <button ion-button block class="mode_bttn" (click)="showRadioAlert()">
      Transportation Mode: {{lastMode}}
   </button>
