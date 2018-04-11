@@ -30,11 +30,9 @@ export class HomePage {
   lastLocation: any;
   connected: Subscription;
   disconnected: Subscription;
-  onToast: any;
-  offToast: any;
   lastMode: any;
-  // Use this flag to protect critical section
-  // when device is offline
+
+  // Use this flag as a condition variable
   enableFunctionality: boolean;
 
   constructor(
@@ -98,20 +96,22 @@ export class HomePage {
 
   onConnectUpdate(connectionState: string){
     let networkType = this.network.type;
-    this.onToast = this.toast.create({
+    let onToast = this.toast.create({
       message: 'You are now ' + connectionState + ' via '+ networkType,
       duration: 4000
     });
-    this.onToast.present();
+    onToast.onDidDismiss(() => {
+      this.checkMode();
+    });
+    onToast.present();
   }
 
   onDisconnectUpdate(){
-    this.offToast = this.toast.create({
+    this.toast.create({
       message: 'You are offline. You will not be able make new requests.',
       position: 'bottom',
       duration: 4000
-    });
-    this.offToast.present();
+    }).present();
   }
   /////////////////////////// End of ION-VIEW //////////////////////////////////
 
