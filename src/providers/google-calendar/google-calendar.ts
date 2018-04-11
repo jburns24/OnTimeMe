@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { NativeStorage } from '@ionic-native/native-storage';
-import { UserProvider } from '../user/user';
 
 @Injectable()
 export class GoogleCalendar {
@@ -20,8 +19,7 @@ export class GoogleCalendar {
   refreshToken: any;
 
   constructor(public http: HttpClient,
-    private storage: NativeStorage,
-    private user: UserProvider) {
+    private storage: NativeStorage) {
     }
 
   init(serverAuthCode: any){
@@ -110,41 +108,41 @@ export class GoogleCalendar {
       }, (error) => {
         console.log("Google-calendar::cannot get list:", error);
         //resolve(1);
-        resolve(this.lastKnown());
+        //resolve(this.lastKnown());
       });
     });
   }
 
-  lastKnown(){
-    return new Promise(resolve => {
-      // 1. Create an alert telling the users they need internet connection
-      // for such request.
-      // 2. If events exist then store the last known location, time-estimates
-      // from there, mode of transportation, and last update.
-      this.user.getUserInfo().then((user) => {
-        console.log("1. Google-calendar::lastKnown(): success");
-        this.storage.getItem(user.id).then((curUser) => {
-          console.log("2. Google-calendar::lastKnown(): success got mode");
-          this.storage.getItem('updated').then((update) => {
-            console.log("3. Google-calendar::lastKnown(): success got update");
-            this.storage.setItem('lastKnown', {mode: curUser.mode, time: update.time}).then(() =>{
-              console.log("Google-calendar::lastKnown(): successfully stored last_known:");
-              this.storage.getItem('lastKnown').then((lastKnown) =>{
-                console.log("Google-calendar::lastKnown(): get last known is:", lastKnown);
-                resolve(1);
-              });
-            }, (error) => {
-              console.log("Google-calendar::lastKnown(): failed to store last known,", error);
-            });
-          }, (error3) => {
-            console.log("3. Google-calendar::lastKnown(): failed to get update,", error3);
-          });
-        }, (error2) => {
-          console.log("2. Google-calendar::lastKnown(): failed to get mode,", error2);
-        });
-      }, (error1) => {
-        console.log("1, Google-calendar::lastKnown(): failed to get user info,", error1);
-      });
-    });
-  }
+  // lastKnown(){
+  //   return new Promise(resolve => {
+  //     // 1. Create an alert telling the users they need internet connection
+  //     // for such request.
+  //     // 2. If events exist then store the last known location, time-estimates
+  //     // from there, mode of transportation, and last update.
+  //     this.user.getUserInfo().then((user) => {
+  //       console.log("1. Google-calendar::lastKnown(): success");
+  //       this.storage.getItem(user.id).then((curUser) => {
+  //         console.log("2. Google-calendar::lastKnown(): success got mode");
+  //         this.storage.getItem('updated').then((update) => {
+  //           console.log("3. Google-calendar::lastKnown(): success got update");
+  //           this.storage.setItem('lastKnown', {mode: curUser.mode, time: update.time}).then(() =>{
+  //             console.log("Google-calendar::lastKnown(): successfully stored last_known:");
+  //             this.storage.getItem('lastKnown').then((lastKnown) =>{
+  //               console.log("Google-calendar::lastKnown(): get last known is:", lastKnown);
+  //               resolve(1);
+  //             });
+  //           }, (error) => {
+  //             console.log("Google-calendar::lastKnown(): failed to store last known,", error);
+  //           });
+  //         }, (error3) => {
+  //           console.log("3. Google-calendar::lastKnown(): failed to get update,", error3);
+  //         });
+  //       }, (error2) => {
+  //         console.log("2. Google-calendar::lastKnown(): failed to get mode,", error2);
+  //       });
+  //     }, (error1) => {
+  //       console.log("1, Google-calendar::lastKnown(): failed to get user info,", error1);
+  //     });
+  //   });
+  // }
 }

@@ -54,9 +54,6 @@ export class MyApp {
       { title: 'Home', component: HomePage, icon:'home' },
       //{ title: 'Preference', component: Preference, icon:'md-settings'}
     ];
-
-    // Set the app to land on the login page as soon as launch
-    this.rootPage = LoginGatePage;
   }
 
   initializeApp(){

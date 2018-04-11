@@ -24,7 +24,7 @@
   </ion-item>
   <p> Last update: {{(lastUpdateTime)}} with selected mode: {{lastMode}} </p>
   <button ion-button block class="mode_bttn" (click)="showRadioAlert()">
-     Transportation Mode: {{transMode}}
+     Transportation Mode: {{lastMode}}
   </button>
   <ion-list>
     <ion-item *ngFor="let event of eventList">

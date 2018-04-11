@@ -26,7 +26,6 @@ export class HomePage {
   todaysEpoch = Date.now();
   location: any;
   epochNow: any;
-  transMode: any;
   lastUpdateTime: any;
   connected: Subscription;
   disconnected: Subscription;
@@ -59,14 +58,21 @@ export class HomePage {
   ///////////////////////// ION-VIEW BEGINS ////////////////////////////////////
   ionViewWillEnter(){
     console.log("ionViewWillEnter");
+    this.enableMenu();
+    this.init();
     // First, check to see if we have internet connection. Use the network plugin
     // type to check this. We are looking for 'none'
     if(this.network.type == 'none'){
       this.enableFunctionality = false;
       console.log("Home::ionViewWillEnter(): we are offline, enable =", this.enableFunctionality);
-      this.onDisconnectUpdate();
+    } else{
+      this.enableFunctionality = true;
     };
+    console.log("-->>enableFunctionality:", this.enableFunctionality);
+  }
 
+  ionViewDidEnter(){
+    this.checkMode();
     this.connected = this.network.onConnect().subscribe(data =>{
       console.log("Home::ionViewDidEnter(): connected to internet,", data);
       this.offToast.dismiss();
@@ -77,32 +83,7 @@ export class HomePage {
     }, (error) => {
       console.log("Home::ionViewDidEnter(): error,", error);
     });
-    // if (!this.enableFunctionality){
-    //   console.log("Home::constructor(): enable is false");
-    //   let date = new Date().toISOString();
-    //   this.user.getUserInfo().then((user) => {
-    //     this.storage.getItem(user.id).then(curUser => {
-    //       this.storage.setItem('lastKnown', {mode: curUser.mode, time: date}).then(() => {
-    //         this.storage.getItem('lastKnown').then((last) => {
-    //           this.lastMode = last.mode;
-    //           this.lastUpdateTime = last.time;
-    //         });
-    //       });
-    //     });
-    //   });
-    // }
-    this.enableMenu();
-    this.init();
-    this.checkMode();
-    console.log("-->>enableFunctionality:", this.enableFunctionality);
-  }
 
-  ionViewDidLeave(){
-    this.offToast.dismiss();
-  }
-
-  ionViewDidEnter(){
-    console.log("ionViewDidEnter", this.network.type);
     this.disconnected = this.network.onDisconnect().subscribe(data => {
       console.log("Home::ionViewDidEnter(): disconncted from internet,", data);
       this.enableFunctionality = false;
@@ -110,42 +91,27 @@ export class HomePage {
     }, (error) => {
       console.log("Home::ionViewDidEnter(): error on disconnect,", error);
     });
+  }
 
-    // this.connected = this.network.onConnect().subscribe(data =>{
-    //   console.log("Home::ionViewDidEnter(): connected to internet,", data);
-    //   this.offToast.dismiss();
-    //   this.offToast.onDidDismiss(() => {
-    //     this.enableFunctionality = true;
-    //   });
-    //   this.onConnectUpdate(data.type);
-    // }, (error) => {
-    //   console.log("Home::ionViewDidEnter(): error,", error);
-    // });
+  ionViewWillLeave(){
+    this.connected.unsubscribe();
+    this.disconnected.unsubscribe();
   }
 
   onConnectUpdate(connectionState: string){
     let networkType = this.network.type;
     this.onToast = this.toast.create({
       message: 'You are now ' + connectionState + ' via '+ networkType,
-      duration: 5000
-    });
-    this.onToast.onDidDismiss(() => {
-      this.checkMode();
+      duration: 4000
     });
     this.onToast.present();
   }
 
   onDisconnectUpdate(){
-    this.storage.getItem('lastKnown').then((data) => {
-      this.lastMode = data.mode;
-      this.lastUpdateTime = data.time;
-    });
-
     this.offToast = this.toast.create({
-      message: 'You are offline. Time estimates may not be accurate. The above shows your last update.',
+      message: 'You are offline. You will not be able make new requests.',
       position: 'bottom',
-      dismissOnPageChange: false,
-      showCloseButton: false
+      duration: 4000
     });
     this.offToast.present();
   }
@@ -163,33 +129,61 @@ export class HomePage {
   }
 
   checkMode(){
-    this.user.getUserInfo().then((user) => {
-      this.storage.getItem(user.id).then((curUser) => {
-        this.transMode = curUser.mode;
-        this.start();
-        console.log("Home::checkMode(): mode already set:", curUser.mode);
-      }, (error) => {
-        console.log("Home::checkMode(): mode not set yet:", error);
-        let nullMode = undefined;
-        this.trans.showRadioAlert(nullMode).then((mode) => {
-          this.transMode = mode;
-          this.start();
-          console.log("Home::checkMode(): promise returned:", this.transMode);
+    if (this.enableFunctionality){
+      this.user.getUserInfo().then((user) => {
+        this.storage.getItem(user.id).then((curUser) => {
+          let date = new Date().toISOString();
+          this.storage.setItem('lastKnown', {mode: curUser.mode, time: date}).then(() => {
+            this.storage.getItem('lastKnown').then((last) => {
+              this.lastMode = last.mode;
+              this.lastUpdateTime = last.time;
+              this.start();
+            });
+          });
+          console.log("Home::checkMode(): mode already set:", curUser.mode);
         }, (error) => {
-          console.log("Home::checkMode(): promise returned error,", error);
+          console.log("Home::checkMode(): mode not set yet:", error);
+          let nullMode = undefined;
+          this.trans.showRadioAlert(nullMode).then((mode) => {
+            let date = new Date().toISOString();
+            this.lastMode = mode;
+            this.lastUpdateTime = date;
+            this.storage.setItem('lastKnown', {mode: this.lastMode, time: date}).then(() => {
+              this.start();
+            });
+            console.log("Home::checkMode(): promise returned:", this.lastMode);
+          }, (error) => {
+            console.log("Home::checkMode(): promise returned error,", error);
+          });
         });
       });
-    });
+    } else{
+      this.storage.getItem('lastKnown').then((last) => {
+        this.lastMode = last.mode;
+        this.lastUpdateTime = last.time;
+        console.log("Home::checkMode(): last know =", last);
+      }, (error) => {
+        console.log("Home::checkMode(): cannot retrieve last known", error);
+      });
+    };
   }
 
   showRadioAlert(){
-    this.trans.showRadioAlert(this.transMode).then((mode) => {
-      this.transMode = mode;
-      this.start();
-      console.log("Home::showRadioAlert(): promise returned:", this.transMode);
-    }, (error) => {
-      console.log("Home::showRadioAlert(): promise returned error,", error);
-    });
+    if (this.enableFunctionality){
+      this.trans.showRadioAlert(this.lastMode).then((mode) => {
+        this.lastMode = mode;
+        this.start();
+        console.log("Home::showRadioAlert(): promise returned:", this.lastMode);
+      }, (error) => {
+        console.log("Home::showRadioAlert(): promise returned error,", error);
+      });
+    } else {
+      this.toast.create({
+        message: 'You are offline. Action is not possible.',
+        position: 'bottom',
+        duration: 4000
+      }).present();
+    };
   }
 
   start(){
@@ -197,20 +191,6 @@ export class HomePage {
       this.user.getUserInfo().then((user) => {
         this.googleCalendar.init(user.serverAuthCode).then(() => {
           this.getList(this.googleCalendar.refreshToken).then(() => {
-            if (this.enableFunctionality){
-              let date = new Date().toISOString();
-              this.storage.setItem('updated', {time: date}).then(() => {
-                this.storage.getItem('updated').then((update) => {
-                  this.storage.setItem('lastKnown', {mode: this.transMode, time: update.time})
-                  .then(() => {
-                    this.storage.getItem('lastKnown').then((last) => {
-                      this.lastMode = last.mode;
-                      this.lastUpdateTime = last.time;
-                    });
-                  });
-                });
-              });
-            };
           }, (err) => {
             console.log("home::getList() error", err);
           });
@@ -227,11 +207,6 @@ export class HomePage {
     return new Promise (resolve => {
       this.googleCalendar.getList(authToken).then( (list) => {
         console.log("list is ", list);
-        if (list == 1){
-          this.enableFunctionality = false;
-          return;
-        };
-        this.enableFunctionality = true;
         this.events = list;
         this.event.storeTodaysEvents(JSON.stringify(this.events)).then(() => {
           console.log('home::getList() successfully saved todays events');
@@ -258,23 +233,26 @@ export class HomePage {
   }
 
   doRefresh(refresher){
-    this.getList(this.googleCalendar.refreshToken).then(() => {
-      if (this.enableFunctionality){
-        let date = new Date().toISOString();
-        this.storage.setItem('lastKnown', {mode: this.transMode, time: date}).then(() => {
-          this.storage.getItem('lastKnown').then((last) => {
-            this.lastMode = last.mode;
-            this.lastUpdateTime = last.time;
-          });
-          refresher.complete();
-          console.log("Home::doRefresh(): successfully stored lastKnown.");
-        }, (error) => {
-          console.log("Home::doRefresh(): failed to store lastKnown,", error);
-        });
-      };
+    if (this.enableFunctionality){
+      this.getList(this.googleCalendar.refreshToken).then(() => {
+        refresher.complete();
+      }, (error) => {
+        console.log("Home::doRefresh(): failed to refresh,", error);
+      });
+    } else {
       refresher.complete();
-    }, (err) => {
-      console.log("home::getList() error", err);
-    });
+    };
+    // } else {
+    //   let date = new Date().toISOString();
+    //   this.storage.setItem('lastKnown', {mode: this.transMode, time: date}).then(() => {
+    //     this.storage.getItem('lastKnown').then((last) => {
+    //       this.lastMode = last.mode;
+    //       this.lastUpdateTime = last.time;
+    //       refresher.complete();
+    //     }, (error) => {
+    //       console.log("Home::doRefresh(): cannot get last known,", error);
+    //     });
+    //   });
+    // };
   }
 }
