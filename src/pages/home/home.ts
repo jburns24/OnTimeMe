@@ -27,6 +27,7 @@ export class HomePage {
   location: any;
   epochNow: any;
   lastUpdateTime: any;
+  lastLocation: any;
   connected: Subscription;
   disconnected: Subscription;
   onToast: any;
@@ -190,6 +191,7 @@ export class HomePage {
     });
   }
 
+  // Last knowns are stored in here while retrieving and storing event list.
   getList(authToken: any){
     return new Promise (resolve => {
       this.googleCalendar.getList(authToken).then( (list) => {
@@ -207,12 +209,15 @@ export class HomePage {
               this.storage.getItem(user.id).then((curUser) => {
                 this.storage.setItem('lastKnown', {mode: curUser.mode, time: date}).then(() => {
                   this.storage.getItem('lastKnown').then((last) => {
-                    this.lastMode = last.mode;
-                    this.lastUpdateTime = last.time;
-                  }, (error) => { console.log("Home::getList():", error) });
-                }, (error) => { console.log("Home::getList():", error) });
-              }, (error) => { console.log("Home::getList():", error) });
-            }, (error) => { console.log("Home::getList():", error) });
+                    this.storage.getItem('lastKnownLocation').then((loc) => {
+                      this.lastMode = last.mode;
+                      this.lastUpdateTime = last.time;
+                      this.lastLocation = loc.origin; // stored in events provider
+                    }, (error5) => { console.log("Home::getList():,", error5) });
+                  }, (error4) => { console.log("Home::getList():", error4) });
+                }, (error3) => { console.log("Home::getList():", error3) });
+              }, (error2) => { console.log("Home::getList():", error2) });
+            }, (error1) => { console.log("Home::getList():", error1) });
             /////////////////////////////////////////////////////////////////////////////
             console.log('Home::getList(): successfully got user events ', events);
           }, (err) => { console.log('Home::getList(): failed to get saved events', err) });

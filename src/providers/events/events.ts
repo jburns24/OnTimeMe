@@ -110,7 +110,7 @@ export class Events {
                 let rows = suc['rows'];
                 let row = rows[0];
                 let elements = row['elements'];
-                let element = elements[0]
+                let element = elements[0];
                 let duration = element['duration'];
                 let event_with_trip = {
                   id: eventd['id'],
@@ -122,9 +122,8 @@ export class Events {
                   trip_duration: duration['value'],
                 };
                 this.eventListWithTrip.push(event_with_trip);
-                // if (elements['status'] == 'OK') {
-
-                // };
+                // Store for offline use...add to this later on....
+                this.storage.setItem('lastKnownLocation', {origin: suc['origin_addresses']});
               }, (error) => {
                 console.log('Home::getList(): failed to get distance:', error);
               });

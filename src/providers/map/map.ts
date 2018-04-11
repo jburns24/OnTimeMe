@@ -6,7 +6,6 @@ import { Geolocation } from '@ionic-native/geolocation';
 
 @Injectable()
 export class Map {
-  mode: any;
   constructor(public http: HttpClient,
     private storage: NativeStorage,
     private user: UserProvider,
@@ -46,8 +45,8 @@ export class Map {
         this.storage.getItem(user.id).then((userId) => {
           console.log("Map::getMode(): success!");
           console.log("==> curUser.id:", user.id, "mode:", userId.mode);
-          this.mode = userId.mode;
-          resolve(this.mode);
+          let mode = userId.mode;
+          resolve(mode);
         }, (error) => {
           console.log("Map::getMode(): no user found in native storage!", error);
         });
