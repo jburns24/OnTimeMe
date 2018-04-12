@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { NativeStorage } from '@ionic-native/native-storage';
+import { UserProvider } from '../../providers/user/user';
 
 @Injectable()
 export class GoogleCalendar {
@@ -18,14 +19,15 @@ export class GoogleCalendar {
   clientId: any = '311811472759-j2p0u79sv24d7dgmr1er559cif0m7k1j.apps.googleusercontent.com';
 
   constructor(public http: HttpClient,
-    private storage: NativeStorage) {
+    private storage: NativeStorage,
+    private user: UserProvider) {
     }
 
   init(serverAuthCode: any) : Promise<any>{
     return new Promise(resolve => {
       this.storage.getItem('refreshToken').then((RT) => {
         console.log("Google-calendar::init(): refreshToken already stored:,", RT.token);
-        resolve(RT.token);
+        resolve(this.getTempAuthToken(RT.token));
       }, (error) => {
         console.log("Google-calendar::init(): refreshToken not set:", error);
         resolve(this.getRefreshTokenId(serverAuthCode));
@@ -49,15 +51,17 @@ export class GoogleCalendar {
         'grant_type': 'authorization_code'
       }
       this.http.post(this.authUrl, httpOptions, { params }).subscribe((data) => {
-        console.log("Google-calendar::getRefreshTokenId(): succesfully got RT_id", data);
-        resolve(this.getRefreshToken(data['refresh_token']));
+        console.log("Google-calendar::getRefreshTokenId(): succesfully got RT_id", data); 
+        let refreshToken = data['refresh_token'];
+        this.storage.setItem('refreshToken', { token: refreshToken });
+        resolve(this.getTempAuthToken(data['refresh_token']));
       }, (error) => {
         console.log("Google-calendar::getRefreshTokenId(): failed!", error);
       });
     });
   }
 
-  getRefreshToken(refreshTokenId: any){
+  getTempAuthToken(refreshTokenId: any){
     return new Promise(resolve => {
       const httpOptions = {
         headers: new HttpHeaders({
@@ -72,23 +76,22 @@ export class GoogleCalendar {
         'grant_type': 'refresh_token'
       }
       this.http.post(this.authUrl, httpOptions, { params }).subscribe((data) => {
-        let refreshToken = data['access_token'];
-        this.storage.setItem('refreshToken', { token: refreshToken });
-        console.log("Google-calendar::getRefreshToken(): successfully got RT", refreshToken);
-        resolve(refreshToken);
+        let accessToken = data['access_token'];
+        console.log("Google-calendar::getTempAuthToken(): successfully got RT", accessToken);
+        resolve(accessToken);
       }, (error) => {
-        console.log("Google-calendar::getRefreshToken(): failed!", error);
+        console.log("Google-calendar::getTempAuthToken(): failed!", error);
       });
     });
   }
 
   //  Takes a user authToken executes a google Event List api call and returns the response
-  getList(refreshToken: string) : Promise<any>{
+  getList(authToken: string) : Promise<any>{
     //  This was taken from the angular 2 documenation on how to set HttpHeaders
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type':  'application/json',
-        'Authorization': 'Bearer ' + refreshToken
+        'Authorization': 'Bearer ' + authToken
       })
     };
 
@@ -108,6 +111,11 @@ export class GoogleCalendar {
       this.http.get(this.calendarUrl + this.eventList + urlParams, httpOptions).subscribe(data => {
         resolve(data);
       }, (error) => {
+        this.user.getUserInfo().then((user) => {
+          this.init(user.serverAuthCode).then((authToken) => {
+            resolve(this.getList(authToken));
+          });
+        });
         console.log("Google-calendar::cannot get list:", error);
       });
     });

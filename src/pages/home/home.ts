@@ -157,8 +157,8 @@ export class HomePage {
 
   start(){
       this.user.getUserInfo().then((user) => {
-        this.googleCalendar.init(user.serverAuthCode).then((refreshToken) => {
-          this.getList(refreshToken).then((list) => {
+        this.googleCalendar.init(user.serverAuthCode).then((authToken) => {
+          this.getList(authToken).then((list) => {
             console.log("Home::start(): got list,", list);
           }, (err) => {
             console.log("home::getList() error", err);
