@@ -13,7 +13,9 @@ export class HoursMinutesSecondsPipe implements PipeTransform {
     let seconds = Math.floor(value % 60);
 
     let timeString ="";
-    args.hours ? timeString += hours + " hrs " : true;
+    if(args.hours && hours != 0) {
+      timeString += hours + " hrs ";
+    }
     args.minutes ? timeString += (minutes - (60 * hours))+ " mins " : true;
     args.seconds ? timeString += seconds + " secs " : true;
 

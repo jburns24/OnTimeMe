@@ -23,7 +23,6 @@ export class HomePage {
   refreshTokenId: any;
   authToken: any;
   eventList: any;
-  todaysEpoch = Date.now();
   location: any;
   epochNow: any;
   lastUpdateTime: any;
@@ -157,7 +156,6 @@ export class HomePage {
   }
 
   start(){
-    this.locationTracker.startTracking().then(() => {
       this.user.getUserInfo().then((user) => {
         this.googleCalendar.init(user.serverAuthCode).then((refreshToken) => {
           this.getList(refreshToken).then((list) => {
@@ -171,7 +169,6 @@ export class HomePage {
       }, (err) => {
         console.log("GetUserInfor error", err);
       });
-    });
   }
 
   showRadioAlert(){
@@ -202,7 +199,7 @@ export class HomePage {
           console.log('home::getList() successfully saved todays events');
           this.event.getTodaysEvents().then((events) =>{
             this.eventList = events;
-            this.epochNow = this.realTimeClock.getEpochTime().do(() => ++this.todaysEpoch);
+            this.epochNow = this.realTimeClock.getEpochTime();
             this.epochNow = this.epochNow.share();
             // SUCCESSFULLY GOT LIST, This is the time when you need to store to last known
             let date = new Date();
