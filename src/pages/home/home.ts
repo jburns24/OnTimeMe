@@ -231,11 +231,11 @@ export class HomePage {
 
   doRefresh(refresher){
     if (this.enableFunctionality){
-      this.storage.getItem('refreshToken').then((refreshToken) => {
-        this.getList(refreshToken.token).then(() => {
+      this.googleCalendar.init().then((authToken) => {
+        this.getList(authToken).then(() => {
           refresher.complete();
         }, (err) => { console.log("home::doRefresh(): error", err) });
-      }, (err2) => { console.log("Home::doRefresh(): failed to get token from native", err2) });
+      }, (err2) => { console.log("Home::doRefresh(): googleCalendar init() failed", err2) });
     } else {
       refresher.complete();
     };
