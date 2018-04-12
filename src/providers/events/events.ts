@@ -122,6 +122,17 @@ export class Events {
                   trip_duration: duration['value'],
                 };
                 this.eventListWithTrip.push(event_with_trip);
+                this.eventListWithTrip.sort((a:any, b:any) => {
+                  if(a.startTime < b.startTime) {
+                    return -1;
+                  }
+                  else if(a.startTime > b.startTime) {
+                    return 1;
+                  }
+                  else {
+                    return 0;
+                  }
+                });
                 // Store for offline use...add to this later on....
                 this.storage.setItem('lastKnownLocation', {origin: suc['origin_addresses']});
               }, (error) => {

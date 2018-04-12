@@ -20,8 +20,13 @@ export class RealTimeClockProvider {
 counter: any = Date.now() / 1000;
 
   getEpochTime() {
+    this.updateTime();
     return Rx.Observable.timer(0, tick)
       .take(this.counter)
       .map(() => ++this.counter);
+  }
+
+  updateTime() {
+    this.counter = Date.now() / 1000;
   }
 }
