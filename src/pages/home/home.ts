@@ -9,12 +9,9 @@ import { Events } from '../../providers/events/events';
 import { Transportation } from '../../providers/transportation-mode/transportation-mode';
 import { Network } from '@ionic-native/network';
 import { Subscription} from 'rxjs/Subscription';
-<<<<<<< HEAD
-=======
 // import { LocalNotification } from '../../providers/local-notification/local-notification';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 
->>>>>>> d7dff61... testing done for the local notification. An example is provided int he ionViewDidEnter() method of the home page.
 
 @Component({
   selector: 'page-home',
@@ -50,12 +47,8 @@ export class HomePage {
     private trans: Transportation,
     private storage: NativeStorage,
     private toast: ToastController,
-<<<<<<< HEAD
-    private network: Network){
-=======
     private network: Network,
     private localNotification: LocalNotifications){
->>>>>>> d7dff61... testing done for the local notification. An example is provided int he ionViewDidEnter() method of the home page.
 
   }
 
@@ -81,8 +74,6 @@ export class HomePage {
   }
 
   ionViewDidEnter(){
-<<<<<<< HEAD
-=======
     /////// TESTING GROUNDS FOR LOCAL NOTIFICATION ////////////////
     this.localNotification.requestPermission().then((permission) => {
       console.log("Home::ionViewDidEnter(): user allowed local notification", permission);
@@ -97,7 +88,6 @@ export class HomePage {
      lockscreen: true
     });
     ////////////////////////////////////////////////////////
->>>>>>> d7dff61... testing done for the local notification. An example is provided int he ionViewDidEnter() method of the home page.
     this.checkMode();
     this.connected = this.network.onConnect().subscribe(data =>{
       console.log("Home::ionViewDidEnter(): connected to internet,", data);

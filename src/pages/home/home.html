@@ -22,12 +22,9 @@
     <h2>Hello {{userName}}!</h2>
     <h4>{{userEmail}}</h4>
   </ion-item>
-<<<<<<< HEAD
-=======
   <button ion-button block class="mode_bttn" (click)="localNotification.clearAll()">
      Clear Notification
   </button>
->>>>>>> d7dff61... testing done for the local notification. An example is provided int he ionViewDidEnter() method of the home page.
   <button ion-button block class="mode_bttn" (click)="showRadioAlert()">
      Transportation Mode: {{lastMode}}
   </button>
@@ -40,7 +37,7 @@
       <p item-left [style.font-size.vw]="'4.2'" class="truncate">{{ event.summary }}</p>
       <p *ngIf="event.happening" item-right [style.color]="(((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? 'red' : 'green'">
         {{
-          (((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? 
+          (((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ?
           "- " + (((epochNow | async) - event.startTime) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true}) :
            (((event.startTime - event.trip_duration) - (epochNow | async)) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true})
         }}
