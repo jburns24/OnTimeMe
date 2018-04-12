@@ -52,16 +52,24 @@ export class HomePage {
 
   }
 
-  /*
-   * Using ion-views to control the flow of things. Much easier, also keeps
-   * updated values in tact. Use subscribe to subscribe to an observable so
-   * that the time-lived is longer. Promise will only return 1 time.
-   */
   ///////////////////////// ION-VIEW BEGINS ////////////////////////////////////
-  ionViewWillEnter(){
-    console.log("ionViewWillEnter");
+
+  // Do permission checks and all that here.
+  ionViewCanEnter(){
+    this.localNotification.requestPermission().then((permission) => {
+      console.log("Home::ionViewDidEnter(): user allowed local notification", permission);
+    });
+  }
+
+  // Runs when page loaded. This will fire up only once. If page leaves,
+  // but is cached, it will not fire again in subsequent viewing. Good
+  // place to put setup code for the page.
+  ionViewDidLoad(){
     this.enableMenu();
     this.init();
+}
+
+  ionViewWillEnter(){
     // First, check to see if we have internet connection. Use the network plugin
     // type to check this. We are looking for 'none'
     if(this.network.type == 'none'){
@@ -74,23 +82,7 @@ export class HomePage {
   }
 
   ionViewDidEnter(){
-    /////// TESTING GROUNDS FOR LOCAL NOTIFICATION ////////////////
-    this.localNotification.requestPermission().then((permission) => {
-      console.log("Home::ionViewDidEnter(): user allowed local notification", permission);
-    });
-    this.localNotification.schedule({
-      title: 'Testing Notification',
-      text: 'Do you like me?',
-      autoClear: true,
-    // vibrate: true,
-    // sticky: false, //Ongoing
-     launch: true,
-     lockscreen: true
-    });
-    ////////////////////////////////////////////////////////
-    this.checkMode();
     this.connected = this.network.onConnect().subscribe(data =>{
-      console.log("Home::ionViewDidEnter(): connected to internet,", data);
       this.enableFunctionality = true;
       this.onConnectUpdate(data.type);
     }, (error) => {
@@ -98,12 +90,14 @@ export class HomePage {
     });
 
     this.disconnected = this.network.onDisconnect().subscribe(data => {
-      console.log("Home::ionViewDidEnter(): disconncted from internet,", data);
       this.enableFunctionality = false;
       this.onDisconnectUpdate();
     }, (error) => {
       console.log("Home::ionViewDidEnter(): error on disconnect,", error);
     });
+
+    console.log("----------------- START -----------------------");
+    this.checkMode();
   }
 
   ionViewWillLeave(){
@@ -137,7 +131,6 @@ export class HomePage {
       this.userName = user.name;
       this.userPicture = user.picture;
       this.userEmail = user.email;
-      console.log("Home::init(): done initializing user profile,");
     }, (error) => {
       console.log("Home::intit(): error cant get user info,", error);
     });
@@ -148,8 +141,7 @@ export class HomePage {
       this.user.getUserInfo().then((user) => {
         this.storage.getItem(user.id).then((curUser) => {
           this.lastMode = curUser.mode;
-            this.start();
-          console.log("Home::checkMode(): mode already set:", this.lastMode);
+          this.start();
         }, (error) => {
           console.log("Home::checkMode(): mode not set yet:", error);
           let nullMode = undefined;
@@ -176,8 +168,8 @@ export class HomePage {
   start(){
       this.user.getUserInfo().then((user) => {
         this.googleCalendar.init(user.serverAuthCode).then((authToken) => {
-          this.getList(authToken).then((list) => {
-            console.log("Home::start(): got list,", list);
+          this.getList(authToken).then((retValue) => {
+            console.log("Home::start(): got list,", retValue);
           }, (err) => {
             console.log("home::getList() error", err);
           });
@@ -194,7 +186,7 @@ export class HomePage {
       this.trans.showRadioAlert(this.lastMode).then((mode) => {
         this.lastMode = mode;
         this.start();
-        console.log("Home::showRadioAlert(): promise returned:", this.lastMode);
+        //console.log("Home::showRadioAlert(): promise returned:", this.lastMode);
       }, (error) => {
         console.log("Home::showRadioAlert(): promise returned error,", error);
       });
@@ -211,10 +203,9 @@ export class HomePage {
   getList(refreshToken: any){
     return new Promise (resolve => {
       this.googleCalendar.getList(refreshToken).then( (list) => {
-        console.log("list is ", list);
         this.events = list;
         this.event.storeTodaysEvents(JSON.stringify(this.events)).then(() => {
-          console.log('home::getList() successfully saved todays events');
+          console.log('Home::getList(): successfully saved todays events');
           this.event.getTodaysEvents().then((events) =>{
             this.eventList = events;
             this.epochNow = this.realTimeClock.getEpochTime();
@@ -229,6 +220,7 @@ export class HomePage {
                       this.lastMode = last.mode;
                       this.lastUpdateTime = last.time;
                       this.lastLocation = loc.origin; // stored in events provider
+                      resolve(this.scheduleAlert(this.eventList));
                     }, (error5) => { console.log("Home::getList():,", error5) });
                   }, (error4) => { console.log("Home::getList():", error4) });
                 }, (error3) => { console.log("Home::getList():", error3) });
@@ -239,16 +231,20 @@ export class HomePage {
           }, (err) => { console.log('Home::getList(): failed to get saved events', err) });
         }, (err) => { console.log('Home::getList(): failed to save events ', err) });
       }, (error) => { console.log("Home::getList(): error:", error) });
-      resolve(this.event);
     });
   }
 
-  enableMenu(){
-    this.menu.enable(true);
+  scheduleAlert(eventsList: any){
+    return new Promise(resolve => {
+      console.log("Home::scheduleAlert(): eventsList param is:", eventsList);
+      console.log("Home::scheduleAlert(): eventsList param size is:", eventsList.length);
+      resolve("done");
+    });
   }
 
   doRefresh(refresher){
     if (this.enableFunctionality){
+      console.log("-------------- REFRESH START -------------")
       this.googleCalendar.init().then((authToken) => {
         this.getList(authToken).then(() => {
           refresher.complete();
@@ -257,5 +253,9 @@ export class HomePage {
     } else {
       refresher.complete();
     };
+  }
+
+  enableMenu(){
+    this.menu.enable(true);
   }
 }

@@ -55,7 +55,7 @@ export class GoogleCalendar {
         'grant_type': 'authorization_code'
       }
       this.http.post(this.authUrl, httpOptions, { params }).subscribe((data) => {
-        console.log("Google-calendar::getRefreshTokenId(): succesfully got RT_id", data);
+        //console.log("Google-calendar::getRefreshTokenId(): succesfully got RT_id", data);
         let refreshToken = data['refresh_token'];
         this.storage.setItem('refreshToken', { token: refreshToken });
         resolve(this.getTempAuthToken(data['refresh_token']));
@@ -82,7 +82,7 @@ export class GoogleCalendar {
       }
       this.http.post(this.authUrl, httpOptions, { params }).subscribe((data) => {
         let accessToken = data['access_token'];
-        console.log("Google-calendar::getTempAuthToken(): successfully got accessToken", accessToken);
+        //console.log("Google-calendar::getTempAuthToken(): successfully got accessToken", accessToken);
         resolve(accessToken);
       }, (error) => {
         console.log("Google-calendar::getTempAuthToken(): failed!", error);

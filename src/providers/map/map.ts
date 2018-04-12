@@ -21,7 +21,6 @@ export class Map {
       let distanceUrl = 'https://maps.googleapis.com/maps/api/distancematrix/json?';
       let originParam = 'origins=' + origin;
       let destParam = '&destinations=' + destination;
-      console.log("MAP::THIS MODE :", mode);
       let modeParam = '&mode=' + mode;
       let apiKey = '&key=AIzaSyC_VYR8OeR5oXOwzX--70vdgdFGoAAC8-w';
 

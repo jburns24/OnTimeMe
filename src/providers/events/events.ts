@@ -28,7 +28,6 @@ export class Events {
     let todaysEventList = [];
     let data = JSON.parse(jsonString);
     let events = data['items'];
-    console.log("events::storeTodaysEvents() are ", events);
     for (let event of events) {
       let start = event['start'];
       let end = event['end'];
@@ -51,7 +50,6 @@ export class Events {
     return this.user.getUserInfo().then((user) => {
       let event_key = user.id + 'events';
       this.storage.setItem(event_key, event_list_object).then(() => {
-        console.log('Events::events saved to user!!');
       }, (err) => {
         console.log('Events::storeTodaysEvents failed to store events ', err);
       });
@@ -106,7 +104,6 @@ export class Events {
               let origin = this.locationTracker.lat + ',' + this.locationTracker.lng;
               this.map.getDistance(eventd['location'], mode, origin).then ((suc) => {
                 // Recreate event list with trip duration
-                console.log('Home::getList(): successfully got distance:', suc)
                 let rows = suc['rows'];
                 let row = rows[0];
                 let elements = row['elements'];
@@ -136,19 +133,21 @@ export class Events {
                 // Store for offline use...add to this later on....
                 this.storage.setItem('lastKnownLocation', {origin: suc['origin_addresses']});
               }, (error) => {
-                console.log('Home::getList(): failed to get distance:', error);
+                console.log('Events::getTodaysEvents(): failed to get distance:', error);
               });
             }
-            console.log('The recreate event list with trip distance ', this.eventListWithTrip);
-            resolve(this.eventListWithTrip);
+            // Storing eventListWithTrip as a JSON String.
+            this.storage.setItem('eventWithTrip', JSON.stringify(this.eventListWithTrip)).then(() => {
+              resolve(this.eventListWithTrip);
+            });
           },(err) =>{
-            console.log('events::getTodaysEvents, failed to get prefrence mode', err);
+            console.log('Events::getTodaysEvents: failed to get prefrence mode', err);
           });
         }, (err) => {
-          console.log('failed to get users events object ', err);
+          console.log('Events::getTodaysEvents(): failed to get users events object ', err);
         });
       }, (err) => {
-        console.log('events::getTodaysEvents() failed to fetch events ', err);
+        console.log('Events::getTodaysEvents(): failed to fetch events ', err);
       });
     });
   }
