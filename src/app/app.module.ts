@@ -25,6 +25,10 @@ import { ContactPage } from '../pages/contact/contact';
 import { HomePage } from '../pages/home/home';
 import { LoginGatePage } from '../pages/login-gate/login-gate';
 import { TabsPage } from '../pages/tabs/tabs';
+<<<<<<< HEAD
+=======
+import { LocalNotifications } from '@ionic-native/local-notifications';
+>>>>>>> d7dff61... testing done for the local notification. An example is provided int he ionViewDidEnter() method of the home page.
 
 
 
@@ -69,7 +73,12 @@ import { TabsPage } from '../pages/tabs/tabs';
     LocationTracker,
     Transportation,
     Network,
+<<<<<<< HEAD
     {provide: ErrorHandler, useClass: IonicErrorHandler}
+=======
+    LocalNotifications,
+    {provide: ErrorHandler, useClass: IonicErrorHandler},
+>>>>>>> d7dff61... testing done for the local notification. An example is provided int he ionViewDidEnter() method of the home page.
   ]
 })
 export class AppModule {}

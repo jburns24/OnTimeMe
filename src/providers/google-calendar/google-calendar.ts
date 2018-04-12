@@ -21,18 +21,24 @@ export class GoogleCalendar {
     private storage: NativeStorage) {
     }
 
+  // See if refreshToken exists
   init(serverAuthCode?: any) : Promise<any>{
     return new Promise(resolve => {
       this.storage.getItem('refreshToken').then((RT) => {
         console.log("Google-calendar::init(): refreshToken already stored:,", RT.token);
+        // If it does skip the auth step to get RT, and go get accessToken
+        // using RT
         resolve(this.getTempAuthToken(RT.token));
       }, (error) => {
         console.log("Google-calendar::init(): refreshToken not set:", error);
+        // Else, we need to get RT using the authCode from initial scope
         resolve(this.getRefreshTokenId(serverAuthCode));
       });
     });
   }
 
+  // Go to this step if no RT is found. This step gives you a RT and an accessToken.
+  // We ignore the accessToken, and use the RT to get a new refreshed accessToken.
   getRefreshTokenId(serverAuthCode: any){
     return new Promise(resolve => {
       const httpOptions = {
@@ -59,6 +65,7 @@ export class GoogleCalendar {
     });
   }
 
+  // Get the refresh authToken that we will need for calendar api calls
   getTempAuthToken(refreshTokenId: any){
     return new Promise(resolve => {
       const httpOptions = {
@@ -83,7 +90,7 @@ export class GoogleCalendar {
     });
   }
 
-  //  Takes a user authToken executes a google Event List api call and returns the response
+  //  Use the authToken from above method to make the api call
   getList(authToken: string) : Promise<any>{
     //  This was taken from the angular 2 documenation on how to set HttpHeaders
     const httpOptions = {
@@ -99,8 +106,6 @@ export class GoogleCalendar {
     let urlParams = '?timeMax='+ tomorrow + '&timeMin=' + today + '&orderBy=startTime&singleEvents=true';
 
     if (this.events) {
-      // if events already exists, promise will resolve and promise can
-      // be call from outside function to obtain data.
       return Promise.resolve(this.data);
     };
 
