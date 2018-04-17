@@ -21,7 +21,6 @@ export class Map {
       let distanceUrl = 'https://maps.googleapis.com/maps/api/distancematrix/json?';
       let originParam = 'origins=' + origin;
       let destParam = '&destinations=' + destination;
-      console.log("MAP::THIS MODE :", mode);
       let modeParam = '&mode=' + mode;
       let apiKey = '&key=AIzaSyC_VYR8OeR5oXOwzX--70vdgdFGoAAC8-w';
 
@@ -29,7 +28,7 @@ export class Map {
       this.http.get(distanceUrl+originParam+destParam+modeParam+apiKey)
       .subscribe(data => {
         resolve(data);
-        console.log("Maps::Success: Distance object is:", data);
+        //console.log("Maps::Success: Distance object is:", data);
       }, (error) => {
         resolve(error);
         console.log("Maps::Failed: failed to get distance:", error);
@@ -63,7 +62,7 @@ export class Map {
         let long = resp.coords.longitude;
         let latLong = lat+","+long;
         resolve(latLong);
-        console.log('Maps::getCurrentPosition(): Success lat/long:', latLong);
+        //console.log('Maps::getCurrentPosition(): Success lat/long:', latLong);
       }, (error) => {
         console.log('Maps::getCurrentPosition(): error getting location:', error);
       });

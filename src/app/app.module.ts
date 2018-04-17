@@ -25,6 +25,7 @@ import { ContactPage } from '../pages/contact/contact';
 import { HomePage } from '../pages/home/home';
 import { LoginGatePage } from '../pages/login-gate/login-gate';
 import { TabsPage } from '../pages/tabs/tabs';
+import { LocalNotifications } from '@ionic-native/local-notifications';
 
 
 
@@ -69,7 +70,8 @@ import { TabsPage } from '../pages/tabs/tabs';
     LocationTracker,
     Transportation,
     Network,
-    {provide: ErrorHandler, useClass: IonicErrorHandler}
+    LocalNotifications,
+    {provide: ErrorHandler, useClass: IonicErrorHandler},
   ]
 })
 export class AppModule {}

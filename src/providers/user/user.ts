@@ -9,7 +9,6 @@ export class UserProvider {
   getUserInfo() : Promise<any> {
     return new Promise(resolve => {
       this.storage.getItem('user').then((data) => {
-        console.log("User::getUserInfo(): user is: ", data);
         resolve(data);
       }, (error) => {
         console.log("UserProvider::getUserInfo(): cannot get user info,", error);
