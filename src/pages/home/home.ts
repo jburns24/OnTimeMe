@@ -165,11 +165,14 @@ export class HomePage {
     };
   }
 
+  // Calling this method should resolved "done" if methods return correctly.
   start(){
+    return new Promise(resolve => {
       this.user.getUserInfo().then((user) => {
         this.googleCalendar.init(user.serverAuthCode).then((authToken) => {
           this.getList(authToken).then((retValue) => {
             console.log("Home::start(): got list,", retValue);
+            resolve(retValue);
           }, (err) => {
             console.log("home::getList() error", err);
           });
@@ -179,6 +182,7 @@ export class HomePage {
       }, (err) => {
         console.log("GetUserInfor error", err);
       });
+    });
   }
 
   showRadioAlert(){
@@ -245,11 +249,9 @@ export class HomePage {
   doRefresh(refresher){
     if (this.enableFunctionality){
       console.log("-------------- REFRESH START -------------")
-      this.googleCalendar.init().then((authToken) => {
-        this.getList(authToken).then(() => {
-          refresher.complete();
-        }, (err) => { console.log("home::doRefresh(): error", err) });
-      }, (err2) => { console.log("Home::doRefresh(): googleCalendar init() failed", err2) });
+      this.start().then((retValue) => {
+        refresher.complete();
+      }, (err) => { console.log("home::doRefresh(): error", err) });
     } else {
       refresher.complete();
     };
