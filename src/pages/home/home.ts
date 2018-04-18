@@ -174,15 +174,14 @@ export class HomePage {
     return new Promise(resolve => {
       this.user.getUserInfo().then((user) => {
         this.googleCalendar.init(user.serverAuthCode).then((authToken) => {
-          this.getList(authToken).then((retValue) => {
-            console.log("Home::start(): got list,", retValue);
-            if (retValue === 0){
+          this.getList(authToken).then((listLength) => {
+            if (listLength === 0){
               this.noEvents = true;
             } else {
               this.noEvents = false;
             };
-            console.log("Home::start(): getList returned with event list length:", retValue);
-            resolve(retValue);
+            console.log("Home::start(): getList returned with event list length:", listLength);
+            resolve(listLength);
           }, (err) => {
             console.log("home::getList() error", err);
           });
@@ -213,7 +212,7 @@ export class HomePage {
     };
   }
 
-  // Last knowns are stored in here while retrieving and storing event list.
+  // @return The length of the eventsList.
   getList(refreshToken: any){
     return new Promise (resolve => {
       this.googleCalendar.getList(refreshToken).then( (list) => {
@@ -239,7 +238,7 @@ export class HomePage {
                         this.lastUpdateTime = last.time;
                         this.lastLocation = loc.origin; // stored in events provider
                         //resolve(this.scheduleAlert(this.eventList));
-                        resolve(this.events.length);
+                        resolve(this.eventList.length);
                       }, (error5) => { console.log("Home::getList():,", error5) });
                     }, (error4) => { console.log("Home::getList():", error4) });
                   }, (error3) => { console.log("Home::getList():", error3) });
