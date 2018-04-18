@@ -68,6 +68,10 @@ export class Events {
    *  entTime:  EPOCH end time in seconds
    *  happening: bit value indication event is ongoing or not
    *  trip_duration:  miliseconds till event in seconds
+   *
+   * @return 0 Promise resolves to 0, if there are no events in the next 24 hrs.
+   * @return eventsWithTrip The events with trip calculation added; the final events list. 
+   *
    */
   getTodaysEvents() {
     return new Promise (resolve => {
@@ -76,39 +80,43 @@ export class Events {
       this.eventListWithTrip = [];
       this.user.getUserInfo().then((user) => {
         this.storage.getItem(user.id + 'events').then((eventList) => {
-          let events = eventList['eventList'];
-          this.map.getPreferenceMode().then((mode) => {
-            this.mode = mode;
-            let counter = 0;
-            console.log("event list length is:", events);
-            for (let event of events) {
-              counter = counter + 1;
-              let ongoing = 0;
-              // Skipping any event that does not have a location.
-              if(typeof event['location'] === 'undefined') {
-                continue;
-              }
-              if (this.now >= event['startTime']) {
-                ongoing = 1;
-              }
-              let new_event = {
-                id: event['id'],
-                summary: event['summary'],
-                location: event['location'],
-                startTime: event['startTime'],
-                endTime: event['endTime'],
-                happening: ongoing,
-              };
-              this.modEventList.push(new_event);
-              if (counter === events.length){
-                this.addTripToList(this.modEventList, mode).then((eventsWithTrip) => {
-                  resolve(eventsWithTrip);
-                });
-              };
-            };
-          },(err) =>{
-            console.log('Events::getTodaysEvents: failed to get prefrence mode', err);
-          });
+          if (eventList.eventList.length === 0){
+            resolve(0);
+          } else {
+            let events = eventList['eventList'];
+            this.map.getPreferenceMode().then((mode) => {
+              this.mode = mode;
+              let counter = 0;
+              console.log("event list length is:", eventList.eventList.length);
+              for (let event of events) {
+               counter = counter + 1;
+               let ongoing = 0;
+               // Skipping any event that does not have a location.
+               if(typeof event['location'] === 'undefined') {
+                  continue;
+                }
+                if (this.now >= event['startTime']) {
+                  ongoing = 1;
+                }
+                let new_event = {
+                  id: event['id'],
+                  summary: event['summary'],
+                  location: event['location'],
+                  startTime: event['startTime'],
+                  endTime: event['endTime'],
+                  happening: ongoing,
+                };
+                this.modEventList.push(new_event);
+                if (counter === events.length){
+                  this.addTripToList(this.modEventList, mode).then((eventsWithTrip) => {
+                    resolve(eventsWithTrip);
+                  });
+                };
+              }; // Else statement block ends here...
+            },(err) =>{
+              console.log('Events::getTodaysEvents: failed to get prefrence mode', err);
+            });
+          };
         }, (err) => {
           console.log('Events::getTodaysEvents(): failed to get users events object ', err);
         });
@@ -142,8 +150,8 @@ export class Events {
             endTime: eventd['endTime'],
             happening: eventd['happening'],
             trip_duration: duration['value'],
-            alerted: false,
-            index: tempIndex
+            //alerted: false,
+            //index: tempIndex
           };
           this.eventListWithTrip.push(event_with_trip);
           this.eventListWithTrip.sort((a:any, b:any) => {

@@ -36,6 +36,7 @@ export class HomePage {
   hasSubscribed: boolean = false;
   subscription: any;
   alertedEvents: any = [];
+  noEvents: any;
 
   // Use this flag as a condition variable
   enableFunctionality: boolean;
@@ -175,6 +176,12 @@ export class HomePage {
         this.googleCalendar.init(user.serverAuthCode).then((authToken) => {
           this.getList(authToken).then((retValue) => {
             console.log("Home::start(): got list,", retValue);
+            if (retValue === 0){
+              this.noEvents = true;
+            } else {
+              this.noEvents = false;
+            };
+            console.log("Home::start(): getList returned with event list length:", retValue);
             resolve(retValue);
           }, (err) => {
             console.log("home::getList() error", err);
@@ -214,26 +221,31 @@ export class HomePage {
         this.event.storeTodaysEvents(JSON.stringify(this.events)).then(() => {
           console.log('Home::getList(): successfully saved todays events');
           this.event.getTodaysEvents().then((events) =>{
-            this.eventList = events;
-            this.epochNow = this.realTimeClock.getEpochTime();
-            this.epochNow = this.epochNow.share();
-            // SUCCESSFULLY GOT LIST, This is the time when you need to store to last known
-            let date = new Date();
-            this.user.getUserInfo().then((user) => {
-              this.storage.getItem(user.id).then((curUser) => {
-                this.storage.setItem('lastKnown', {mode: curUser.mode, time: date}).then(() => {
-                  this.storage.getItem('lastKnown').then((last) => {
-                    this.storage.getItem('lastKnownLocation').then((loc) => {
-                      this.lastMode = last.mode;
-                      this.lastUpdateTime = last.time;
-                      this.lastLocation = loc.origin; // stored in events provider
-                      //resolve(this.scheduleAlert(this.eventList));
-                      resolve("done");
-                    }, (error5) => { console.log("Home::getList():,", error5) });
-                  }, (error4) => { console.log("Home::getList():", error4) });
-                }, (error3) => { console.log("Home::getList():", error3) });
-              }, (error2) => { console.log("Home::getList():", error2) });
-            }, (error1) => { console.log("Home::getList():", error1) });
+            if (events === 0){
+              console.log("Home::getList(): user has no events");
+              resolve(0);
+            } else {
+              this.eventList = events;
+              this.epochNow = this.realTimeClock.getEpochTime();
+              this.epochNow = this.epochNow.share();
+              // SUCCESSFULLY GOT LIST, This is the time when you need to store to last known
+              let date = new Date();
+              this.user.getUserInfo().then((user) => {
+                this.storage.getItem(user.id).then((curUser) => {
+                  this.storage.setItem('lastKnown', {mode: curUser.mode, time: date}).then(() => {
+                    this.storage.getItem('lastKnown').then((last) => {
+                      this.storage.getItem('lastKnownLocation').then((loc) => {
+                        this.lastMode = last.mode;
+                        this.lastUpdateTime = last.time;
+                        this.lastLocation = loc.origin; // stored in events provider
+                        //resolve(this.scheduleAlert(this.eventList));
+                        resolve(this.events.length);
+                      }, (error5) => { console.log("Home::getList():,", error5) });
+                    }, (error4) => { console.log("Home::getList():", error4) });
+                  }, (error3) => { console.log("Home::getList():", error3) });
+                }, (error2) => { console.log("Home::getList():", error2) });
+              }, (error1) => { console.log("Home::getList():", error1) });
+            };
             /////////////////////////////////////////////////////////////////////////////
             console.log('Home::getList(): successfully got user events ', events);
           }, (err) => { console.log('Home::getList(): failed to get saved events', err) });
@@ -309,19 +321,19 @@ export class HomePage {
     // 6. store it back in the local storage.
     // this.alertedEvents.push(eventParam.id);
 
-    //console.log("EVENT ID:", eventParam.summary);
+    console.log("EVENT ID alerted:", eventParam.summary);
     // resolve("done");
   //  console.log("EVENT LIST WITH TRIP IS:", eventList);
-    this.user.getUserInfo().then(user => {
-      this.storage.getItem(user.id).then((alreadyAlerted) => {
-        if (eventParam.id === alreadyAlerted.eventId){
-          //console.log("Home::alertNow(): already alerted event id:", alreadyAlerted.eventId);
-          resolve("already alerted");
-        } else{
-          resolve(this.scheduleAlert(eventParam));
-        };
-      });
-    });
+    // this.user.getUserInfo().then(user => {
+    //   this.storage.getItem(user.id).then((alreadyAlerted) => {
+    //     if (eventParam.id === alreadyAlerted.eventId){
+    //       //console.log("Home::alertNow(): already alerted event id:", alreadyAlerted.eventId);
+    //       resolve("already alerted");
+    //     } else{
+    //       resolve(this.scheduleAlert(eventParam));
+    //     };
+    //   });
+    //});
 
 
     // let eventListWithTrip: any;
