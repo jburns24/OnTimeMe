@@ -122,8 +122,10 @@ export class Events {
     return new Promise(resolve => {
       console.log("modified event list is ", this.modEventList);
       let counter = 0;
+      let tempIndex = -1;
       for (let eventd of modEventList) {
         counter = counter + 1;
+        tempIndex = tempIndex + 1;
         let origin = this.locationTracker.lat + ',' + this.locationTracker.lng;
         this.map.getDistance(eventd['location'], mode, origin).then ((suc) => {
           // Recreate event list with trip duration
@@ -140,6 +142,8 @@ export class Events {
             endTime: eventd['endTime'],
             happening: eventd['happening'],
             trip_duration: duration['value'],
+            alerted: false,
+            index: tempIndex
           };
           this.eventListWithTrip.push(event_with_trip);
           this.eventListWithTrip.sort((a:any, b:any) => {

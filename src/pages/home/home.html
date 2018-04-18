@@ -47,6 +47,15 @@
           (((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? "Running Late!" : (((event.startTime - event.trip_duration) - (epochNow | async)) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true})
         }}
       </p>
+      <!-- <p *ngIf="((!event.alerted) && (((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ))"> -->
+      <p *ngIf="(((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 )">
+        <!-- <ion-item *ngFor="let alertedEvent of alertedEvents">
+          <p *ngIf="(((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) && (event.id != alertedEvent)"> -->
+            {{alertNow(eventList, event)}}
+            working...
+          <!-- </p>
+        </ion-item> -->
+      </p>
     </ion-item>
   </ion-list>
 
