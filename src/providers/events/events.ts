@@ -70,7 +70,7 @@ export class Events {
    *  trip_duration:  miliseconds till event in seconds
    *
    * @return 0 Promise resolves to 0, if there are no events in the next 24 hrs.
-   * @return eventsWithTrip The events with trip calculation added; the final events list. 
+   * @return eventsWithTrip The events with trip calculation added; the final events list.
    *
    */
   getTodaysEvents() {
@@ -150,8 +150,6 @@ export class Events {
             endTime: eventd['endTime'],
             happening: eventd['happening'],
             trip_duration: duration['value'],
-            //alerted: false,
-            //index: tempIndex
           };
           this.eventListWithTrip.push(event_with_trip);
           this.eventListWithTrip.sort((a:any, b:any) => {

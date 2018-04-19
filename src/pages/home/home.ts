@@ -237,7 +237,7 @@ export class HomePage {
                       this.storage.getItem('lastKnownLocation').then((loc) => {
                         this.lastMode = last.mode;
                         this.lastUpdateTime = last.time;
-                        this.lastLocation = loc.origin; // stored in events provider
+                        this.lastLocation = loc.origin;
                         //resolve(this.scheduleAlert(this.eventList));
                         resolve(this.eventList.length);
                       }, (error5) => { console.log("Home::getList():,", error5) });
@@ -255,152 +255,27 @@ export class HomePage {
   }
 
   // Schedule local notification for each event here...
-  scheduleAlert(event: any/*eventsList: any*/){
+  scheduleAlert(event: any){
     return new Promise(resolve => {
-      // this.alertEpoch = this.realTimeClock.getEpochTime();
-      // this.alertEpoch = this.alertEpoch.share();
-      // if (this.hasSubscribed){
-      //   this.subscription.unsubscribe();
-      // };
-
-      // this.epochNow = this.realTimeClock.getEpochTime();
-      // this.epochNow = this.epochNow.share();
-
-      //this.hasSubscribed = true;
-
-      //for (let event of eventsList){
-        //this.subscription = this.epochNow.subscribe((epochSubscriber) => {
-          //if (((event.startTime - event.trip_duration) - epochSubscriber) === 0){
-          // this.user.getUserInfo().then((user) => {
-          //   let key = user.id + event.id;
-          //   this.storage.setItem(key, {flag: true}).then(() => {
-          //     this.storage.getItem(key).then((alerted) => {
-          //       console.log("flag is :", alerted.flag, "eventId is:", event.id);
-          //
-            this.localNotification.schedule({
-              title: 'Testing local notification',
-              text: 'Time to leave for event: ' + event.summary + '!!!',
-              sound: 'file://sound.mp3',
-              vibrate: true,
-              launch: true,
-              wakeup: true,
-              autoClear: true,
-              lockscreen: true
-            });
-          //
-          //     });
-          //   });
-          // });
-          //console.log("I have alerted:", event.id);
-          // this.user.getUserInfo().then(user => {
-          //   this.storage.getItem(user.id).then(curUser => {
-          //     this.storage.setItem(user.id, {mode: curUser.mode, eventId: event.id});
-          //     //console.log("I have successfully set :", event.id);
-          //     resolve("done");
-          //   });
-          // });
-            //console.log("Home::scheduleAlert(): testing timer", this.epochNow);
-            //console.log("Home::scheduleAlert(): subscriber:", epochSubscriber);
-          //};
-        //});
-      //}
-      // console.log("Home::scheduleAlert(): eventsList param is:", eventsList);
-      // console.log("Home::scheduleAlert(): eventsList param size is:", eventsList.length);
+      this.localNotification.schedule({
+        title: 'Testing local notification',
+        text: 'Time to leave for event: ' + event.summary + '!!!',
+        sound: 'file://sound.mp3',
+        vibrate: true,
+        launch: true,
+        wakeup: true,
+        autoClear: true,
+        lockscreen: true
+      });
     });
   }
 
+  // Calls scheduleAlert to send out an alert.
   alertNow(eventList: any, eventParam: any){
     return new Promise (resolve => {
-    // There are 3 ways to implement this, this is one way:
-    // 1. events will have a property alerted. If you are here this means that alerted = false.
-    // 2. Need to get events list from local storage to get starttime and all that sort.
-    // 3. make the alerted property of event at index to true.
-    // 4. store the flag to local storage using userId + eventId as the key.
-    // 4b. if cant find in local storage that means its not set, so make alerted flag == false.
-    // 5. then set the flag appropriately to the alerted flag of the event.
-    // 6. store it back in the local storage.
-    // this.alertedEvents.push(eventParam.id);
-
-    console.log("EVENT ID alerted:", eventParam.summary);
-    this.scheduleAlert(eventParam);
-    // resolve("done");
-  //  console.log("EVENT LIST WITH TRIP IS:", eventList);
-    // this.user.getUserInfo().then(user => {
-    //   this.storage.getItem(user.id).then((alreadyAlerted) => {
-    //     if (eventParam.id === alreadyAlerted.eventId){
-    //       //console.log("Home::alertNow(): already alerted event id:", alreadyAlerted.eventId);
-    //       resolve("already alerted");
-    //     } else{
-    //       resolve(this.scheduleAlert(eventParam));
-    //     };
-    //   });
-    //});
-
-
-    // let eventListWithTrip: any;
-    // let counter = 0;
-    // let flag = false;
-    // for (let event of eventList) {
-    //     counter = counter + 1;
-    //     if (event.id === eventParam.id){
-    //       flag = true;
-    //       console.log("FLAG IS:", flag);
-    //     };
-    //   // }
-    //
-    //     let event_with_trip = {
-    //       id: event['id'],
-    //       summary: event['summary'],
-    //       location: event['location'],
-    //       startTime: event['startTime'],
-    //       endTime: event['endTime'],
-    //       happening: event['happening'],
-    //       trip_duration: event['trip_duration'],
-    //       alerted: flag,
-    //       //index: tempIndex
-    //     };
-    //
-    //     eventListWithTrip.push(event_with_trip);
-    //     eventListWithTrip.sort((a:any, b:any) => {
-    //       if(a.startTime < b.startTime) {
-    //         return -1;
-    //       }
-    //       else if(a.startTime > b.startTime) {
-    //         return 1;
-    //       }
-    //       else {
-    //         return 0;
-    //       }
-    //     });
-    //
-    //     if (counter === eventList.length){
-    //       this.storage.setItem('eventWithTrip', JSON.stringify(eventListWithTrip)).then(() => {
-    //         console.log("Home::alertNow(): modified eventList is:", eventListWithTrip);
-    //       })
-    //     };
-    // }
-    // This is another way
-    // this.user.getUserInfo().then((user) => {
-    //   let key = user.id + event.id;
-    //   this.storage.getItem(key).then((alerted) => {
-    //     // if (!alerted.flag){
-    //     //   console.log("Home::alertNow(): event <", event.summary, "> has already been alerted!");
-    //     //   return;
-    //     // }
-    //     // Else we scheduleAlert to alert now!
-    //     console.log("Home::alertNow(): flag is :", alerted.flag, "eventId is:", event.id);
-    //   }, (error) => {
-    //     this.scheduleAlert(event);
-    //     console.log("Home::alertNow(): flag not found, schedule an alert", error);
-    //   });
-    // });
-
-    // The other way is to edit the html and remove the async for the epochNow.
-    // Have the observers (events) subscribe to the epochNow in this component.
-    // Then in the html dont use the async (using it will make the timer incorrect).
-    // Instead pass the subscription to the html so that it will update the timer appropriately.
-    //resolve("DONE");
-  });
+      console.log("EVENT alerted:", eventParam.summary);
+      resolve(this.scheduleAlert(eventParam));
+    });
   }
 
   doRefresh(refresher){
