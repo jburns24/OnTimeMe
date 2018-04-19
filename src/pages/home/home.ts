@@ -27,12 +27,15 @@ export class HomePage {
   authToken: any;
   eventList: any;
   location: any;
-  epochNow: any;
+  epochNow: any = null;
   lastUpdateTime: any;
   lastLocation: any;
   connected: Subscription;
   disconnected: Subscription;
   lastMode: any;
+  noEvents: any;
+  Math: any = Math; // Needed for home.html bindings.
+  alertedEvent: any = null;
 
   // Use this flag as a condition variable
   enableFunctionality: boolean;
@@ -171,9 +174,14 @@ export class HomePage {
     return new Promise(resolve => {
       this.user.getUserInfo().then((user) => {
         this.googleCalendar.init(user.serverAuthCode).then((authToken) => {
-          this.getList(authToken).then((retValue) => {
-            console.log("Home::start(): got list,", retValue);
-            resolve(retValue);
+          this.getList(authToken).then((listLength) => {
+            if (listLength === 0){
+              this.noEvents = true;
+            } else {
+              this.noEvents = false;
+            };
+            console.log("Home::start(): getList returned with event list length:", listLength);
+            resolve(listLength);
           }, (err) => {
             console.log("home::getList() error", err);
           });
@@ -205,7 +213,7 @@ export class HomePage {
     };
   }
 
-  // Last knowns are stored in here while retrieving and storing event list.
+  // @return The length of the eventsList.
   getList(refreshToken: any){
     return new Promise (resolve => {
       this.googleCalendar.getList(refreshToken).then( (list) => {
@@ -213,25 +221,30 @@ export class HomePage {
         this.event.storeTodaysEvents(JSON.stringify(this.events)).then(() => {
           console.log('Home::getList(): successfully saved todays events:', this.events);
           this.event.getTodaysEvents().then((events) =>{
-            this.eventList = events;
-            this.epochNow = this.realTimeClock.getEpochTime();
-            this.epochNow = this.epochNow.share();
-            // SUCCESSFULLY GOT LIST, This is the time when you need to store to last known
-            let date = new Date();
-            this.user.getUserInfo().then((user) => {
-              this.storage.getItem(user.id).then((curUser) => {
-                this.storage.setItem('lastKnown', {mode: curUser.mode, time: date}).then(() => {
-                  this.storage.getItem('lastKnown').then((last) => {
-                    this.storage.getItem('lastKnownLocation').then((loc) => {
-                      this.lastMode = last.mode;
-                      this.lastUpdateTime = last.time;
-                      this.lastLocation = loc.origin; // stored in events provider
-                      resolve(this.scheduleAlert(this.eventList));
-                    }, (error5) => { console.log("Home::getList():,", error5) });
-                  }, (error4) => { console.log("Home::getList():", error4) });
-                }, (error3) => { console.log("Home::getList():", error3) });
-              }, (error2) => { console.log("Home::getList():", error2) });
-            }, (error1) => { console.log("Home::getList():", error1) });
+            if (events === 0){
+              console.log("Home::getList(): user has no events");
+              resolve(0);
+            } else {
+              this.eventList = events;
+              this.epochNow = this.realTimeClock.getEpochTime();
+              this.epochNow = this.epochNow.share();
+              // SUCCESSFULLY GOT LIST, This is the time when you need to store to last known
+              let date = new Date();
+              this.user.getUserInfo().then((user) => {
+                this.storage.getItem(user.id).then((curUser) => {
+                  this.storage.setItem('lastKnown', {mode: curUser.mode, time: date}).then(() => {
+                    this.storage.getItem('lastKnown').then((last) => {
+                      this.storage.getItem('lastKnownLocation').then((loc) => {
+                        this.lastMode = last.mode;
+                        this.lastUpdateTime = last.time;
+                        this.lastLocation = loc.origin;
+                        resolve(this.eventList.length);
+                      }, (error5) => { console.log("Home::getList():,", error5) });
+                    }, (error4) => { console.log("Home::getList():", error4) });
+                  }, (error3) => { console.log("Home::getList():", error3) });
+                }, (error2) => { console.log("Home::getList():", error2) });
+              }, (error1) => { console.log("Home::getList():", error1) });
+            };
             /////////////////////////////////////////////////////////////////////////////
             console.log('Home::getList(): successfully got user events ', events);
           }, (err) => { console.log('Home::getList(): failed to get saved events', err) });
@@ -240,12 +253,36 @@ export class HomePage {
     });
   }
 
-  scheduleAlert(eventsList: any){
+  // Schedule local notification for each event here...
+  scheduleAlert(event: any){
     return new Promise(resolve => {
-      console.log("Home::scheduleAlert(): eventsList param is:", eventsList);
-      console.log("Home::scheduleAlert(): eventsList param size is:", eventsList.length);
-      resolve("done");
+      this.localNotification.schedule({
+        title: 'Yous gonna be late yo!!!',
+        text: 'Time to leave for event: ' + event.summary + '!!!',
+        sound: 'res://platform_default', // User's default sound
+        vibrate: true,
+        launch: true,
+        wakeup: true,
+        autoClear: true,
+        lockscreen: true
+      })
+      resolve("alerting");
     });
+  }
+
+  // Calls scheduleAlert to send out an alert.
+  doesEventNeedAlert(eventParam: any){
+    console.log("event id is", eventParam.id);
+    if (this.alertedEvent != eventParam.id){
+      this.alertedEvent = eventParam.id;
+      console.log("Home::alertNow(): EVENT alerted:", eventParam.summary);
+      this.scheduleAlert(eventParam);
+      return;
+    }
+    else {
+      console.log("Home::alertNow(): ", eventParam.summary, "already alerted!");
+      return;
+    };
   }
 
   doRefresh(refresher){

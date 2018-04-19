@@ -28,7 +28,10 @@
   <button ion-button block class="mode_bttn" (click)="selectEventsMode()">
      Transportation Mode: {{lastMode}}
   </button>
-  <ion-item>
+  <ion-item *ngIf="noEvents">
+    <p> You have no events for the next 24 hours! </p>
+  </ion-item>
+  <ion-item *ngIf="!noEvents">
     <p> Last updated: {{(lastUpdateTime | date:'medium':'mediumTime')}} </p>
     <p> Location: {{lastLocation}} </p>
   </ion-item>
@@ -46,6 +49,9 @@
         {{
           (((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? "Running Late!" : (((event.startTime - event.trip_duration) - (epochNow | async)) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true})
         }}
+      </p>
+      <p *ngIf="((Math.floor((event.startTime - event.trip_duration) - (epochNow | async))) == 0)">
+        {{doesEventNeedAlert(event)}}
       </p>
     </ion-item>
   </ion-list>

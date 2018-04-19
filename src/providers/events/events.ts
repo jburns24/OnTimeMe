@@ -134,6 +134,10 @@ export class Events {
    *  entTime:  EPOCH end time in seconds
    *  happening: bit value indication event is ongoing or not
    *  trip_duration:  miliseconds till event in seconds
+   *
+   * @return 0 Promise resolves to 0, if there are no events in the next 24 hrs.
+   * @return eventsWithTrip The events with trip calculation added; the final events list.
+   *
    */
   getTodaysEvents() {
     return new Promise (resolve => {
@@ -142,6 +146,45 @@ export class Events {
       this.eventListWithTrip = [];
       this.user.getUserInfo().then((user) => {
         this.storage.getItem(user.id + 'events').then((eventList) => {
+<<<<<<< HEAD
+          if (eventList.eventList.length === 0){
+            resolve(0);
+          } else {
+            let events = eventList['eventList'];
+            this.map.getPreferenceMode().then((mode) => {
+              this.mode = mode;
+              let counter = 0;
+              console.log("event list length is:", eventList.eventList.length);
+              for (let event of events) {
+               counter = counter + 1;
+               let ongoing = 0;
+               // Skipping any event that does not have a location.
+               if(typeof event['location'] === 'undefined') {
+                  continue;
+                }
+                if (this.now >= event['startTime']) {
+                  ongoing = 1;
+                }
+                let new_event = {
+                  id: event['id'],
+                  summary: event['summary'],
+                  location: event['location'],
+                  startTime: event['startTime'],
+                  endTime: event['endTime'],
+                  happening: ongoing,
+                };
+                this.modEventList.push(new_event);
+                if (counter === events.length){
+                  this.addTripToList(this.modEventList, mode).then((eventsWithTrip) => {
+                    resolve(eventsWithTrip);
+                  });
+                };
+              }; // Else statement block ends here...
+            },(err) =>{
+              console.log('Events::getTodaysEvents: failed to get prefrence mode', err);
+            });
+          };
+=======
           let events = eventList['eventList'];
           this.map.getPreferenceMode().then((mode) => {
             this.mode = mode;
@@ -175,6 +218,7 @@ export class Events {
           },(err) =>{
             console.log('Events::getTodaysEvents: failed to get prefrence mode', err);
           });
+>>>>>>> master
         }, (err) => {
           console.log('Events::getTodaysEvents(): failed to get users events object ', err);
         });
@@ -188,8 +232,10 @@ export class Events {
     return new Promise(resolve => {
       console.log("modified event list is ", this.modEventList);
       let counter = 0;
+      let tempIndex = -1;
       for (let eventd of modEventList) {
         counter = counter + 1;
+        tempIndex = tempIndex + 1;
         let origin = this.locationTracker.lat + ',' + this.locationTracker.lng;
         this.map.getDistance(eventd['location'], eventd['mode'], origin).then ((suc) => {
           // Recreate event list with trip duration
