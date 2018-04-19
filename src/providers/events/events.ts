@@ -38,17 +38,26 @@ export class Events {
           this.mode = mode;
           this.storage.getItem(event_key).then((oldEventList) => {
             // Create a map to hold old events and modes
+
+            // DEBUG: debugger
+            console.log("Events::storeTodaysEvents(): oldEvents are:", oldEventList);
+
             let oldTransDict = {};
             let oldEvents = oldEventList['eventList'];
             for (let oldEvent of oldEvents) {
-              oldTransDict[oldEvent.id] = oldEvent.mode;
+              if (oldEvent.mode != undefined){
+                oldTransDict[oldEvent.id] = oldEvent.mode;
+              };
+
+              // DEBUG: debugger
+              console.log("Events::storeTodaysEvents(): for event:", oldEvent.summary, "oldEvent.mode is:", oldEvent.mode);
             }
             for (let event of events) {
               let newMode = this.mode;
               //  Check if new event is an old event if so use the old trans mode
               if (event.id in oldTransDict) {
                 if (oldTransDict[event.id].mode != null) {
-                  newMode = oldTransDict[event.id].mode;  
+                  newMode = oldTransDict[event.id].mode;
                 }
               }
               let start = event['start'];
@@ -108,7 +117,7 @@ export class Events {
               });
             }, (err) => {
               console.log('Events::storeTodaysEvents failed to get user ', err);
-            });                        
+            });
           });
         }, (err)=>{console.log("events::storeTodaysEvents did not get a preference mode", err)});
       }, (err) => {console.log("events::storeTodaysEvents did not get a user object", err);});
@@ -133,12 +142,10 @@ export class Events {
       this.eventListWithTrip = [];
       this.user.getUserInfo().then((user) => {
         this.storage.getItem(user.id + 'events').then((eventList) => {
-          console.log("event::getTodaysEvents got the event list from storage", eventList);
           let events = eventList['eventList'];
           this.map.getPreferenceMode().then((mode) => {
             this.mode = mode;
             let counter = 0;
-            console.log("event list length is:", events);
             for (let event of events) {
               counter = counter + 1;
               let ongoing = 0;
