@@ -31,7 +31,6 @@ export class Events {
       let event_key = "";
       let data = JSON.parse(jsonString);
       let events = data['items'];
-      console.log("events::storeTodaysEvents() are ", events);
       this.user.getUserInfo().then((user) => {
         event_key = user.id + 'events';
         this.map.getPreferenceMode().then((mode) => {
@@ -50,7 +49,7 @@ export class Events {
               };
 
               // DEBUG: debugger
-              console.log("Events::storeTodaysEvents(): for event:", oldEvent.summary, "oldEvent.mode is:", oldEvent.mode);
+              console.log("Events::storeTodaysEvents(): for event: <", oldEvent.summary, ">, oldEvent.mode is: <", oldEvent.mode, ">");
             }
             for (let event of events) {
               let newMode = this.mode;
@@ -79,7 +78,7 @@ export class Events {
             };
             this.user.getUserInfo().then((user) => {
               this.storage.setItem(event_key, event_list_object).then(() => {
-                console.log('Events::events saved to user!!');
+                console.log('Events::storeTodaysEvents(): events saved to user!!');
                 resolve(true);
               }, (err) => {
                 console.log('Events::storeTodaysEvents failed to store events ', err);
@@ -110,17 +109,17 @@ export class Events {
             };
             this.user.getUserInfo().then((user) => {
               this.storage.setItem(event_key, event_list_object).then(() => {
-                console.log('Events::events saved to user!!');
+                console.log('Events::storeTodaysEvents(): events saved to user!!');
                 resolve(true);
               }, (err) => {
-                console.log('Events::storeTodaysEvents failed to store events ', err);
+                console.log('Events::storeTodaysEvents(): failed to store events ', err);
               });
             }, (err) => {
-              console.log('Events::storeTodaysEvents failed to get user ', err);
+              console.log('Events::storeTodaysEvents(): failed to get user ', err);
             });
           });
-        }, (err)=>{console.log("events::storeTodaysEvents did not get a preference mode", err)});
-      }, (err) => {console.log("events::storeTodaysEvents did not get a user object", err);});
+        }, (err)=>{console.log("Events::storeTodaysEvents(): did not get a preference mode", err)});
+      }, (err) => {console.log("Events::storeTodaysEvents(): did not get a user object", err);});
     });
   }
 
@@ -146,7 +145,6 @@ export class Events {
       this.eventListWithTrip = [];
       this.user.getUserInfo().then((user) => {
         this.storage.getItem(user.id + 'events').then((eventList) => {
-<<<<<<< HEAD
           if (eventList.eventList.length === 0){
             resolve(0);
           } else {
@@ -171,7 +169,8 @@ export class Events {
                   location: event['location'],
                   startTime: event['startTime'],
                   endTime: event['endTime'],
-                  happening: ongoing,
+                  mode: event['mode'],
+                  happening: ongoing
                 };
                 this.modEventList.push(new_event);
                 if (counter === events.length){
@@ -184,41 +183,6 @@ export class Events {
               console.log('Events::getTodaysEvents: failed to get prefrence mode', err);
             });
           };
-=======
-          let events = eventList['eventList'];
-          this.map.getPreferenceMode().then((mode) => {
-            this.mode = mode;
-            let counter = 0;
-            for (let event of events) {
-              counter = counter + 1;
-              let ongoing = 0;
-              // Skipping any event that does not have a location.
-              if(typeof event['location'] === 'undefined') {
-                continue;
-              }
-              if (this.now >= event['startTime']) {
-                ongoing = 1;
-              }
-              let new_event = {
-                id: event['id'],
-                summary: event['summary'],
-                location: event['location'],
-                startTime: event['startTime'],
-                endTime: event['endTime'],
-                mode: event['mode'],
-                happening: ongoing,
-              };
-              this.modEventList.push(new_event);
-              if (counter === events.length){
-                this.addTripToList(this.modEventList, mode).then((eventsWithTrip) => {
-                  resolve(eventsWithTrip);
-                });
-              };
-            };
-          },(err) =>{
-            console.log('Events::getTodaysEvents: failed to get prefrence mode', err);
-          });
->>>>>>> master
         }, (err) => {
           console.log('Events::getTodaysEvents(): failed to get users events object ', err);
         });
