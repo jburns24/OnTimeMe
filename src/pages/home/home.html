@@ -51,7 +51,7 @@
         }}
       </p>
       <p *ngIf="((Math.floor((event.startTime - event.trip_duration) - (epochNow | async))) == 0)">
-        {{alertNow(eventList, event)}}
+        {{alertNow(event)}}
       </p>
     </ion-item>
   </ion-list>

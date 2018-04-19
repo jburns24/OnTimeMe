@@ -33,11 +33,9 @@ export class HomePage {
   connected: Subscription;
   disconnected: Subscription;
   lastMode: any;
-  hasSubscribed: boolean = false;
-  subscription: any;
-  alertedEvents: any = [];
   noEvents: any;
-  Math: any = Math;
+  Math: any = Math; // Needed for home.html bindings.
+  alertedEvent: any = null;
 
   // Use this flag as a condition variable
   enableFunctionality: boolean;
@@ -238,7 +236,6 @@ export class HomePage {
                         this.lastMode = last.mode;
                         this.lastUpdateTime = last.time;
                         this.lastLocation = loc.origin;
-                        //resolve(this.scheduleAlert(this.eventList));
                         resolve(this.eventList.length);
                       }, (error5) => { console.log("Home::getList():,", error5) });
                     }, (error4) => { console.log("Home::getList():", error4) });
@@ -260,22 +257,30 @@ export class HomePage {
       this.localNotification.schedule({
         title: 'Testing local notification',
         text: 'Time to leave for event: ' + event.summary + '!!!',
-        sound: 'file://sound.mp3',
+        sound: 'res://platform_default', // User's default sound
         vibrate: true,
         launch: true,
         wakeup: true,
         autoClear: true,
         lockscreen: true
-      });
+      })
+      resolve("alerting");
     });
   }
 
   // Calls scheduleAlert to send out an alert.
-  alertNow(eventList: any, eventParam: any){
-    return new Promise (resolve => {
-      console.log("EVENT alerted:", eventParam.summary);
-      resolve(this.scheduleAlert(eventParam));
-    });
+  alertNow(eventParam: any){
+    console.log("event id is", eventParam.id);
+    if (this.alertedEvent != eventParam.id){
+      this.alertedEvent = eventParam.id;
+      console.log("Home::alertNow(): EVENT alerted:", eventParam.summary);
+      this.scheduleAlert(eventParam);
+      return;
+    }
+    else {
+      console.log("Home::alertNow(): ", eventParam.summary, "already alerted!");
+      return;
+    };
   }
 
   doRefresh(refresher){
