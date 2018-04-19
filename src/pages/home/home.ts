@@ -255,7 +255,7 @@ export class HomePage {
   scheduleAlert(event: any){
     return new Promise(resolve => {
       this.localNotification.schedule({
-        title: 'Testing local notification',
+        title: 'Yous gonna be late yo!!!',
         text: 'Time to leave for event: ' + event.summary + '!!!',
         sound: 'res://platform_default', // User's default sound
         vibrate: true,
@@ -269,7 +269,7 @@ export class HomePage {
   }
 
   // Calls scheduleAlert to send out an alert.
-  alertNow(eventParam: any){
+  doesEventNeedAlert(eventParam: any){
     console.log("event id is", eventParam.id);
     if (this.alertedEvent != eventParam.id){
       this.alertedEvent = eventParam.id;
