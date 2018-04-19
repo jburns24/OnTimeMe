@@ -37,6 +37,7 @@ export class HomePage {
   subscription: any;
   alertedEvents: any = [];
   noEvents: any;
+  Math: any = Math;
 
   // Use this flag as a condition variable
   enableFunctionality: boolean;
@@ -276,28 +277,28 @@ export class HomePage {
           //     this.storage.getItem(key).then((alerted) => {
           //       console.log("flag is :", alerted.flag, "eventId is:", event.id);
           //
-          //   this.localNotification.schedule({
-          //     title: 'Testing local notification',
-          //     text: 'Time to leave for event: ',/// + event.summary + '!!!',
-          //     sound: 'file://sound.mp3',
-          //     vibrate: true,
-          //     launch: true,
-          //     wakeup: true,
-          //     autoClear: true,
-          //     lockscreen: true
-          //   });
+            this.localNotification.schedule({
+              title: 'Testing local notification',
+              text: 'Time to leave for event: ' + event.summary + '!!!',
+              sound: 'file://sound.mp3',
+              vibrate: true,
+              launch: true,
+              wakeup: true,
+              autoClear: true,
+              lockscreen: true
+            });
           //
           //     });
           //   });
           // });
           //console.log("I have alerted:", event.id);
-          this.user.getUserInfo().then(user => {
-            this.storage.getItem(user.id).then(curUser => {
-              this.storage.setItem(user.id, {mode: curUser.mode, eventId: event.id});
-              //console.log("I have successfully set :", event.id);
-              resolve("done");
-            });
-          });
+          // this.user.getUserInfo().then(user => {
+          //   this.storage.getItem(user.id).then(curUser => {
+          //     this.storage.setItem(user.id, {mode: curUser.mode, eventId: event.id});
+          //     //console.log("I have successfully set :", event.id);
+          //     resolve("done");
+          //   });
+          // });
             //console.log("Home::scheduleAlert(): testing timer", this.epochNow);
             //console.log("Home::scheduleAlert(): subscriber:", epochSubscriber);
           //};
@@ -321,6 +322,7 @@ export class HomePage {
     // this.alertedEvents.push(eventParam.id);
 
     console.log("EVENT ID alerted:", eventParam.summary);
+    this.scheduleAlert(eventParam);
     // resolve("done");
   //  console.log("EVENT LIST WITH TRIP IS:", eventList);
     // this.user.getUserInfo().then(user => {
