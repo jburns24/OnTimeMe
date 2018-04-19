@@ -40,11 +40,12 @@ export class Map {
   // calls native storage to get the user preference mode.
   getPreferenceMode(){
     return new Promise(resolve => {
+      let mode  = 'driving';
       this.user.getUserInfo().then((user) => {
         this.storage.getItem(user.id).then((userId) => {
           console.log("Map::getMode(): success!");
           console.log("==> curUser.id:", user.id, "mode:", userId.mode);
-          let mode = userId.mode;
+          mode = userId.mode;
           resolve(mode);
         }, (error) => {
           console.log("Map::getMode(): no user found in native storage!", error);

@@ -12,10 +12,11 @@ export class Transportation {
     private user: UserProvider) {
   }
 
-  showRadioAlert(transMode?: any): Promise<any> {
+  showRadioAlert(transMode?: any, titleParam?: any): Promise<any> {
     return new Promise(resolve => {
       let alert = this.alertCrl.create();
-      alert.setTitle('Select Your Mode of Transportation');
+      let title = titleParam;
+      alert.setTitle(title);
       const modeArray = ['driving', 'bicycling', 'walking'];
       // Iterate thru modeArray and create inputs for each element
       modeArray.forEach( mode => {

@@ -24,37 +24,103 @@ export class Events {
   // Stores todays events in a new object in storage with the naming convention of
   // user.id + events for example 111696224874024244260events
   // expects a josn object of the Events.list api call
-  storeTodaysEvents(jsonString:any ){
-    let todaysEventList = [];
-    let data = JSON.parse(jsonString);
-    let events = data['items'];
-    for (let event of events) {
-      let start = event['start'];
-      let end = event['end'];
-      let beginTime = Date.parse(start['dateTime']) / 1000;
-      let finishTime = Date.parse(end['dateTime']) / 1000;
+  storeTodaysEvents(jsonString:any ) {
+    return new Promise<boolean> (resolve =>{
+      // set some local variables
+      let todaysEventList = [];
+      let event_key = "";
+      let data = JSON.parse(jsonString);
+      let events = data['items'];
+      console.log("events::storeTodaysEvents() are ", events);
+      this.user.getUserInfo().then((user) => {
+        event_key = user.id + 'events';
+        this.map.getPreferenceMode().then((mode) => {
+          this.mode = mode;
+          this.storage.getItem(event_key).then((oldEventList) => {
+            // Create a map to hold old events and modes
 
-      let new_event = {
-        id: event['id'],
-        summary: event['summary'],
-        location: event['location'],
-        startTime: beginTime,
-        endTime: finishTime
-      };
-      todaysEventList.push(new_event);
-    }
+            // DEBUG: debugger
+            console.log("Events::storeTodaysEvents(): oldEvents are:", oldEventList);
 
-    let event_list_object = {
-      eventList: todaysEventList
-    };
-    return this.user.getUserInfo().then((user) => {
-      let event_key = user.id + 'events';
-      this.storage.setItem(event_key, event_list_object).then(() => {
-      }, (err) => {
-        console.log('Events::storeTodaysEvents failed to store events ', err);
-      });
-    }, (err) => {
-      console.log('Events::storeTodaysEvents failed to get user ', err);
+            let oldTransDict = {};
+            let oldEvents = oldEventList['eventList'];
+            for (let oldEvent of oldEvents) {
+              if (oldEvent.mode != undefined){
+                oldTransDict[oldEvent.id] = oldEvent.mode;
+              };
+
+              // DEBUG: debugger
+              console.log("Events::storeTodaysEvents(): for event:", oldEvent.summary, "oldEvent.mode is:", oldEvent.mode);
+            }
+            for (let event of events) {
+              let newMode = this.mode;
+              //  Check if new event is an old event if so use the old trans mode
+              if (event.id in oldTransDict) {
+                if (oldTransDict[event.id].mode != null) {
+                  newMode = oldTransDict[event.id].mode;
+                }
+              }
+              let start = event['start'];
+              let end = event['end'];
+              let beginTime = Date.parse(start['dateTime']) / 1000;
+              let finishTime = Date.parse(end['dateTime']) / 1000;
+              let new_event = {
+                id: event['id'],
+                summary: event['summary'],
+                location: event['location'],
+                startTime: beginTime,
+                endTime: finishTime,
+                mode: newMode
+              };
+              todaysEventList.push(new_event);
+            }
+            let event_list_object = {
+              eventList: todaysEventList
+            };
+            this.user.getUserInfo().then((user) => {
+              this.storage.setItem(event_key, event_list_object).then(() => {
+                console.log('Events::events saved to user!!');
+                resolve(true);
+              }, (err) => {
+                console.log('Events::storeTodaysEvents failed to store events ', err);
+              });
+            }, (err) => {
+              console.log('Events::storeTodaysEvents failed to get user ', err);
+            });
+          }, (err) => {
+            console.log("events::storeTodaysEvents and old event list was not found");
+
+            for (let event of events) {
+              let start = event['start'];
+              let end = event['end'];
+              let beginTime = Date.parse(start['dateTime']) / 1000;
+              let finishTime = Date.parse(end['dateTime']) / 1000;
+              let new_event = {
+                id: event['id'],
+                summary: event['summary'],
+                location: event['location'],
+                startTime: beginTime,
+                endTime: finishTime,
+                mode: this.mode
+              };
+              todaysEventList.push(new_event);
+            }
+            let event_list_object = {
+              eventList: todaysEventList
+            };
+            this.user.getUserInfo().then((user) => {
+              this.storage.setItem(event_key, event_list_object).then(() => {
+                console.log('Events::events saved to user!!');
+                resolve(true);
+              }, (err) => {
+                console.log('Events::storeTodaysEvents failed to store events ', err);
+              });
+            }, (err) => {
+              console.log('Events::storeTodaysEvents failed to get user ', err);
+            });
+          });
+        }, (err)=>{console.log("events::storeTodaysEvents did not get a preference mode", err)});
+      }, (err) => {console.log("events::storeTodaysEvents did not get a user object", err);});
     });
   }
 
@@ -80,6 +146,7 @@ export class Events {
       this.eventListWithTrip = [];
       this.user.getUserInfo().then((user) => {
         this.storage.getItem(user.id + 'events').then((eventList) => {
+<<<<<<< HEAD
           if (eventList.eventList.length === 0){
             resolve(0);
           } else {
@@ -117,6 +184,41 @@ export class Events {
               console.log('Events::getTodaysEvents: failed to get prefrence mode', err);
             });
           };
+=======
+          let events = eventList['eventList'];
+          this.map.getPreferenceMode().then((mode) => {
+            this.mode = mode;
+            let counter = 0;
+            for (let event of events) {
+              counter = counter + 1;
+              let ongoing = 0;
+              // Skipping any event that does not have a location.
+              if(typeof event['location'] === 'undefined') {
+                continue;
+              }
+              if (this.now >= event['startTime']) {
+                ongoing = 1;
+              }
+              let new_event = {
+                id: event['id'],
+                summary: event['summary'],
+                location: event['location'],
+                startTime: event['startTime'],
+                endTime: event['endTime'],
+                mode: event['mode'],
+                happening: ongoing,
+              };
+              this.modEventList.push(new_event);
+              if (counter === events.length){
+                this.addTripToList(this.modEventList, mode).then((eventsWithTrip) => {
+                  resolve(eventsWithTrip);
+                });
+              };
+            };
+          },(err) =>{
+            console.log('Events::getTodaysEvents: failed to get prefrence mode', err);
+          });
+>>>>>>> master
         }, (err) => {
           console.log('Events::getTodaysEvents(): failed to get users events object ', err);
         });
@@ -135,7 +237,7 @@ export class Events {
         counter = counter + 1;
         tempIndex = tempIndex + 1;
         let origin = this.locationTracker.lat + ',' + this.locationTracker.lng;
-        this.map.getDistance(eventd['location'], mode, origin).then ((suc) => {
+        this.map.getDistance(eventd['location'], eventd['mode'], origin).then ((suc) => {
           // Recreate event list with trip duration
           let rows = suc['rows'];
           let row = rows[0];
@@ -150,6 +252,7 @@ export class Events {
             endTime: eventd['endTime'],
             happening: eventd['happening'],
             trip_duration: duration['value'],
+            mode: eventd['mode'],
           };
           this.eventListWithTrip.push(event_with_trip);
           this.eventListWithTrip.sort((a:any, b:any) => {

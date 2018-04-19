@@ -148,7 +148,8 @@ export class HomePage {
         }, (error) => {
           console.log("Home::checkMode(): mode not set yet:", error);
           let nullMode = undefined;
-          this.trans.showRadioAlert(nullMode).then((mode) => {
+          let title = "Please select your default mode of transportation.";
+          this.trans.showRadioAlert(nullMode, title).then((mode) => {
             this.lastMode = mode;
             this.start();
             console.log("Home::checkMode(): promise returned:", this.lastMode);
@@ -193,9 +194,10 @@ export class HomePage {
     });
   }
 
-  showRadioAlert(){
+  selectEventsMode(){
     if (this.enableFunctionality){
-      this.trans.showRadioAlert(this.lastMode).then((mode) => {
+      let title = "Change mode to selected for all events?";
+      this.trans.showRadioAlert(this.lastMode, title).then((mode) => {
         this.lastMode = mode;
         this.start();
         //console.log("Home::showRadioAlert(): promise returned:", this.lastMode);
@@ -217,7 +219,7 @@ export class HomePage {
       this.googleCalendar.getList(refreshToken).then( (list) => {
         this.events = list;
         this.event.storeTodaysEvents(JSON.stringify(this.events)).then(() => {
-          console.log('Home::getList(): successfully saved todays events');
+          console.log('Home::getList(): successfully saved todays events:', this.events);
           this.event.getTodaysEvents().then((events) =>{
             if (events === 0){
               console.log("Home::getList(): user has no events");
