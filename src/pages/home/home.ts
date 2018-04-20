@@ -208,7 +208,7 @@ export class HomePage {
 
   selectEventsMode(){
     if (this.enableFunctionality){
-      let title = "Change mode to selected for all events?";
+      let title = "Change transportation mode for all events?";
       this.trans.showRadioAlert(this.lastMode, title).then((mode) => {
         this.lastMode = mode;
         this.start();
