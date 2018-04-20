@@ -38,6 +38,7 @@ export class HomePage {
   noEvents: any;
   Math: any = Math; // Needed for home.html bindings.
   alertedEvent: any = null;
+  alertedEventMode: any = null;
 
   // Use this flag as a condition variable
   enableFunctionality: boolean;
@@ -276,18 +277,32 @@ export class HomePage {
         launch: true,
         wakeup: true,
         autoClear: true,
-        lockscreen: true
-      })
-      resolve("alerting");
+        lockscreen: true,
+        led: true,
+        priority: 2, // 2 is max and -2 is lowest
+        actions: [
+          { id: 'mode', launch: true, title: 'Change Transport Mode?'},
+          { id: 'map', title: 'MAP',  }
+        ]
+      });
+      this.localNotification.on('map').subscribe(() => {
+        this.launchMap(event.location);
+        resolve("alerting");
+      });
+      this.localNotification.on('mode').subscribe(() => {
+        this.selectEventsMode();
+        resolve("alerting");
+      });
     });
   }
 
   // Calls scheduleAlert to send out an alert.
   doesEventNeedAlert(eventParam: any){
     console.log("event id is", eventParam.id);
-    if (this.alertedEvent != eventParam.id){
+    if ((this.alertedEvent != eventParam.id) && (this.alertedEventMode != eventParam.mode)){
       this.alertedEvent = eventParam.id;
-      console.log("Home::alertNow(): EVENT alerted:", eventParam.summary);
+      this.alertedEventMode = eventParam.mode;
+      console.log("Home::alertNow(): EVENT alerted:", eventParam.summary, "with mode:", eventParam.mode);
       this.scheduleAlert(eventParam);
       return;
     }
@@ -300,10 +315,11 @@ export class HomePage {
   launchMap(eventLocation: any){
     let dest = eventLocation;
     let options: LaunchNavigatorOptions = {
+      enableDebug: true,
       // start: 'Chico, CA',
-      // transportMode: 'walking',
+      transportMode: this.launchNavigator.TRANSPORT_MODE.WALKING,
       // enableGeocoding: true,
-      //app: this.launchNavigator.APP.GOOGLE_MAPS,
+      app: this.launchNavigator.APP.GOOGLE_MAPS
     };
 
     this.launchNavigator.navigate(dest, options).then((success) =>{
