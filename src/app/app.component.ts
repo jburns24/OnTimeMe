@@ -10,10 +10,10 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { AlertController } from 'ionic-angular/components/alert/alert-controller';
 import { LoginGatePage } from '../pages/login-gate/login-gate';
 import { HomePage } from '../pages/home/home';
-import { PreferencePage } from '../pages/preference/preference';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { GooglePlus } from '@ionic-native/google-plus';
-import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
+
+//import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
 import { LocationTracker } from '../providers/location-tracker/location-tracker'
 import {
   Platform,
@@ -42,8 +42,8 @@ export class MyApp {
     private loadingCtrl: LoadingController,
     private storage: NativeStorage,
     private alertCrl: AlertController,
-    private googlePlus: GooglePlus, 
-    private googleCalendar: GoogleCalendar,
+    private googlePlus: GooglePlus,
+    //private googleCalendar: GoogleCalendar,
     private locationTracker: LocationTracker
   ){
     // This function will initialize the app upon opening the app.
@@ -53,11 +53,8 @@ export class MyApp {
     // Set our app's pages in the left menu; Add new pages here!!!
     this.pages = [
       { title: 'Home', component: HomePage, icon:'home' },
-      { title: 'Preference', component: PreferencePage, icon:'md-settings'}
+      //{ title: 'Preference', component: Preference, icon:'md-settings'}
     ];
-
-    // Set the app to land on the login page as soon as launch
-    this.rootPage = LoginGatePage;
   }
 
   initializeApp(){
@@ -68,26 +65,30 @@ export class MyApp {
       this.statusBar.styleBlackOpaque();
 
       /*** This is where the logic is implemented for checking user log ins ***/
-      this.storage.getItem('user') // Try to get item from local storage and...
-      .then( (data) => {
-        // Logic checks if users are logged in...this is the place
-        // to do all your init() and dummy calls if these calls depends on
-        // user being logged in. This is mainly for when user didn't log out
-        // and you need to re-init() stuff.
-        if (data.isLoggedIn == true){
-          this.trySilentLogin().then(() => {
-            // Succeed, profile exists...allow that person to access his/her data
-            this.nav.setRoot(HomePage);
-            this.splashScreen.hide();
-          }, (err) => {
-            console.log("Silent Login Failed", err);
-          });
-        };
-      }, (error) => {
-        console.log("App.comp::initializeApp() user object was not found at login.");
-        // Failed, user not logged on, ask him/her to log in
-        this.nav.setRoot(LoginGatePage);
-        this.splashScreen.hide();
+      this.locationTracker.startTracking().then(() => {
+        this.storage.getItem('user') // Try to get item from local storage and...
+        .then( (data) => {
+          // Logic checks if users are logged in...this is the place
+          // to do all your init() and dummy calls if these calls depends on
+          // user being logged in. This is mainly for when user didn't log out
+          // and you need to re-init() stuff.
+          if (data.isLoggedIn == true){
+            this.trySilentLogin().then(() => {
+              // Succeed, profile exists...allow that person to access his/her data
+              this.nav.setRoot(HomePage);
+              this.splashScreen.hide();
+            }, (err) => {
+              console.log("Silent Login Failed", err);
+            });
+          };
+        }, (error) => {
+          console.log("App.comp::initializeApp() user object was not found at login.");
+          // Failed, user not logged on, ask him/her to log in
+          this.nav.setRoot(LoginGatePage);
+          this.splashScreen.hide();
+        });
+      }, (err) => {
+        console.log("app.component.ts Failed to start location ", err);
       });
     }, (err) => {
         console.log(err);
@@ -143,9 +144,9 @@ export class MyApp {
       this.googlePlus.logout().then((response) => {
         this.storage.remove('user').then(() => {
           this.storage.remove('refreshToken').then(() =>{
-            this.googleCalendar.refreshToken = null;
+            //this.googleCalendar.refreshToken = null;
             console.log("refreshToken is successfully removed from native storage.");
-            console.log("refreshToken should now be null", this.googleCalendar.refreshToken);
+            //console.log("refreshToken should now be null", this.googleCalendar.refreshToken);
             this.nav.setRoot(LoginGatePage).then(() =>{
               // DEBUGGING: this part below
               this.locationTracker.stopTracking().then(() =>{

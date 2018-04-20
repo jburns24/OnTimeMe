@@ -17,18 +17,43 @@
   <br>
   <ion-item no-lines style="background-color:transparent">
     <ion-avatar item-left >
-      <img src="{{user.picture}}" class="center">
+      <img src="{{userPicture}}" class="center">
     </ion-avatar>
-    <h2>Hello {{user.name}}!</h2>
-    <h4>{{user.email}}</h4>
+    <h2>Hello {{userName}}!</h2>
+    <h4>{{userEmail}}</h4>
+  </ion-item>
+  <button ion-button block class="mode_bttn" (click)="selectEventsMode()">
+     Transportation Mode: {{lastMode}}
+  </button>
+  <ion-item *ngIf="noEvents">
+    <p> You have no events for the next 24 hours! </p>
+  </ion-item>
+  <ion-item *ngIf="!noEvents">
+    <p> Last updated: {{(lastUpdateTime | date:'medium':'mediumTime')}} </p>
+    <p> Location: {{lastLocation}} </p>
   </ion-item>
   <ion-list>
-    <ion-item *ngFor="let event of eventList;">
-      <p item-left [style.font-size.vw]="'4.9'">{{ event.summary }}</p>
-      <p item-right [style.color]="(((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? 'red' : 'green'">
+    <ion-item *ngFor="let event of eventList">
+      <p item-left >
+        <button ion-button block class="mode_bttn" (click)="launchMap(event.location)">
+          MAP
+        </button>
+      </p>
+      <p item-left [style.font-size.vw]="'4.2'" class="truncate">{{ event.summary }}</p>
+      <p *ngIf="event.happening" item-right text-right [style.color]="(((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? 'red' : 'green'">
         {{
-          (((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? "Ongoing" : (((event.startTime - event.trip_duration) - (epochNow | async)) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true})
+          (((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ?
+          "- " + (((epochNow | async) - event.startTime) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true}) :
+           (((event.startTime - event.trip_duration) - (epochNow | async)) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true})
         }}
+      </p>
+      <p *ngIf="!event.happening" item-right text-right [style.color]="(((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? 'red' : 'green'">
+        {{
+          (((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? "Running Late!" : (((event.startTime - event.trip_duration) - (epochNow | async)) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true})
+        }}
+      </p>
+      <p *ngIf="((Math.floor((event.startTime - event.trip_duration) - (epochNow | async))) == 0)">
+        {{doesEventNeedAlert(event)}}
       </p>
     </ion-item>
   </ion-list>
