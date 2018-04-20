@@ -276,9 +276,15 @@ export class HomePage {
         launch: true,
         wakeup: true,
         autoClear: true,
-        lockscreen: true
-      })
-      resolve("alerting");
+        lockscreen: true,
+        actions: [
+          { id: 'map', title: 'MAP' }
+        ]
+      });
+      this.localNotification.on('map').subscribe(() => {
+        this.launchMap(event.location);
+        resolve("alerting");
+      });
     });
   }
 
