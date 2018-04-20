@@ -34,18 +34,20 @@
   </ion-item>
   <ion-list>
     <ion-item *ngFor="let event of eventList">
+      <p item-left >
+        <button ion-button block class="mode_bttn" (click)="launchMap(event.location)">
+          MAP
+        </button>
+      </p>
       <p item-left [style.font-size.vw]="'4.2'" class="truncate">{{ event.summary }}</p>
-      <button ion-button block class="mode_bttn" (click)="launchMap(event.location)">
-         MAP
-      </button>
-      <p *ngIf="event.happening" item-right [style.color]="(((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? 'red' : 'green'">
+      <p *ngIf="event.happening" item-right text-right [style.color]="(((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? 'red' : 'green'">
         {{
           (((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ?
           "- " + (((epochNow | async) - event.startTime) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true}) :
            (((event.startTime - event.trip_duration) - (epochNow | async)) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true})
         }}
       </p>
-      <p *ngIf="!event.happening" item-right [style.color]="(((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? 'red' : 'green'">
+      <p *ngIf="!event.happening" item-right text-right [style.color]="(((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? 'red' : 'green'">
         {{
           (((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? "Running Late!" : (((event.startTime - event.trip_duration) - (epochNow | async)) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true})
         }}

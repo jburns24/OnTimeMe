@@ -103,9 +103,6 @@ export class HomePage {
     });
 
     console.log("----------------- START -----------------------");
-    // let app = this.launchNavigator.APP.GOOGLE_MAPS;
-    // let platform = this.launchNavigator.PLATFORM.ANDROID;
-    // console.log("Supported modes?", this.launchNavigator.getTransportModes(app, platform));
     this.checkMode().then((retValue) => {
     });
   }
