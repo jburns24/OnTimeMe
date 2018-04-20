@@ -27,23 +27,27 @@ export class Transportation {
           checked: transMode == mode,
         });
       })
-
-      alert.addButton('Cancel');
+      if (transMode != null){
+        alert.addButton('Cancel');
+      };
       alert.addButton({
         text: 'OK',
         handler: data => {
-          this.user.getUserInfo().then((user) => {
-            this.storage.setItem(user.id, { mode: data }).then(() => {
-              //console.log("Transportation::showRadioAlert(): successfully set mode");
-              //console.log("==> user.id:", user.id, "mode:", data);
-              this.storage.getItem(user.id).then((user) => {
-                this.mode = user.mode;
-                resolve(this.mode);
+          if (data != null){
+            this.user.getUserInfo().then((user) => {
+              this.storage.setItem(user.id, { mode: data }).then(() => {
+                this.storage.getItem(user.id).then((user) => {
+                  this.mode = user.mode;
+                  resolve(this.mode);
+                });
+              }, (error) => {
+                console.log("Transporation::showRadioAlert(): failed to set item,", error);
               });
-            }, (error) => {
-              console.log("Transporation::showRadioAlert(): failed to set item,", error);
             });
-          });
+          } else {
+            let title = "You have to select a default mode of transportation!"
+            resolve(this.showRadioAlert(null, title));
+          };
         }
       });
       alert.present();

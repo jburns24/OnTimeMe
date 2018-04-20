@@ -145,35 +145,40 @@ export class HomePage {
 
   checkMode(){
     return new Promise(resolve => {
-    if (this.enableFunctionality){
-      this.user.getUserInfo().then((user) => {
-        this.storage.getItem(user.id).then((curUser) => {
-          this.lastMode = curUser.mode;
-          resolve(this.start());
-        }, (error) => {
-          console.log("Home::checkMode(): mode not set yet:", error);
-          let nullMode = undefined;
-          let title = "Please select your default mode of transportation.";
-          this.trans.showRadioAlert(nullMode, title).then((mode) => {
-            this.lastMode = mode;
+      if (this.enableFunctionality){
+        this.user.getUserInfo().then((user) => {
+          this.storage.getItem(user.id).then((curUser) => {
+            this.lastMode = curUser.mode;
             resolve(this.start());
-            console.log("Home::checkMode(): promise returned:", this.lastMode);
           }, (error) => {
-            console.log("Home::checkMode(): promise returned error,", error);
+            console.log("Home::checkMode(): mode not set yet:", error);
+            let nullMode = undefined;
+            let title = "Please select your default mode of transportation.";
+            this.trans.showRadioAlert(nullMode, title).then((mode) => {
+              console.log("mode", mode);
+              if (mode === null){
+                this.checkMode();
+              } else {
+                this.lastMode = mode;
+                console.log("Home::checkMode(): promise returned:", this.lastMode);
+                resolve(this.start());
+              };
+            }, (error) => {
+              console.log("Home::checkMode(): promise returned error,", error);
+            });
           });
         });
-      });
-    } else{
-      this.storage.getItem('lastKnown').then((last) => {
-        this.lastMode = last.mode;
-        this.lastUpdateTime = last.time;
-        console.log("Home::checkMode(): last know =", last);
-        resolve(0);
-      }, (error) => {
-        console.log("Home::checkMode(): cannot retrieve last known", error);
-      });
-    };
-  });
+      } else{
+        this.storage.getItem('lastKnown').then((last) => {
+          this.lastMode = last.mode;
+          this.lastUpdateTime = last.time;
+          console.log("Home::checkMode(): last know =", last);
+          resolve(0);
+        }, (error) => {
+          console.log("Home::checkMode(): cannot retrieve last known", error);
+        });
+      };
+    });
   }
 
   // Calling this method should resolved listLength if methods return correctly.
@@ -310,7 +315,7 @@ export class HomePage {
   doRefresh(refresher){
     if (this.enableFunctionality){
       console.log("-------------- REFRESH START -------------")
-      this.start().then((retValue) => {
+      this.checkMode().then((retValue) => {
         refresher.complete();
       }, (err) => { console.log("home::doRefresh(): error", err) });
     } else {

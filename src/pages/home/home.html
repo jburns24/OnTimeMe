@@ -22,9 +22,21 @@
     <h2>Hello {{userName}}!</h2>
     <h4>{{userEmail}}</h4>
   </ion-item>
-  <button ion-button block class="mode_bttn" (click)="selectEventsMode()">
-     Transportation Mode: {{lastMode}}
-  </button>
+
+    <button ion-button block class="mode_bttn" (click)="selectEventsMode()">
+      <p *ngIf="lastMode == 'driving'">
+        Transportation Mode: &nbsp;
+        <ion-icon name="car"></ion-icon>
+      </p>
+      <p *ngIf="lastMode == 'bicycling'">
+        Transportation Mode: &nbsp;
+        <ion-icon name="bicycle"></ion-icon>
+      </p>
+      <p *ngIf="lastMode == 'walking'">
+        Transportation Mode: &nbsp;
+        <ion-icon name="walk"></ion-icon>
+      </p>
+    </button>
   <ion-item *ngIf="noEvents">
     <p> You have no events for the next 24 hours! </p>
   </ion-item>
