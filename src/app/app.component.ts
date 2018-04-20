@@ -12,6 +12,7 @@ import { LoginGatePage } from '../pages/login-gate/login-gate';
 import { HomePage } from '../pages/home/home';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { GooglePlus } from '@ionic-native/google-plus';
+
 //import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
 import { LocationTracker } from '../providers/location-tracker/location-tracker'
 import {

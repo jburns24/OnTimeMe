@@ -9,6 +9,8 @@ import { Events } from '../../providers/events/events';
 import { Transportation } from '../../providers/transportation-mode/transportation-mode';
 import { Network } from '@ionic-native/network';
 import { Subscription} from 'rxjs/Subscription';
+import { LaunchNavigator, LaunchNavigatorOptions } from '@ionic-native/launch-navigator';
+
 // import { LocalNotification } from '../../providers/local-notification/local-notification';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 
@@ -51,7 +53,8 @@ export class HomePage {
     private storage: NativeStorage,
     private toast: ToastController,
     private network: Network,
-    private localNotification: LocalNotifications){
+    private localNotification: LocalNotifications,
+    private launchNavigator: LaunchNavigator){
 
   }
 
@@ -100,7 +103,11 @@ export class HomePage {
     });
 
     console.log("----------------- START -----------------------");
-    this.checkMode();
+    // let app = this.launchNavigator.APP.GOOGLE_MAPS;
+    // let platform = this.launchNavigator.PLATFORM.ANDROID;
+    // console.log("Supported modes?", this.launchNavigator.getTransportModes(app, platform));
+    this.checkMode().then((retValue) => {
+    });
   }
 
   ionViewWillLeave(){
@@ -140,18 +147,19 @@ export class HomePage {
   }
 
   checkMode(){
+    return new Promise(resolve => {
     if (this.enableFunctionality){
       this.user.getUserInfo().then((user) => {
         this.storage.getItem(user.id).then((curUser) => {
           this.lastMode = curUser.mode;
-          this.start();
+          resolve(this.start());
         }, (error) => {
           console.log("Home::checkMode(): mode not set yet:", error);
           let nullMode = undefined;
           let title = "Please select your default mode of transportation.";
           this.trans.showRadioAlert(nullMode, title).then((mode) => {
             this.lastMode = mode;
-            this.start();
+            resolve(this.start());
             console.log("Home::checkMode(): promise returned:", this.lastMode);
           }, (error) => {
             console.log("Home::checkMode(): promise returned error,", error);
@@ -163,13 +171,15 @@ export class HomePage {
         this.lastMode = last.mode;
         this.lastUpdateTime = last.time;
         console.log("Home::checkMode(): last know =", last);
+        resolve(0);
       }, (error) => {
         console.log("Home::checkMode(): cannot retrieve last known", error);
       });
     };
+  });
   }
 
-  // Calling this method should resolved "done" if methods return correctly.
+  // Calling this method should resolved listLength if methods return correctly.
   start(){
     return new Promise(resolve => {
       this.user.getUserInfo().then((user) => {
@@ -283,6 +293,21 @@ export class HomePage {
       console.log("Home::alertNow(): ", eventParam.summary, "already alerted!");
       return;
     };
+  }
+
+  launchMap(eventLocation: any){
+    let dest = eventLocation;
+    let options: LaunchNavigatorOptions = {
+      // start: 'Chico, CA',
+      // transportMode: 'walking',
+      // enableGeocoding: true,
+      //app: this.launchNavigator.APP.GOOGLE_MAPS,
+    };
+
+    this.launchNavigator.navigate(dest, options).then((success) =>{
+      success => console.log("Home:: launched navigator works");
+      error => console.log("Home:: lauching failed.");
+    });
   }
 
   doRefresh(refresher){

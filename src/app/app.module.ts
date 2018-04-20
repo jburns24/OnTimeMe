@@ -26,8 +26,7 @@ import { HomePage } from '../pages/home/home';
 import { LoginGatePage } from '../pages/login-gate/login-gate';
 import { TabsPage } from '../pages/tabs/tabs';
 import { LocalNotifications } from '@ionic-native/local-notifications';
-
-
+import { LaunchNavigator } from '@ionic-native/launch-navigator';
 
 @NgModule({
   declarations: [
@@ -71,6 +70,7 @@ import { LocalNotifications } from '@ionic-native/local-notifications';
     Transportation,
     Network,
     LocalNotifications,
+    LaunchNavigator,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
   ]
 })
