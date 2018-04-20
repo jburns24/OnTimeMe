@@ -155,9 +155,14 @@ export class HomePage {
           let nullMode = undefined;
           let title = "Please select your default mode of transportation.";
           this.trans.showRadioAlert(nullMode, title).then((mode) => {
-            this.lastMode = mode;
-            resolve(this.start());
-            console.log("Home::checkMode(): promise returned:", this.lastMode);
+            console.log("mode", mode);
+            if (mode === null){
+              this.checkMode();
+            } else {
+              this.lastMode = mode;
+              console.log("Home::checkMode(): promise returned:", this.lastMode);
+              resolve(this.start());
+            };
           }, (error) => {
             console.log("Home::checkMode(): promise returned error,", error);
           });
