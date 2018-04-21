@@ -39,6 +39,8 @@ export class HomePage {
   Math: any = Math; // Needed for home.html bindings.
   alertedEvent: any = null;
   alertedEventMode: any = null;
+  hasUber = false;
+  hasLyft = false;
 
   // Use this flag as a condition variable
   enableFunctionality: boolean;
@@ -321,6 +323,53 @@ export class HomePage {
       console.log("Home::alertNow(): ", eventParam.summary, "already alerted!");
       return;
     };
+  }
+
+  checkForLyftOrUber() : Promise<boolean> {
+    return new Promise (resolve => {
+      this.launchNavigator.availableApps().then((appList) => {
+        if ('uber' in appList) {
+          this.hasUber = true;
+        }
+        if ('lyft' in appList) {
+          this.hasLyft = true;
+        }
+        resolve(this.hasUber || this.hasLyft);
+      }, (err) => {
+        console.log("Did not get an app list from launch Navigator", err);
+        resolve(this.hasUber || this.hasLyft);
+      });
+    });
+  }
+
+  launchLyft(eventLocation: any) : Promise<any> {
+    return new Promise (resolve =>{
+      if(this.hasLyft) {
+        let options: LaunchNavigatorOptions = {
+          enableDebug: true,
+          app: this.launchNavigator.APP.LYFT
+        };
+        this.launchNavigator.navigate(eventLocation, options).then((success) => {
+          success => console.log("Home:: launched navigator works");
+          error => console.log("Home:: lauching failed.");
+        });
+      }
+    });
+  }
+
+  launcUber(eventLocation: any) : Promise<any> {
+    return new Promise (resolve =>{
+      if(this.hasUber) {
+        let options: LaunchNavigatorOptions = {
+          enableDebug: true,
+          app: this.launchNavigator.APP.UBER
+        };
+        this.launchNavigator.navigate(eventLocation, options).then((success) => {
+          success => console.log("Home:: launched navigator works");
+          error => console.log("Home:: lauching failed.");
+        });
+      }
+    });
   }
 
   launchMap(eventLocation: any){
