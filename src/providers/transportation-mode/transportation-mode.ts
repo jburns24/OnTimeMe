@@ -36,10 +36,10 @@ export class Transportation {
           if (data != null){
             this.user.getUserInfo().then((user) => {
               this.storage.setItem(user.id, { mode: data }).then(() => {
-                this.storage.getItem(user.id).then((user) => {
-                  this.mode = user.mode;
-                  resolve(this.mode);
-                });
+                // this.storage.getItem(user.id).then((user) => {
+                //   this.mode = user.mode;
+                  resolve(true);
+                //});
               }, (error) => {
                 console.log("Transporation::showRadioAlert(): failed to set item,", error);
               });
@@ -69,6 +69,7 @@ export class Transportation {
           checked: eventParam.mode == mode,
         });
       })
+      alert.addButton('Cancel');
       alert.addButton({
         text: 'OK',
         handler: data => {
