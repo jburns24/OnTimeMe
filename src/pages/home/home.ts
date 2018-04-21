@@ -146,6 +146,7 @@ export class HomePage {
       this.userName = user.name;
       this.userPicture = user.picture;
       this.userEmail = user.email;
+      this.checkForLyftOrUber();
     }, (error) => {
       console.log("Home::intit(): error cant get user info,", error);
     });
@@ -328,10 +329,10 @@ export class HomePage {
   checkForLyftOrUber() : Promise<boolean> {
     return new Promise (resolve => {
       this.launchNavigator.availableApps().then((appList) => {
-        if ('uber' in appList) {
+        if (appList['uber'] == true) {
           this.hasUber = true;
         }
-        if ('lyft' in appList) {
+        if (appList['lyft'] == true) {
           this.hasLyft = true;
         }
         resolve(this.hasUber || this.hasLyft);
@@ -357,7 +358,7 @@ export class HomePage {
     });
   }
 
-  launcUber(eventLocation: any) : Promise<any> {
+  launchUber(eventLocation: any) : Promise<any> {
     return new Promise (resolve =>{
       if(this.hasUber) {
         let options: LaunchNavigatorOptions = {
