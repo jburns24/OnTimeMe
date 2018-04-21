@@ -57,7 +57,7 @@ export class Transportation {
   getNewMode(eventParam:any){
     return new Promise(resolve => {
       let alert = this.alertCrl.create();
-      let title = 'Set new mode for event: ' + eventParam.summary + '?';
+      let title = 'Set new mode for ' + eventParam.summary + '?';
       alert.setTitle(title);
       const modeArray = ['driving', 'bicycling', 'walking'];
       // Iterate thru modeArray and create inputs for each element
