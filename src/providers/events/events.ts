@@ -24,7 +24,7 @@ export class Events {
   // Stores todays events in a new object in storage with the naming convention of
   // user.id + events for example 111696224874024244260events
   // expects a josn object of the Events.list api call
-  storeTodaysEvents(jsonString:any ) {
+  storeTodaysEvents(jsonString?:any, modeParam?:any, eventParam?:any, allEventFlag?:any) {
     return new Promise<boolean> (resolve =>{
       // set some local variables
       let todaysEventList = [];
@@ -40,25 +40,45 @@ export class Events {
 
             // DEBUG: debugger
             console.log("Events::storeTodaysEvents(): oldEvents are:", oldEventList);
+            console.log("ALLEVENT FLAG IS SET", allEventFlag);
+
+            // if (eventParam != undefined){
+            //   console.log("Events::storeTodaysEvents(): eventParam.id are:", eventParam.id);
+            // };
 
             let oldTransDict = {};
             let oldEvents = oldEventList['eventList'];
-            for (let oldEvent of oldEvents) {
-              if (oldEvent.mode != undefined){
-                oldTransDict[oldEvent.id] = oldEvent.mode;
-              };
+            if (!allEventFlag){
+              for (let oldEvent of oldEvents) {
+                if (oldEvent.mode != undefined){
+                  oldTransDict[oldEvent.id] = oldEvent.mode;
+                  console.log("EVENTPARAM AND MODEPARAM", eventParam, modeParam);
+                  if (eventParam != undefined && modeParam != undefined){
+                    if (oldEvent.id === eventParam.id){
+                      oldTransDict[oldEvent.id] = modeParam;
+                      console.log("OLDEVENT new MODE", modeParam);
+                    };
+                  };
+                };
 
-              // DEBUG: debugger
-              console.log("Events::storeTodaysEvents(): for event: <", oldEvent.summary, ">, oldEvent.mode is: <", oldEvent.mode, ">");
-            }
+                // DEBUG: debugger
+                console.log("Events::storeTodaysEvents(): for event: <", oldEvent.summary, ">, oldEvent.mode is: <", oldEvent.mode, ">");
+              };
+            };
             for (let event of events) {
               let newMode = this.mode;
+
               //  Check if new event is an old event if so use the old trans mode
-              if (event.id in oldTransDict) {
-                if (oldTransDict[event.id].mode != null) {
-                  newMode = oldTransDict[event.id].mode;
-                }
-              }
+              if (!allEventFlag){
+                if (event.id in oldTransDict) {
+                  console.log("EVEN EXIST IN OLD", oldTransDict[event.id]);
+                  if (oldTransDict[event.id] != null) {
+                    newMode = oldTransDict[event.id];
+                    console.log("NEWMODE : ", newMode);
+                  };
+                };
+              };
+
               let start = event['start'];
               let end = event['end'];
               let beginTime = Date.parse(start['dateTime']) / 1000;
@@ -78,7 +98,7 @@ export class Events {
             };
             this.user.getUserInfo().then((user) => {
               this.storage.setItem(event_key, event_list_object).then(() => {
-                console.log('Events::storeTodaysEvents(): events saved to user!!');
+                console.log('Events::storeTodaysEvents(): events saved to user!!', event_list_object);
                 resolve(true);
               }, (err) => {
                 console.log('Events::storeTodaysEvents failed to store events ', err);
@@ -88,7 +108,7 @@ export class Events {
             });
           }, (err) => {
             console.log("events::storeTodaysEvents and old event list was not found");
-
+            //resolve(this.setAllEventMode());
             for (let event of events) {
               let start = event['start'];
               let end = event['end'];
@@ -122,6 +142,48 @@ export class Events {
       }, (err) => {console.log("Events::storeTodaysEvents(): did not get a user object", err);});
     });
   }
+
+  // setAllEventMode(){
+  //   return new Promise(resolve => {
+  //     let todaysEventList = [];
+  //     let event_key = "";
+  //     let data = JSON.parse(jsonString);
+  //     let events = data['items'];
+  //     this.user.getUserInfo().then((user) => {
+  //       event_key = user.id + 'events';
+  //       this.map.getPreferenceMode().then((mode) => {
+  //         this.mode = mode;
+  //
+  //     for (let event of events) {
+  //       let start = event['start'];
+  //       let end = event['end'];
+  //       let beginTime = Date.parse(start['dateTime']) / 1000;
+  //       let finishTime = Date.parse(end['dateTime']) / 1000;
+  //       let new_event = {
+  //         id: event['id'],
+  //         summary: event['summary'],
+  //         location: event['location'],
+  //         startTime: beginTime,
+  //         endTime: finishTime,
+  //         mode: this.mode
+  //       };
+  //       todaysEventList.push(new_event);
+  //     }
+  //     let event_list_object = {
+  //       eventList: todaysEventList
+  //     };
+  //     this.user.getUserInfo().then((user) => {
+  //       this.storage.setItem(event_key, event_list_object).then(() => {
+  //         console.log('Events::storeTodaysEvents(): events saved to user!!');
+  //         resolve(true);
+  //       }, (err) => {
+  //         console.log('Events::storeTodaysEvents(): failed to store events ', err);
+  //       });
+  //     }, (err) => {
+  //       console.log('Events::storeTodaysEvents(): failed to get user ', err);
+  //     });
+  //   });
+  // }
 
   /**
    *  Returns an array of events, each event will have all of these

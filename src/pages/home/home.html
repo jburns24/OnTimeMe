@@ -45,13 +45,22 @@
     <p> Location: {{lastLocation}} </p>
   </ion-item>
   <ion-list>
-    <ion-item *ngFor="let event of eventList">
+    <ion-item *ngFor="let event of eventList" item-balance>
       <p item-left >
         <button ion-button block class="mode_bttn" (click)="launchMap(event.location)">
           MAP
         </button>
       </p>
       <p item-left [style.font-size.vw]="'4.2'" class="truncate">{{ event.summary }}</p>
+      <p *ngIf="event.mode == 'driving'" item-left>
+        <ion-icon name="car" (click)="changeModeForEvent(event)"></ion-icon>
+      </p>
+      <p *ngIf="event.mode == 'bicycling'" item-left>
+        <ion-icon name="bicycle" (click)="changeModeForEvent(event)"></ion-icon>
+      </p>
+      <p *ngIf="event.mode == 'walking'" item-left>
+        <ion-icon name="walk" (click)="changeModeForEvent(event)"></ion-icon>
+      </p>
       <p *ngIf="event.happening" item-right text-right [style.color]="(((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? 'red' : 'green'">
         {{
           (((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ?

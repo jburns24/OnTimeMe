@@ -36,10 +36,10 @@ export class Transportation {
           if (data != null){
             this.user.getUserInfo().then((user) => {
               this.storage.setItem(user.id, { mode: data }).then(() => {
-                this.storage.getItem(user.id).then((user) => {
-                  this.mode = user.mode;
-                  resolve(this.mode);
-                });
+                // this.storage.getItem(user.id).then((user) => {
+                //   this.mode = user.mode;
+                  resolve(true);
+                //});
               }, (error) => {
                 console.log("Transporation::showRadioAlert(): failed to set item,", error);
               });
@@ -48,6 +48,32 @@ export class Transportation {
             let title = "You have to select a default mode of transportation!"
             resolve(this.showRadioAlert(null, title));
           };
+        }
+      });
+      alert.present();
+    });
+  }
+
+  getNewMode(eventParam:any){
+    return new Promise(resolve => {
+      let alert = this.alertCrl.create();
+      let title = 'Set new mode for ' + eventParam.summary + '?';
+      alert.setTitle(title);
+      const modeArray = ['driving', 'bicycling', 'walking'];
+      // Iterate thru modeArray and create inputs for each element
+      modeArray.forEach( mode => {
+        alert.addInput({
+          type: 'radio',
+          label: mode,
+          value: mode,
+          checked: eventParam.mode == mode,
+        });
+      })
+      alert.addButton('Cancel');
+      alert.addButton({
+        text: 'OK',
+        handler: data => {
+          resolve(data);
         }
       });
       alert.present();

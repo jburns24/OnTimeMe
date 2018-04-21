@@ -82,6 +82,11 @@ export class HomePage {
     if(this.network.type == 'none'){
       this.enableFunctionality = false;
       console.log("Home::ionViewWillEnter(): we are offline, enable =", this.enableFunctionality);
+      this.toast.create({
+        message: 'You are offline. You must connect to the internet to use this app.',
+        position: 'bottom',
+        duration: 4000
+      }).present();
     } else{
       this.enableFunctionality = true;
     };
@@ -150,7 +155,8 @@ export class HomePage {
         this.user.getUserInfo().then((user) => {
           this.storage.getItem(user.id).then((curUser) => {
             this.lastMode = curUser.mode;
-            resolve(this.start());
+            let allEventFlag = false;
+            resolve(this.start(allEventFlag));
           }, (error) => {
             console.log("Home::checkMode(): mode not set yet:", error);
             let nullMode = undefined;
@@ -183,11 +189,11 @@ export class HomePage {
   }
 
   // Calling this method should resolved listLength if methods return correctly.
-  start(){
+  start(allEventFlag?: any){
     return new Promise(resolve => {
       this.user.getUserInfo().then((user) => {
         this.googleCalendar.init(user.serverAuthCode).then((authToken) => {
-          this.getList(authToken).then((listLength) => {
+          this.getList(authToken, allEventFlag).then((listLength) => {
             if (listLength === 0){
               this.noEvents = true;
             } else {
@@ -210,9 +216,14 @@ export class HomePage {
   selectEventsMode(){
     if (this.enableFunctionality){
       let title = "Change transportation mode for all events?";
-      this.trans.showRadioAlert(this.lastMode, title).then((mode) => {
-        this.lastMode = mode;
-        this.start();
+      this.trans.showRadioAlert(this.lastMode, title).then((allEventFlag) => {
+        console.log("ALLEVENTFLAG IS", allEventFlag);
+        this.user.getUserInfo().then((user) => {
+          this.storage.getItem(user.id).then((user) => {
+            this.lastMode = user.mode;
+            this.start(allEventFlag);
+          });
+        });
         //console.log("Home::showRadioAlert(): promise returned:", this.lastMode);
       }, (error) => {
         console.log("Home::showRadioAlert(): promise returned error,", error);
@@ -227,11 +238,11 @@ export class HomePage {
   }
 
   // @return The length of the eventsList.
-  getList(refreshToken: any){
+  getList(refreshToken: any, allEventFlag?: any){
     return new Promise (resolve => {
       this.googleCalendar.getList(refreshToken).then( (list) => {
         this.events = list;
-        this.event.storeTodaysEvents(JSON.stringify(this.events)).then(() => {
+        this.event.storeTodaysEvents(JSON.stringify(this.events),undefined,undefined, allEventFlag).then(() => {
           console.log('Home::getList(): successfully saved todays events:', this.events);
           this.event.getTodaysEvents().then((events) =>{
             if (events === 0){
@@ -326,6 +337,24 @@ export class HomePage {
       success => console.log("Home:: launched navigator works");
       error => console.log("Home:: lauching failed.");
     });
+  }
+
+  changeModeForEvent(event: any){
+    if (this.enableFunctionality){
+      console.log("EVENT PARM ID", event.id);
+      this.trans.getNewMode(event).then((mode) => {
+        console.log("NEW MODE IS", mode);
+        this.event.storeTodaysEvents(JSON.stringify(this.events), mode, event, false).then(() => {
+          this.checkMode();
+        });
+      });
+    } else {
+      this.toast.create({
+        message: 'You are offline. Action is not possible.',
+        position: 'bottom',
+        duration: 4000
+      }).present();
+    };
   }
 
   doRefresh(refresher){
