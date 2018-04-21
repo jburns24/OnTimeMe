@@ -82,6 +82,11 @@ export class HomePage {
     if(this.network.type == 'none'){
       this.enableFunctionality = false;
       console.log("Home::ionViewWillEnter(): we are offline, enable =", this.enableFunctionality);
+      this.toast.create({
+        message: 'You are offline. You must connect to the internet to use this app.',
+        position: 'bottom',
+        duration: 4000
+      }).present();
     } else{
       this.enableFunctionality = true;
     };
@@ -335,13 +340,21 @@ export class HomePage {
   }
 
   changeModeForEvent(event: any){
-    console.log("EVENT PARM ID", event.id);
-    this.trans.getNewMode(event).then((mode) => {
-      console.log("NEW MODE IS", mode);
-      this.event.storeTodaysEvents(JSON.stringify(this.events), mode, event, false).then(() => {
-        this.checkMode();
+    if (this.enableFunctionality){
+      console.log("EVENT PARM ID", event.id);
+      this.trans.getNewMode(event).then((mode) => {
+        console.log("NEW MODE IS", mode);
+        this.event.storeTodaysEvents(JSON.stringify(this.events), mode, event, false).then(() => {
+          this.checkMode();
+        });
       });
-    });
+    } else {
+      this.toast.create({
+        message: 'You are offline. Action is not possible.',
+        position: 'bottom',
+        duration: 4000
+      }).present();
+    };
   }
 
   doRefresh(refresher){
