@@ -24,7 +24,7 @@ export class Events {
   // Stores todays events in a new object in storage with the naming convention of
   // user.id + events for example 111696224874024244260events
   // expects a josn object of the Events.list api call
-  storeTodaysEvents(jsonString:any ) {
+  storeTodaysEvents(jsonString?:any, modeParam?:any, eventParam?:any) {
     return new Promise<boolean> (resolve =>{
       // set some local variables
       let todaysEventList = [];
@@ -40,12 +40,22 @@ export class Events {
 
             // DEBUG: debugger
             console.log("Events::storeTodaysEvents(): oldEvents are:", oldEventList);
+            // if (eventParam != undefined){
+            //   console.log("Events::storeTodaysEvents(): eventParam.id are:", eventParam.id);
+            // };
 
             let oldTransDict = {};
             let oldEvents = oldEventList['eventList'];
             for (let oldEvent of oldEvents) {
               if (oldEvent.mode != undefined){
-                oldTransDict[oldEvent.id] = oldEvent.mode;
+                  oldTransDict[oldEvent.id] = oldEvent.mode;
+                  console.log("EVENTPARAM AND MODEPARAM", eventParam, modeParam);
+                  if (eventParam != undefined && modeParam != undefined){
+                    if (oldEvent.id === eventParam.id){
+                      oldTransDict[oldEvent.id] = modeParam;
+                      console.log("OLDEVENT new MODE", modeParam);
+                    };
+                  };
               };
 
               // DEBUG: debugger
@@ -55,8 +65,10 @@ export class Events {
               let newMode = this.mode;
               //  Check if new event is an old event if so use the old trans mode
               if (event.id in oldTransDict) {
-                if (oldTransDict[event.id].mode != null) {
-                  newMode = oldTransDict[event.id].mode;
+                console.log("EVEN EXIST IN OLD", oldTransDict[event.id]);
+                if (oldTransDict[event.id] != null) {
+                  newMode = oldTransDict[event.id];
+                  console.log("NEWMODE : ", newMode);
                 }
               }
               let start = event['start'];
@@ -78,7 +90,7 @@ export class Events {
             };
             this.user.getUserInfo().then((user) => {
               this.storage.setItem(event_key, event_list_object).then(() => {
-                console.log('Events::storeTodaysEvents(): events saved to user!!');
+                console.log('Events::storeTodaysEvents(): events saved to user!!', event_list_object);
                 resolve(true);
               }, (err) => {
                 console.log('Events::storeTodaysEvents failed to store events ', err);

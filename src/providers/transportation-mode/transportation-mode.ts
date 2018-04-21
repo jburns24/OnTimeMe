@@ -53,4 +53,29 @@ export class Transportation {
       alert.present();
     });
   }
+
+  getNewMode(eventParam:any){
+    return new Promise(resolve => {
+      let alert = this.alertCrl.create();
+      let title = 'Set new mode for event: ' + eventParam.summary + '?';
+      alert.setTitle(title);
+      const modeArray = ['driving', 'bicycling', 'walking'];
+      // Iterate thru modeArray and create inputs for each element
+      modeArray.forEach( mode => {
+        alert.addInput({
+          type: 'radio',
+          label: mode,
+          value: mode,
+          checked: eventParam.mode == mode,
+        });
+      })
+      alert.addButton({
+        text: 'OK',
+        handler: data => {
+          resolve(data);
+        }
+      });
+      alert.present();
+    });
+  }
 }

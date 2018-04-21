@@ -52,6 +52,21 @@
         </button>
       </p>
       <p item-left [style.font-size.vw]="'4.2'" class="truncate">{{ event.summary }}</p>
+      <p *ngIf="event.mode == 'driving'" item-left>
+        <button ion-button icon-start (click)="changeModeForEvent(event)">
+          <ion-icon name="car"></ion-icon>
+        </button>
+     </p>
+      <p *ngIf="event.mode == 'bicycling'" item-left>
+        <button ion-button icon-start (click)="changeModeForEvent(event)">
+          <ion-icon name="bicycle"></ion-icon>
+        </button>
+      </p>
+      <p *ngIf="event.mode == 'walking'" item-left>
+        <button ion-button icon-start (click)="changeModeForEvent(event)">
+          <ion-icon name="walk"></ion-icon>
+        </button>
+      </p>
       <p *ngIf="event.happening" item-right text-right [style.color]="(((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? 'red' : 'green'">
         {{
           (((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ?

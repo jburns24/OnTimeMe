@@ -328,6 +328,16 @@ export class HomePage {
     });
   }
 
+  changeModeForEvent(event: any){
+    console.log("EVENT PARM ID", event.id);
+    this.trans.getNewMode(event).then((mode) => {
+      console.log("NEW MODE IS", mode);
+      this.event.storeTodaysEvents(JSON.stringify(this.events), mode, event).then(() => {
+        this.checkMode();
+      });
+    });
+  }
+
   doRefresh(refresher){
     if (this.enableFunctionality){
       console.log("-------------- REFRESH START -------------")
