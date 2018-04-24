@@ -90,3 +90,26 @@ h1.as-header-icon ion-icon{
     padding: 10px 5px;
   }
 }
+
+.alertCustomCss {
+	// text color for basic alerts
+	color: white; 
+	// // alert modal page bg color. Warning this will remove the alert transparency
+	// background-color: color($colors, dark, base); 
+
+	button {
+			color: white !important; // button text color
+			background-color: color($colors, secondary, base) !important;
+					//button bg color
+	}
+
+	.alert-message {
+			color: white; // text color for confirm alerts
+			// text-align: center !important;
+	}
+
+
+	.alert-wrapper {
+			background-color: color($colors, dark, base); // bg color of alert content
+	}
+}

@@ -11,7 +11,6 @@ $font-path: "../assets/fonts";
 // http://ionicframework.com/docs/theming/rtl-support/
 $app-direction: ltr;
 
-
 @import "ionic.globals";
 
 
@@ -52,8 +51,10 @@ $colors: (
 // App Material Design Variables
 // --------------------------------------------------
 // Material Design only Sass variables can go here
-
-
+$alert-md-button-margin-bottom: 5px;
+$alert-md-button-margin-top: 5px;
+$alert-md-head-text-align: center;
+$alert-md-button-text-align: start !important;
 
 
 // App Windows Variables
