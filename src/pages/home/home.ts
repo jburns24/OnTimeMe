@@ -314,7 +314,7 @@ export class HomePage {
   eventOptionAlert(eventLocation: any) : Promise<boolean> {
     return new Promise(resolve => {
       let alert = this.alertCrl.create();
-      alert.setCssClass("alertCustomCss");
+      alert.setCssClass("alertCss");
       alert.setTitle("Additional Event Options")
       let eventOptions = ['Map'];
       if (this.hasLyft)
