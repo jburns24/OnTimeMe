@@ -90,3 +90,21 @@ h1.as-header-icon ion-icon{
     padding: 10px 5px;
   }
 }
+
+.alertCss {
+	color: white; 
+
+	button {
+			color: white !important;
+			background-color: color($colors, secondary, base) !important;
+	}
+
+	.alert-message {
+			color: white;
+	}
+
+
+	.alert-wrapper {
+			background-color: color($colors, dark, base); // bg color of alert content
+	}
+}

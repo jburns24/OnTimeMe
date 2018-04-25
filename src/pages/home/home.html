@@ -10,11 +10,19 @@
     <ion-title>Home</ion-title>
     </ion-navbar>
   </ion-header>
-
   <br>
-  <br>
-  <h1 class="logo">Be On Time...</h1>
-  <br>
+  <ion-item no-lines style="background-color:transparent">
+      <h1 class="logo">Be On Time...</h1>
+      <p item-right *ngIf="lastMode == 'driving'" (click)="selectEventsMode()">
+          <ion-icon class="trans-mode" name="car"></ion-icon>
+        </p>
+        <p item-right *ngIf="lastMode == 'bicycling'" (click)="selectEventsMode()">
+          <ion-icon class="trans-mode" name="bicycle"></ion-icon>
+        </p>
+        <p item-right *ngIf="lastMode == 'walking'" (click)="selectEventsMode()">
+          <ion-icon class="trans-mode" name="walk"></ion-icon>
+        </p>
+  </ion-item>
   <ion-item no-lines style="background-color:transparent">
     <ion-avatar item-left >
       <img src="{{userPicture}}" class="center">
@@ -22,53 +30,38 @@
     <h2>Hello {{userName}}!</h2>
     <h4>{{userEmail}}</h4>
   </ion-item>
-
-    <button ion-button block class="mode_bttn" (click)="selectEventsMode()">
-      <p *ngIf="lastMode == 'driving'">
-        Transportation Mode: &nbsp;
-        <ion-icon name="car"></ion-icon>
-      </p>
-      <p *ngIf="lastMode == 'bicycling'">
-        Transportation Mode: &nbsp;
-        <ion-icon name="bicycle"></ion-icon>
-      </p>
-      <p *ngIf="lastMode == 'walking'">
-        Transportation Mode: &nbsp;
-        <ion-icon name="walk"></ion-icon>
-      </p>
-    </button>
   <ion-item *ngIf="noEvents">
     <p> You have no events for the next 24 hours! </p>
   </ion-item>
-  <ion-item *ngIf="!noEvents">
-    <p> Last updated: {{(lastUpdateTime | date:'medium':'mediumTime')}} </p>
-    <p> Location: {{lastLocation}} </p>
-  </ion-item>
   <ion-list>
+    <ion-item>
+      <p item-left>
+        <strong>Title</strong>
+      </p>
+      <p item-right>
+        <strong>Leave In</strong>
+      </p>
+    </ion-item>
     <ion-item *ngFor="let event of eventList" item-balance>
-      <p item-left >
-        <button ion-button block class="mode_bttn" (click)="launchMap(event.location)">
-          MAP
-        </button>
-      </p>
+      <ion-icon item-left name="md-add-circle" (click)="eventOptionAlert(event.location)"></ion-icon>
       <p item-left [style.font-size.vw]="'4.2'" class="truncate">{{ event.summary }}</p>
-      <p *ngIf="event.mode == 'driving'" item-left>
-        <ion-icon name="car" (click)="changeModeForEvent(event)"></ion-icon>
+      <p *ngIf="event.mode == 'driving'" item-left (click)="changeModeForEvent(event)">
+        <ion-icon name="car"></ion-icon>
       </p>
-      <p *ngIf="event.mode == 'bicycling'" item-left>
-        <ion-icon name="bicycle" (click)="changeModeForEvent(event)"></ion-icon>
+      <p *ngIf="event.mode == 'bicycling'" item-left (click)="changeModeForEvent(event)">
+        <ion-icon name="bicycle"></ion-icon>
       </p>
-      <p *ngIf="event.mode == 'walking'" item-left>
-        <ion-icon name="walk" (click)="changeModeForEvent(event)"></ion-icon>
+      <p *ngIf="event.mode == 'walking'" item-left (click)="changeModeForEvent(event)">
+        <ion-icon name="walk"></ion-icon>
       </p>
-      <p *ngIf="event.happening" item-right text-right [style.color]="(((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? 'red' : 'green'">
+      <p *ngIf="event.happening" item-right text-right [style.color]="(((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? 'red' : 'green'" (click)="changeModeForEvent(event)">
         {{
           (((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ?
           "- " + (((epochNow | async) - event.startTime) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true}) :
            (((event.startTime - event.trip_duration) - (epochNow | async)) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true})
         }}
       </p>
-      <p *ngIf="!event.happening" item-right text-right [style.color]="(((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? 'red' : 'green'">
+      <p *ngIf="!event.happening" item-right text-right [style.color]="(((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? 'red' : 'green'" (click)="changeModeForEvent(event)">
         {{
           (((event.startTime - event.trip_duration) - (epochNow | async)) <= 0 ) ? "Running Late!" : (((event.startTime - event.trip_duration) - (epochNow | async)) | hoursMinutesSeconds:{hours: true, minutes: true, seconds: true})
         }}
@@ -78,5 +71,8 @@
       </p>
     </ion-item>
   </ion-list>
-
+  <ion-item class= "last-updated" *ngIf="!noEvents" no-lines style="background-color:transparent">
+    <p> * Last updated: {{(lastUpdateTime | date:'medium':'mediumTime')}} </p>
+    <p> &nbsp;&nbsp;&nbsp;Location: {{lastLocation}} </p>
+  </ion-item>
 </ion-content>

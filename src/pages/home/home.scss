@@ -1,7 +1,14 @@
 page-home {
+
     .home-content {
         background: #56CA96;
 
+        .trans-mode {
+            padding-top: 20px;
+            font-size: 35px;
+            color: black; //Preferred size here
+        }
+    
         .logo {
             font-size: 9.8vw;
             width: 100%;
@@ -13,7 +20,6 @@ page-home {
         }
         .item .item-content {
             background-color: #56CA96;
-            //background-color: transparent !important;
         }
 
         .center {
@@ -28,20 +34,7 @@ page-home {
             white-space: nowrap;
             width: 40%;
           }
-        //.title {
-            //font-size: 9.8vw;
-            //width: 100%;
-            //font-weight: bolder;
-            //color: aliceblue;
-            //letter-spacing: -3px;
-            //text-align: center;
-        //}
-        //.item-avatar  {
-            //width:100% !important;
-            //height : 100% !important;
-            //max-width: 100px !important;  //any size
-            //max-height: 100px !important; //any size
-        //}
+
         ion-avatar img {
             width: 50px !important;
             height: 50px !important;
@@ -55,6 +48,3 @@ div.center {
   text-align: center;
 }
 
-/*h1 {
-    text-align: center;
-}*/

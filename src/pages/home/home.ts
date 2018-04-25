@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { MenuController, ToastController } from 'ionic-angular';
+import { MenuController, ToastController, AlertController } from 'ionic-angular';
 import { UserProvider } from '../../providers/user/user';
 import { GoogleCalendar} from '../../providers/google-calendar/google-calendar';
 import { NativeStorage } from '@ionic-native/native-storage';
@@ -39,6 +39,8 @@ export class HomePage {
   Math: any = Math; // Needed for home.html bindings.
   alertedEvent: any = null;
   alertedEventMode: any = null;
+  hasUber = false;
+  hasLyft = false;
 
   // Use this flag as a condition variable
   enableFunctionality: boolean;
@@ -55,7 +57,8 @@ export class HomePage {
     private toast: ToastController,
     private network: Network,
     private localNotification: LocalNotifications,
-    private launchNavigator: LaunchNavigator){
+    private launchNavigator: LaunchNavigator,
+    private alertCrl: AlertController){
 
   }
 
@@ -144,6 +147,7 @@ export class HomePage {
       this.userName = user.name;
       this.userPicture = user.picture;
       this.userEmail = user.email;
+      this.checkForLyftOrUber();
     }, (error) => {
       console.log("Home::intit(): error cant get user info,", error);
     });
@@ -307,6 +311,52 @@ export class HomePage {
     });
   }
 
+  eventOptionAlert(eventLocation: any) : Promise<boolean> {
+    return new Promise(resolve => {
+      let alert = this.alertCrl.create();
+      alert.setCssClass("alertCss");
+      alert.setTitle("Additional Event Options")
+      let eventOptions = ['Map'];
+      if (this.hasLyft)
+        eventOptions.push("Lyft");
+      if (this.hasUber)
+        eventOptions.push("Uber");
+      eventOptions.forEach(option => {
+        alert.addButton({
+          text: option,
+          handler: () => {
+            // Dirctions case
+            if (option == "Map") {
+              this.launchMap(eventLocation).then(() => {
+                resolve(true);
+              }, (err) => {
+                console.log("home::eventOptionAlert launchMap failed ", err);
+                resolve(false);
+              });
+            }
+            if (option == "Uber") {
+              this.launchUber(eventLocation).then(() => {
+                resolve(true);
+              }, (err) => {
+                console.log("home::eventOptionAlert launchUber failed ", err);
+                resolve(false);
+              });
+            }
+            if (option == "Lyft") {
+              this.launchLyft(eventLocation).then(() => {
+                resolve(true);
+              }, (err) => {
+                console.log("home::eventOptionAlert launchLyft failed ", err);
+                resolve(false);
+              });
+            }
+          }
+        });
+      });
+      resolve(alert.present());
+    })
+  }
+
   // Calls scheduleAlert to send out an alert.
   doesEventNeedAlert(eventParam: any){
     console.log("event id is", eventParam.id);
@@ -323,19 +373,77 @@ export class HomePage {
     };
   }
 
-  launchMap(eventLocation: any){
-    let dest = eventLocation;
-    let options: LaunchNavigatorOptions = {
-      enableDebug: true,
-      // start: 'Chico, CA',
-      transportMode: this.launchNavigator.TRANSPORT_MODE.WALKING,
-      // enableGeocoding: true,
-      app: this.launchNavigator.APP.GOOGLE_MAPS
-    };
+  checkForLyftOrUber() : Promise<boolean> {
+    return new Promise (resolve => {
+      this.launchNavigator.availableApps().then((appList) => {
+        if (appList['uber'] == true) {
+          this.hasUber = true;
+        }
+        if (appList['lyft'] == true) {
+          this.hasLyft = true;
+        }
+        resolve(this.hasUber || this.hasLyft);
+      }, (err) => {
+        console.log("Did not get an app list from launch Navigator", err);
+        resolve(this.hasUber || this.hasLyft);
+      });
+    });
+  }
 
-    this.launchNavigator.navigate(dest, options).then((success) =>{
-      success => console.log("Home:: launched navigator works");
-      error => console.log("Home:: lauching failed.");
+  launchLyft(eventLocation: any) : Promise<any> {
+    return new Promise (resolve =>{
+      if(this.hasLyft) {
+        let options: LaunchNavigatorOptions = {
+          enableDebug: true,
+          app: this.launchNavigator.APP.LYFT
+        };
+        this.launchNavigator.navigate(eventLocation, options).then((success) => {
+          console.log("Home:: launched Lyft works");
+          resolve(true);
+        },(err) => {
+          console.log("Home:: lauching Lyft failed.");
+          resolve(false);
+        });
+      }
+    });
+  }
+
+  launchUber(eventLocation: any) : Promise<any> {
+    return new Promise (resolve =>{
+      if(this.hasUber) {
+        let options: LaunchNavigatorOptions = {
+          enableDebug: true,
+          app: this.launchNavigator.APP.UBER
+        };
+        this.launchNavigator.navigate(eventLocation, options).then((success) => {
+          console.log("Home:: launched Uber works");
+          resolve(true);
+        },(err) => {
+          console.log("Home:: lauching Uber failed.");
+          resolve(false);
+        });
+      }
+    });
+  }
+
+  launchMap(eventLocation: any) : Promise<boolean> {
+    return new Promise(resolve => {
+      let dest = eventLocation;
+      let options: LaunchNavigatorOptions = {
+        enableDebug: true,
+        // start: 'Chico, CA',
+        transportMode: this.launchNavigator.TRANSPORT_MODE.WALKING,
+        // enableGeocoding: true,
+        app: this.launchNavigator.APP.GOOGLE_MAPS
+      };
+  
+      this.launchNavigator.navigate(dest, options).then((success) => {
+        console.log("Home:: launched navigator works");
+        resolve(true);
+      },(err) => {
+        console.log("Home:: lauching failed.");
+        resolve(false);
+      });
     });
   }
 
