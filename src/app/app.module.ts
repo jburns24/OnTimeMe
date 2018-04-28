@@ -19,6 +19,21 @@ import { RealTimeClockProvider } from '../providers/real-time-clock/real-time-cl
 import { LocationTracker } from '../providers/location-tracker/location-tracker';
 import { Transportation } from '../providers/transportation-mode/transportation-mode';
 import { Network } from '@ionic-native/network';
+import { AppProviders } from './app.providers'
+
+// Mocks
+import { GooglePlusMock } from '@ionic-native-mocks/google-plus';
+import { NativeStorageMock } from '@ionic-native-mocks/native-storage'
+import { BackgroundGeolocatioMock } from '@ionic-native-mocks/background-geolocation'
+import { GeolocationMock } from '@ionic-native-mocks/geolocation'
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+//import { LocalNotificationsMocks } from '@ionic-native-mocks/local-notifications'
+import { LaunchNavigatorMock } from '@ionic-native-mocks/launch-navigator'
+import {
+  NetworkMock,
+  StatusBarMock,
+  SplashScreenMock } from 'ionic-mocks';
+
 // Pages
 import { AboutPage } from '../pages/about/about';
 import { ContactPage } from '../pages/contact/contact';
@@ -53,25 +68,26 @@ import { LaunchNavigator } from '@ionic-native/launch-navigator';
     TabsPage,
     LoginGatePage,
   ],
-  providers: [
-    StatusBar,
-    SplashScreen,
-    GooglePlus,
-    NativeStorage,
-    BackgroundGeolocation,
-    Geolocation,
-    UserProvider,
-    GoogleCalendar,
-    HttpClient,
-    Events,
-    Map,
-    RealTimeClockProvider,
-    LocationTracker,
-    Transportation,
-    Network,
-    LocalNotifications,
-    LaunchNavigator,
-    {provide: ErrorHandler, useClass: IonicErrorHandler},
-  ]
+  providers: AppProviders.getProviders()
+  // providers: [
+  //   StatusBar,
+  //   SplashScreen,
+  //   GooglePlus,
+  //   NativeStorage,
+  //   BackgroundGeolocation,
+  //   Geolocation,
+  //   UserProvider,
+  //   GoogleCalendar,
+  //   HttpClient,
+  //   Events,
+  //   Map,
+  //   RealTimeClockProvider,
+  //   LocationTracker,
+  //   Transportation,
+  //   Network,
+  //   LocalNotifications,
+  //   LaunchNavigator,
+  //   {provide: ErrorHandler, useClass: IonicErrorHandler},
+  // ]
 })
 export class AppModule {}

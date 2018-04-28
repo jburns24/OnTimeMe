@@ -62,7 +62,7 @@ export class MyApp {
     .then(() => {
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
-      this.statusBar.styleBlackOpaque();
+      //this.statusBar.styleBlackOpaque();
 
       /*** This is where the logic is implemented for checking user log ins ***/
       this.locationTracker.startTracking().then(() => {
