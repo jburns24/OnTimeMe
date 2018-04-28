@@ -7,7 +7,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
-import { AlertController } from 'ionic-angular/components/alert/alert-controller';
+// import { AlertController } from 'ionic-angular/components/alert/alert-controller';
 import { LoginGatePage } from '../pages/login-gate/login-gate';
 import { HomePage } from '../pages/home/home';
 import { NativeStorage } from '@ionic-native/native-storage';
@@ -20,7 +20,8 @@ import {
   MenuController,
   Nav,
   LoadingController,
-  Loading
+  Loading,
+  AlertController
 } from 'ionic-angular';
 
 @Component({
@@ -62,7 +63,7 @@ export class MyApp {
     .then(() => {
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
-      this.statusBar.styleBlackOpaque();
+      //this.statusBar.styleBlackOpaque();
 
       /*** This is where the logic is implemented for checking user log ins ***/
       this.locationTracker.startTracking().then(() => {
