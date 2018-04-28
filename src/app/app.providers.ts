@@ -1,5 +1,5 @@
 import { ErrorHandler } from '@angular/core';
-import { IonicErrorHandler } from 'ionic-angular';
+import { IonicErrorHandler , MenuController, LoadingController, AlertController, Alert} from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { GooglePlus } from '@ionic-native/google-plus';
@@ -20,7 +20,10 @@ import { LaunchNavigatorMock } from '@ionic-native-mocks/launch-navigator'
 import {
     NetworkMock,
     StatusBarMock,
-    SplashScreenMock } from 'ionic-mocks';
+    SplashScreenMock,
+    MenuControllerMock,
+    LoadingControllerMock,
+    AlertControllerMock, } from 'ionic-mocks';
 
 
 //  Need Mocks for
@@ -53,7 +56,11 @@ export class AppProviders {
             //  Should be a mock
             LocalNotifications,
 
-            {provide: LaunchNavigator, useClass: LaunchNavigatorMock},  
+            
+            {provide: AlertController, useClass: AlertControllerMock},
+            {provide: LoadingController, useClass: LoadingControllerMock},
+            {provide: MenuController, useClass: MenuControllerMock},
+            {provide: LaunchNavigator, useClass: LaunchNavigatorMock},
             //{provide: LocalNotifications, useClass: LocalNotificationsMocks},
             {provide: Network, useClass: NetworkMock},
             {provide: HttpClient, useClass: HttpClientTestingModule},
@@ -70,6 +77,9 @@ export class AppProviders {
  
           // Use device providers
           providers = [
+            AlertController,
+            LoadingController,
+            MenuController,
             Transportation,
             LocationTracker,
             RealTimeClockProvider,

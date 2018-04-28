@@ -110,6 +110,22 @@ export class NavMock {
 
 }
 
+export class LocationTrackerMock {
+
+  public startTracking(): any {
+    return new Promise(function(resolve: Function):void {
+      resolve();
+    });
+  }
+
+  public stopTracking(): any {
+    return new Promise(function(resolve: Function):void {
+      resolve();
+    });
+  }
+
+}
+
 export class DeepLinkerMock {
 
 }
