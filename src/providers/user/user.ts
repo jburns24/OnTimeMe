@@ -12,6 +12,7 @@ export class UserProvider {
         resolve(data);
       }, (error) => {
         console.log("UserProvider::getUserInfo(): cannot get user info,", error);
+        resolve(false);
       });
     });
   }

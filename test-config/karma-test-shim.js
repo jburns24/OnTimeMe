@@ -11,6 +11,7 @@ require('zone.js/dist/jasmine-patch');
 require('zone.js/dist/async-test');
 require('zone.js/dist/fake-async-test');
 
+// Looking for files to load; here we specify .spec.ts as the file to look for.
 var appContext = require.context('../src', true, /\.spec\.ts/);
 
 appContext.keys().forEach(appContext);

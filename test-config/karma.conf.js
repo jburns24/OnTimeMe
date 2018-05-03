@@ -6,6 +6,8 @@ module.exports = function(config) {
 
     frameworks: ['jasmine'],
 
+    // Files that Karma needs to know about; list of files / patterns to load
+    // in the browser.
     files: [
       {
         pattern: './test-config/karma-test-shim.js',
@@ -49,13 +51,29 @@ module.exports = function(config) {
       fixWebpackSourcePaths: true
     },
 
-    reporters: config.coverage ? ['kjhtml', 'dots', 'coverage-istanbul'] : ['kjhtml', 'dots'],
-    port: 9876,
-    colors: true,
+    client: {
+      captureConsole: true
+    },
+
+    browserConsoleLogOptions: {
+      level: 'log',
+      format: '%b %T: %m',
+      terminal: true
+    },
+
     logLevel: config.LOG_INFO,
+
+    reporters: config.coverage ? ['kjhtml', 'dots', 'coverage-istanbul'] : ['kjhtml', 'dots'],
+
+    port: 9876,
+
+    colors: true,
+
     autoWatch: true,
+
     browsers: ['Chrome'],
-    singleRun: false
+
+    singleRun: true
   };
 
   config.set(_config);
