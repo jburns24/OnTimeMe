@@ -56,14 +56,15 @@ module.exports = function(config) {
     },
 
     browserConsoleLogOptions: {
-      level: 'log',
-      format: '%b %T: %m',
+      level: 'DEBUG',
+      // format: '%b %T: %m',
       terminal: true
     },
 
-    logLevel: config.LOG_INFO,
+    //logLevel: config.LOG_DEBUG,
 
-    reporters: config.coverage ? ['kjhtml', 'dots', 'coverage-istanbul'] : ['kjhtml', 'dots'],
+    reporters: config.coverage ? [/*'kjhtml',*/ 'progress', 'verbose', /*'dots',*/ 'coverage-istanbul'] :
+      [/*'kjhtml', 'dots',*/ 'progress', 'verbose'],
 
     port: 9876,
 
