@@ -20,3 +20,4 @@ script:
   - ionic platform add android@latest
   - cp signing/debug-signing.properties platforms/android/
   - ionic cordova build android
+  - npm test
