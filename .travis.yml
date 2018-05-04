@@ -10,14 +10,19 @@ addons:
       - google-chrome-stable
 language: node_js
 node_js:
-  - stable
+  - node
 braches:
   only:
     - master
 before_install:
+  - npm i -g npm@5.6.0
+cache:
+  directories:
+    - node_modules
+before_script:
   - npm install
   - ionic cordova platform add android@latest
   - cp signing/debug-signing.properties platforms/android/
   - ionic cordova build android
-after_success:
+script:
   - npm test
