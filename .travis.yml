@@ -1,6 +1,7 @@
-sudo: required
+sudo: enabled
 os: linux
 dist: trusty
+group: stable
 addons:
   apt:
     sources:
@@ -13,11 +14,10 @@ node_js:
 braches:
   only:
     - master
-before_script:
-  - npm install -g ionic cordova
-script:
+before_install:
   - npm install
-  - ionic platform add android@latest
+  - ionic cordova platform add android@latest
   - cp signing/debug-signing.properties platforms/android/
   - ionic cordova build android
+after_success:
   - npm test
