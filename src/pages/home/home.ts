@@ -62,13 +62,27 @@ export class HomePage {
     private alertCrl: AlertController,
     private backgroundMode: BackgroundMode){
 
+    // Ensure tha the backbutton will be override so that our app
+    // can go into the background when back button is pushed.
     this.backgroundMode.on('enable').subscribe(() => {
       this.backgroundMode.overrideBackButton();
       // this.backgroundMode.disableWebViewOptimizations();
-      // resolve(this.waitForIt());
-      //resolve(true);
     });
-
+    this.backgroundMode.on('activate').subscribe(() =>{
+      this.backgroundMode.setDefaults({
+        title: 'OnTimeMe is running in the background.',
+        text: 'We are helping you be on time.',
+        icon: 'icon',
+        color: 'F14F4D', // hex format
+        resume: true,
+        hidden: false,
+        bigText: true,
+        // To run in background without notification
+        silent: false
+      });
+      this.backgroundMode.disableWebViewOptimizations();
+      this.backgroundMode.moveToBackground();
+    });
   }
 
   ///////////////////////// ION-VIEW BEGINS ////////////////////////////////////

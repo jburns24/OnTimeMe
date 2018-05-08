@@ -70,10 +70,22 @@ export class MyApp {
       /*** This is where the logic is implemented for checking user log ins ***/
       this.enableBackgroundMode().then((retVal) => {
         if(retVal){
-          console.log("Yes background mode should be on");
+          console.log("App.comp::initializeApp(): Yes background mode should be on");
         }
       });
+      // Before our app can run background mode must be enabled.
       this.backgroundMode.on('enable').subscribe( () => {
+        // this.platform.registerBackButtonAction((event) => {
+        //   this.setBackgroundDefaults();
+        //   this.backgroundMode.moveToBackground();
+        // }); // AFter this then run everything normally....
+        this.backgroundMode.on('activated').subscribe( () => {
+          this.setBackgroundDefaults();
+          this.backgroundMode.disableWebViewOptimizations();
+          this.backgroundMode.moveToBackground();
+
+        });
+
         this.locationTracker.startTracking().then(() => {
           this.storage.getItem('user') // Try to get item from local storage and...
           .then( (data) => {
@@ -91,13 +103,13 @@ export class MyApp {
               });
             };
           }, (error) => {
-            console.log("App.comp::initializeApp() user object was not found at login.");
+            console.log("App.comp::initializeApp(): user object was not found at login.");
             // Failed, user not logged on, ask him/her to log in
             this.nav.setRoot(LoginGatePage);
             this.splashScreen.hide();
           });
         }, (err) => {
-          console.log("app.component.ts Failed to start location ", err);
+          console.log("App.comp::initializeApp(): Failed to start location ", err);
         });
       });
     }, (err) => {
@@ -120,6 +132,7 @@ export class MyApp {
       // DEBUG: check if background mode is enable
       this.backgroundMode.on('enable').subscribe(() => {
         this.backgroundMode.overrideBackButton();
+        // this.setBackgroundDefaults();
         // this.backgroundMode.disableWebViewOptimizations();
         // resolve(this.waitForIt());
         resolve(true);
@@ -127,13 +140,13 @@ export class MyApp {
     });
   }
 
-  waitForIt(){
-    return new Promise(resolve => {
+  setBackgroundDefaults(){
+    //return new Promise(resolve => {
       // resolve(this.backgroundMode.isEnabled());
-      if (this.backgroundMode.isEnabled()){
-        console.log("APP.COMPONENT::initializeApp(): background mode is enabled.");
-        // Overide the back button to go to background instead of closing the app
-        this.backgroundMode.overrideBackButton();
+      // if (this.backgroundMode.isEnabled()){
+        // console.log("APP.COMPONENT::initializeApp(): background mode is enabled.");
+        // // Overide the back button to go to background instead of closing the app
+        // this.backgroundMode.overrideBackButton();
 
         // Set the Default values for the background notification mode.
         this.backgroundMode.setDefaults({
@@ -143,9 +156,9 @@ export class MyApp {
           color: 'F14F4D', // hex format
           resume: true,
           hidden: false,
-          bigText: true
+          bigText: true,
           // To run in background without notification
-          // silent: true
+          silent: false
       });
 
       // Might need this later:
@@ -153,15 +166,15 @@ export class MyApp {
       // might not work while in background even the background mode is active.
       // To fix such issues the plugin provides a method to disable most
       // optimizations done by Android/CrossWalk.
-      // cordova.plugins.backgroundMode.on('activate', function() {
-      // cordova.plugins.backgroundMode.disableWebViewOptimizations();
+      // this.backgroundMode.on('activate', function() {
+      //   this.backgroundMode.disableWebViewOptimizations();
       // });
-        resolve(true);
-      } else{
-        console.log("APP.COMPONENT::initializeApp(): background mode is not enabled.");
-        resolve(false);
-      };
-    });
+    //     resolve(true);
+    //   } else{
+    //     console.log("APP.COMPONENT::initializeApp(): background mode is not enabled.");
+    //     resolve(false);
+    //   };
+    // });
   }
 
   showLoading() {
