@@ -40,12 +40,6 @@ module.exports = function(config) {
       noInfo: true
     },
 
-    browserConsoleLogOptions: {
-      level: 'log',
-      format: '%b %T: %m',
-      terminal: true
-    },
-
     coverageIstanbulReporter: {
       reports: [ 'html', 'lcovonly' ],
       fixWebpackSourcePaths: true
@@ -56,15 +50,15 @@ module.exports = function(config) {
     },
 
     browserConsoleLogOptions: {
-      level: 'DEBUG',
-      // format: '%b %T: %m',
+      level: 'log',
+      format: '%b %T: %m',
       terminal: true
     },
 
     //logLevel: config.LOG_DEBUG,
 
-    reporters: config.coverage ? [/*'kjhtml',*/ 'progress', 'verbose', /*'dots',*/ 'coverage-istanbul'] :
-      [/*'kjhtml', 'dots',*/ 'progress', 'verbose'],
+    reporters: config.coverage ? ['kjhtml', 'progress', 'verbose', 'dots', 'coverage-istanbul'] :
+      ['kjhtml', 'dots', 'progress', 'verbose'],
 
     port: 9876,
 

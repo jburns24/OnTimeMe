@@ -12,13 +12,14 @@ export class UserProviderMock{
     return new Promise(resolve => {
       this.storage.setItem('user', {
         name: 'Test',
-        id: '1',
+        id: 2,
         email: 'test@test.com',
         picture: 'www.test_picture.org',
         authToken: 'token',
         serverAuthCode: 'auth_code',
         isLoggedIn: true
-      }).then(() => {
+      })
+      .then(() => {
         this.storage.getItem('user').then((data) => {
           resolve(data);
         });
