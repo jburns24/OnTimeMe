@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { MenuController, ToastController, AlertController } from 'ionic-angular';
+import { MenuController, ToastController, AlertController, Platform } from 'ionic-angular';
 import { UserProvider } from '../../providers/user/user';
 import { GoogleCalendar} from '../../providers/google-calendar/google-calendar';
 import { NativeStorage } from '@ionic-native/native-storage';
@@ -60,7 +60,8 @@ export class HomePage {
     private localNotification: LocalNotifications,
     private launchNavigator: LaunchNavigator,
     private alertCrl: AlertController,
-    private backgroundMode: BackgroundMode){
+    private backgroundMode: BackgroundMode,
+    private platform: Platform){
 
     // Ensure tha the backbutton will be override so that our app
     // can go into the background when back button is pushed.
@@ -68,6 +69,7 @@ export class HomePage {
       this.backgroundMode.overrideBackButton();
       // this.backgroundMode.disableWebViewOptimizations();
     });
+
     this.backgroundMode.on('activate').subscribe(() =>{
       this.backgroundMode.setDefaults({
         title: 'OnTimeMe is running in the background.',
@@ -83,6 +85,12 @@ export class HomePage {
       this.backgroundMode.disableWebViewOptimizations();
       this.backgroundMode.moveToBackground();
     });
+
+    this.platform.registerBackButtonAction((event) => {
+      this.backgroundMode.overrideBackButton();
+      this.backgroundMode.disableWebViewOptimizations();
+      this.backgroundMode.moveToBackground();
+    }); // AFter this then run everything normally....
   }
 
   ///////////////////////// ION-VIEW BEGINS ////////////////////////////////////

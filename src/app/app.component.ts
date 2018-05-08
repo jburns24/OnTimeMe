@@ -75,17 +75,6 @@ export class MyApp {
       });
       // Before our app can run background mode must be enabled.
       this.backgroundMode.on('enable').subscribe( () => {
-        // this.platform.registerBackButtonAction((event) => {
-        //   this.setBackgroundDefaults();
-        //   this.backgroundMode.moveToBackground();
-        // }); // AFter this then run everything normally....
-        this.backgroundMode.on('activated').subscribe( () => {
-          this.setBackgroundDefaults();
-          this.backgroundMode.disableWebViewOptimizations();
-          this.backgroundMode.moveToBackground();
-
-        });
-
         this.locationTracker.startTracking().then(() => {
           this.storage.getItem('user') // Try to get item from local storage and...
           .then( (data) => {
