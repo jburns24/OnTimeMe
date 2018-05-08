@@ -20,6 +20,7 @@ import { LocationTracker } from '../providers/location-tracker/location-tracker'
 import { Transportation } from '../providers/transportation-mode/transportation-mode';
 import { Network } from '@ionic-native/network';
 import { AppProviders } from './app.providers'
+import { BackgroundMode } from '@ionic-native/background-mode';
 
 // Mocks
 import { GooglePlusMock } from '@ionic-native-mocks/google-plus';
@@ -33,6 +34,8 @@ import {
   NetworkMock,
   StatusBarMock,
   SplashScreenMock } from 'ionic-mocks';
+
+
 
 // Pages
 import { AboutPage } from '../pages/about/about';

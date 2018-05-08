@@ -32,6 +32,7 @@
     "@ionic-native-mocks/launch-navigator": "^2.0.7",
     "@ionic-native-mocks/native-storage": "^2.0.7",
     "@ionic-native/background-geolocation": "4.7.0",
+    "@ionic-native/background-mode": "^4.7.0",
     "@ionic-native/core": "4.7.0",
     "@ionic-native/geolocation": "4.7.0",
     "@ionic-native/google-plus": "4.7.0",
@@ -47,6 +48,7 @@
     "cordova": "^8.0.0",
     "cordova-android": "7.1.0",
     "cordova-plugin-actionsheet": "^2.3.3",
+    "cordova-plugin-background-mode": "git+https://github.com/katzer/cordova-plugin-background-mode.git",
     "cordova-plugin-badge": "^0.8.7",
     "cordova-plugin-device": "^2.0.2",
     "cordova-plugin-dialogs": "^2.0.1",
@@ -121,7 +123,8 @@
       },
       "cordova-plugin-network-information": {},
       "cordova-plugin-local-notification": {},
-      "uk.co.workingedge.phonegap.plugin.launchnavigator": {}
+      "uk.co.workingedge.phonegap.plugin.launchnavigator": {},
+      "cordova-plugin-background-mode": {}
     },
     "platforms": [
       "android"

@@ -14,6 +14,8 @@ import { HttpClient } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Network } from '@ionic-native/network';
 import { LocalNotifications } from '@ionic-native/local-notifications';
+import { BackgroundMode } from '@ionic-native/background-mode';
+
 //import { LocalNotificationsMocks } from '@ionic-native-mocks/local-notifications'
 import { LaunchNavigator } from '@ionic-native/launch-navigator';
 import { LaunchNavigatorMock } from '@ionic-native-mocks/launch-navigator'
@@ -34,15 +36,15 @@ import { Events } from '../providers/events/events';
 import { RealTimeClockProvider } from '../providers/real-time-clock/real-time-clock';
 import { LocationTracker } from '../providers/location-tracker/location-tracker';
 import { Transportation } from '../providers/transportation-mode/transportation-mode';
- 
+
 export class AppProviders {
- 
+
     public static getProviders() {
- 
+
         let providers;
- 
+
         if(document.URL.includes('https://') || document.URL.includes('http://')){
- 
+
           // Use browser providers
           providers = [
             Transportation,
@@ -56,7 +58,7 @@ export class AppProviders {
             //  Should be a mock
             LocalNotifications,
 
-            
+
             {provide: AlertController, useClass: AlertControllerMock},
             {provide: LoadingController, useClass: LoadingControllerMock},
             {provide: MenuController, useClass: MenuControllerMock},
@@ -72,9 +74,9 @@ export class AppProviders {
             {provide: SplashScreen, useClass: SplashScreenMock},
             {provide: ErrorHandler, useClass: IonicErrorHandler}
           ];
- 
+
         } else {
- 
+
           // Use device providers
           providers = [
             AlertController,
@@ -97,13 +99,14 @@ export class AppProviders {
             GooglePlus,
             SplashScreen,
             StatusBar,
+            BackgroundMode,
             {provide: ErrorHandler, useClass: IonicErrorHandler}
-          ]; 
- 
+          ];
+
         }
- 
+
         return providers;
- 
+
     }
- 
+
 }

@@ -10,6 +10,7 @@ import { Transportation } from '../../providers/transportation-mode/transportati
 import { Network } from '@ionic-native/network';
 import { Subscription} from 'rxjs/Subscription';
 import { LaunchNavigator, LaunchNavigatorOptions } from '@ionic-native/launch-navigator';
+import { BackgroundMode } from '@ionic-native/background-mode';
 
 // import { LocalNotification } from '../../providers/local-notification/local-notification';
 import { LocalNotifications } from '@ionic-native/local-notifications';
@@ -58,7 +59,15 @@ export class HomePage {
     private network: Network,
     private localNotification: LocalNotifications,
     private launchNavigator: LaunchNavigator,
-    private alertCrl: AlertController){
+    private alertCrl: AlertController,
+    private backgroundMode: BackgroundMode){
+
+    this.backgroundMode.on('enable').subscribe(() => {
+      this.backgroundMode.overrideBackButton();
+      // this.backgroundMode.disableWebViewOptimizations();
+      // resolve(this.waitForIt());
+      //resolve(true);
+    });
 
   }
 
@@ -436,7 +445,7 @@ export class HomePage {
         // enableGeocoding: true,
         app: this.launchNavigator.APP.GOOGLE_MAPS
       };
-  
+
       this.launchNavigator.navigate(dest, options).then((success) => {
         console.log("Home:: launched navigator works");
         resolve(true);

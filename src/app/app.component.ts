@@ -12,6 +12,7 @@ import { LoginGatePage } from '../pages/login-gate/login-gate';
 import { HomePage } from '../pages/home/home';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { GooglePlus } from '@ionic-native/google-plus';
+import { BackgroundMode } from '@ionic-native/background-mode';
 
 //import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
 import { LocationTracker } from '../providers/location-tracker/location-tracker'
@@ -45,7 +46,8 @@ export class MyApp {
     private alertCrl: AlertController,
     private googlePlus: GooglePlus,
     //private googleCalendar: GoogleCalendar,
-    private locationTracker: LocationTracker
+    private locationTracker: LocationTracker,
+    private backgroundMode: BackgroundMode
   ){
     // This function will initialize the app upon opening the app.
     // Anything you want initialized, do it here!!!!
@@ -66,33 +68,99 @@ export class MyApp {
       //this.statusBar.styleBlackOpaque();
 
       /*** This is where the logic is implemented for checking user log ins ***/
-      this.locationTracker.startTracking().then(() => {
-        this.storage.getItem('user') // Try to get item from local storage and...
-        .then( (data) => {
-          // Logic checks if users are logged in...this is the place
-          // to do all your init() and dummy calls if these calls depends on
-          // user being logged in. This is mainly for when user didn't log out
-          // and you need to re-init() stuff.
-          if (data.isLoggedIn == true){
-            this.trySilentLogin().then(() => {
-              // Succeed, profile exists...allow that person to access his/her data
-              this.nav.setRoot(HomePage);
-              this.splashScreen.hide();
-            }, (err) => {
-              console.log("Silent Login Failed", err);
-            });
-          };
-        }, (error) => {
-          console.log("App.comp::initializeApp() user object was not found at login.");
-          // Failed, user not logged on, ask him/her to log in
-          this.nav.setRoot(LoginGatePage);
-          this.splashScreen.hide();
+      this.enableBackgroundMode().then((retVal) => {
+        if(retVal){
+          console.log("Yes background mode should be on");
+        }
+      });
+      this.backgroundMode.on('enable').subscribe( () => {
+        this.locationTracker.startTracking().then(() => {
+          this.storage.getItem('user') // Try to get item from local storage and...
+          .then( (data) => {
+            // Logic checks if users are logged in...this is the place
+            // to do all your init() and dummy calls if these calls depends on
+            // user being logged in. This is mainly for when user didn't log out
+            // and you need to re-init() stuff.
+            if (data.isLoggedIn == true){
+              this.trySilentLogin().then(() => {
+                // Succeed, profile exists...allow that person to access his/her data
+                this.nav.setRoot(HomePage);
+                this.splashScreen.hide();
+              }, (err) => {
+                console.log("Silent Login Failed", err);
+              });
+            };
+          }, (error) => {
+            console.log("App.comp::initializeApp() user object was not found at login.");
+            // Failed, user not logged on, ask him/her to log in
+            this.nav.setRoot(LoginGatePage);
+            this.splashScreen.hide();
+          });
+        }, (err) => {
+          console.log("app.component.ts Failed to start location ", err);
         });
-      }, (err) => {
-        console.log("app.component.ts Failed to start location ", err);
       });
     }, (err) => {
-        console.log(err);
+      console.log(err);
+    });
+  }
+
+
+  enableBackgroundMode(){
+    return new Promise(resolve => {
+      //this.backgroundMode.on('deviceready').subscribe(() => {
+        this.backgroundMode.enable();
+        resolve(this.checkIfEnable());
+      //});
+    });
+  }
+
+  checkIfEnable(){
+    return new Promise(resolve => {
+      // DEBUG: check if background mode is enable
+      this.backgroundMode.on('enable').subscribe(() => {
+        this.backgroundMode.overrideBackButton();
+        // this.backgroundMode.disableWebViewOptimizations();
+        // resolve(this.waitForIt());
+        resolve(true);
+      });
+    });
+  }
+
+  waitForIt(){
+    return new Promise(resolve => {
+      // resolve(this.backgroundMode.isEnabled());
+      if (this.backgroundMode.isEnabled()){
+        console.log("APP.COMPONENT::initializeApp(): background mode is enabled.");
+        // Overide the back button to go to background instead of closing the app
+        this.backgroundMode.overrideBackButton();
+
+        // Set the Default values for the background notification mode.
+        this.backgroundMode.setDefaults({
+          title: 'OnTimeMe is running in the background.',
+          text: 'We are helping you be on time.',
+          icon: 'icon',
+          color: 'F14F4D', // hex format
+          resume: true,
+          hidden: false,
+          bigText: true
+          // To run in background without notification
+          // silent: true
+      });
+
+      // Might need this later:
+      // Various APIs like playing media or tracking GPS position in background
+      // might not work while in background even the background mode is active.
+      // To fix such issues the plugin provides a method to disable most
+      // optimizations done by Android/CrossWalk.
+      // cordova.plugins.backgroundMode.on('activate', function() {
+      // cordova.plugins.backgroundMode.disableWebViewOptimizations();
+      // });
+        resolve(true);
+      } else{
+        console.log("APP.COMPONENT::initializeApp(): background mode is not enabled.");
+        resolve(false);
+      };
     });
   }
 
