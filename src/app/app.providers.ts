@@ -15,6 +15,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Network } from '@ionic-native/network';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { BackgroundMode } from '@ionic-native/background-mode';
+import { BackgroundModeProvider } from '../providers/background-mode/background-mode';
 
 //import { LocalNotificationsMocks } from '@ionic-native-mocks/local-notifications'
 import { LaunchNavigator } from '@ionic-native/launch-navigator';
@@ -100,6 +101,7 @@ export class AppProviders {
             SplashScreen,
             StatusBar,
             BackgroundMode,
+            BackgroundModeProvider,
             {provide: ErrorHandler, useClass: IonicErrorHandler}
           ];
 

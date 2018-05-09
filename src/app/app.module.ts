@@ -21,6 +21,7 @@ import { Transportation } from '../providers/transportation-mode/transportation-
 import { Network } from '@ionic-native/network';
 import { AppProviders } from './app.providers'
 import { BackgroundMode } from '@ionic-native/background-mode';
+import { BackgroundModeProvider } from '../providers/background-mode/background-mode';
 
 // Mocks
 import { GooglePlusMock } from '@ionic-native-mocks/google-plus';
@@ -55,7 +56,7 @@ import { LaunchNavigator } from '@ionic-native/launch-navigator';
     TabsPage,
     LoginGatePage,
     DateTimePipe,
-    HoursMinutesSecondsPipe
+    HoursMinutesSecondsPipe,
   ],
   imports: [
     BrowserModule,
