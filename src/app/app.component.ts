@@ -150,9 +150,8 @@ export class MyApp {
             //this.googleCalendar.refreshToken = null;
             console.log("refreshToken is successfully removed from native storage.");
             //console.log("refreshToken should now be null", this.googleCalendar.refreshToken);
-            this.nav.setRoot(LoginGatePage).then(() =>{
-              // DEBUGGING: this part below
-              this.locationTracker.stopTracking().then(() =>{
+            this.locationTracker.stopTracking().then(() =>{
+              this.nav.setRoot(LoginGatePage).then(() =>{
                 this.storage.getItem('refreshToken').then((res) => {
                   console.log("trying to get refresh token after it has been removed", (res));
                 }, (error) => {
