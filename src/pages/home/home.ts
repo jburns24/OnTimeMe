@@ -116,8 +116,7 @@ export class HomePage {
         };
       });
     };
-
-    this.locationTracker.startTracking();
+    //this.locationTracker.startTracking();
   }
 
   ionViewDidEnter(){
@@ -149,7 +148,11 @@ export class HomePage {
     });
 
     console.log("----------------- START -----------------------");
-    this.checkMode().then((retValue) => {
+    this.isLocationEnabled().then(() => {
+      this.locationTracker.startTracking().then(() => {
+        this.checkMode().then((retValue) => {
+        });
+      });
     });
   }
 
@@ -495,6 +498,37 @@ export class HomePage {
     });
   }
 
+  // Check to see if user has enabled location tracking...
+  isLocationEnabled(){
+    return new Promise(resolve => {
+      console.log("Checking location service settings");
+      console.log(this.locationTracker.backgroundGeolocation.isLocationEnabled());
+      this.locationTracker.backgroundGeolocation.isLocationEnabled().then((status) => {
+        if(!status){
+          let alert = this.alertCrl.create();
+          alert.setTitle('App requires location service to be turned on.');
+          alert.addButton({
+            text: 'OK',
+            handler: () => {
+              if(this.backgroundMode.backgroundMode.isEnabled()){
+                this.disableBackgroundMode().then(() => {
+                  this.locationTracker.backgroundGeolocation.showAppSettings();
+                  resolve(true);
+                });
+              } else{
+                this.locationTracker.backgroundGeolocation.showAppSettings();
+                resolve(true);
+              };
+            }
+          });
+          alert.present();
+        } else {
+          resolve(true);
+        };
+      });
+    });
+  }
+
   disableBackgroundMode() : Promise<any>{
     return new Promise(resolve => {
       this.backgroundMode.backgroundMode.disable();
@@ -524,9 +558,13 @@ export class HomePage {
   doRefresh(refresher){
     if (this.enableFunctionality){
       console.log("-------------- REFRESH START -------------")
-      this.checkMode().then((retValue) => {
-        refresher.complete();
-      }, (err) => { console.log("home::doRefresh(): error", err) });
+      this.isLocationEnabled().then(() => {
+        this.locationTracker.startTracking().then(() => {
+          this.checkMode().then((retValue) => {
+            refresher.complete();
+          }, (err) => { console.log("home::doRefresh(): error", err) });
+        });
+      });
     } else {
       refresher.complete();
     };

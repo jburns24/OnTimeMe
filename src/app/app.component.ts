@@ -49,35 +49,21 @@ export class MyApp {
     private locationTracker: LocationTracker,
     private backgroundMode: BackgroundModeProvider
   ){
-    // This function will initialize the app upon opening the app.
-    // Anything you want initialized, do it here!!!!
     this.initializeApp();
 
     // Set our app's pages in the left menu; Add new pages here!!!
     this.pages = [
       { title: 'Home', component: HomePage, icon:'home' },
-      //{ title: 'Preference', component: Preference, icon:'md-settings'}
     ];
   }
 
   initializeApp(){
     this.platform.ready()
     .then(() => {
-      // Okay, so the platform is ready and our plugins are available.
-      // Here you can do any higher level native things you might need.
-      //this.statusBar.styleBlackOpaque();
-
-      /*** This is where the logic is implemented for checking user log ins ***/
-      // this.locationTracker.startTracking().then(() => {
-        this.storage.getItem('user') // Try to get item from local storage and...
+        this.storage.getItem('user')
         .then( (data) => {
-          // Logic checks if users are logged in...this is the place
-          // to do all your init() and dummy calls if these calls depends on
-          // user being logged in. This is mainly for when user didn't log out
-          // and you need to re-init() stuff.
           if (data.isLoggedIn == true){
             this.trySilentLogin().then(() => {
-              // Succeed, profile exists...allow that person to access his/her data
               this.nav.setRoot(HomePage);
               this.splashScreen.hide();
             }, (err) => {
@@ -87,13 +73,14 @@ export class MyApp {
         }, (error) => {
           console.log("App.comp::initializeApp(): user object was not found at login.");
           // Failed, user not logged on, ask him/her to log in
-            this.locationTracker.startTracking().then(() => {
-              console.log("LoginGatePage::ionViewDidEnter(): started tracking");
+          // Check to see if user has enabled location tracking...
+          this.locationTracker.startTracking().then(() => {
+            console.log("App.comp::initializeApp(): started tracking");
+            setTimeout( () => {
               this.nav.setRoot(LoginGatePage);
               this.splashScreen.hide();
-            }, (error) => {
-              console.log("LoginGatePage::ionViewWDidEnter(): error,", error);
-            });
+            }, 3000);
+          });
         });
     }, (err) => {
       console.log(err);
