@@ -43,12 +43,6 @@ export class LoginGatePage {
     } else {
       this.enableLogin = true;
     };
-
-    this.locationTracker.startTracking().then(() => {
-      console.log("LoginGatePage::ionViewDidEnter(): started tracking");
-    }, (error) => {
-      console.log("LoginGatePage::ionViewWDidEnter(): error,", error);
-    });
   }
 
   ionViewDidEnter(){

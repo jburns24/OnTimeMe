@@ -116,6 +116,8 @@ export class HomePage {
         };
       });
     };
+
+    this.locationTracker.startTracking();
   }
 
   ionViewDidEnter(){

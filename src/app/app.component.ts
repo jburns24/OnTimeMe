@@ -87,12 +87,14 @@ export class MyApp {
         }, (error) => {
           console.log("App.comp::initializeApp(): user object was not found at login.");
           // Failed, user not logged on, ask him/her to log in
-          this.nav.setRoot(LoginGatePage);
-          this.splashScreen.hide();
+            this.locationTracker.startTracking().then(() => {
+              console.log("LoginGatePage::ionViewDidEnter(): started tracking");
+              this.nav.setRoot(LoginGatePage);
+              this.splashScreen.hide();
+            }, (error) => {
+              console.log("LoginGatePage::ionViewWDidEnter(): error,", error);
+            });
         });
-      // }, (err) => {
-      //   console.log("App.comp::initializeApp(): Failed to start location ", err);
-      // });
     }, (err) => {
       console.log(err);
     });
