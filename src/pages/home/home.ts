@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { MenuController, ToastController, AlertController } from 'ionic-angular';
+import { MenuController, ToastController, AlertController, Platform } from 'ionic-angular';
 import { UserProvider } from '../../providers/user/user';
 import { GoogleCalendar} from '../../providers/google-calendar/google-calendar';
 import { NativeStorage } from '@ionic-native/native-storage';
@@ -10,6 +10,7 @@ import { Transportation } from '../../providers/transportation-mode/transportati
 import { Network } from '@ionic-native/network';
 import { Subscription} from 'rxjs/Subscription';
 import { LaunchNavigator, LaunchNavigatorOptions } from '@ionic-native/launch-navigator';
+import { BackgroundModeProvider } from '../../providers/background-mode/background-mode';
 
 // import { LocalNotification } from '../../providers/local-notification/local-notification';
 import { LocalNotifications } from '@ionic-native/local-notifications';
@@ -41,6 +42,7 @@ export class HomePage {
   alertedEventMode: any = null;
   hasUber = false;
   hasLyft = false;
+  backgrounded: Subscription;
 
   // Use this flag as a condition variable
   enableFunctionality: boolean;
@@ -58,8 +60,20 @@ export class HomePage {
     private network: Network,
     private localNotification: LocalNotifications,
     private launchNavigator: LaunchNavigator,
-    private alertCrl: AlertController){
+    private alertCrl: AlertController,
+    private backgroundMode: BackgroundModeProvider,
+    private platform: Platform){
 
+    this.platform.resume.subscribe(() => {
+      console.log("-----OUR APP RESUMED------");
+      if(!this.backgroundMode.backgroundMode.isEnabled()){
+        this.backgroundMode.enableBackgroundMode().then((retVal) => {
+          if(retVal){
+            console.log("Home::constructor(): Background mode got turned on again");
+          }
+        });
+      };
+    });
   }
 
   ///////////////////////// ION-VIEW BEGINS ////////////////////////////////////
@@ -94,6 +108,14 @@ export class HomePage {
       this.enableFunctionality = true;
     };
     console.log("-->>enableFunctionality:", this.enableFunctionality);
+
+    if(!this.backgroundMode.backgroundMode.isEnabled()){
+      this.backgroundMode.enableBackgroundMode().then((retVal) => {
+        if(retVal){
+          console.log("Home::ionViewWillEnter(): Background mode is turned on");
+        };
+      });
+    };
   }
 
   ionViewDidEnter(){
@@ -111,6 +133,19 @@ export class HomePage {
       console.log("Home::ionViewDidEnter(): error on disconnect,", error);
     });
 
+    this.backgrounded = this.backgroundMode.backgroundMode.on('activate').subscribe(() =>{
+      this.backgroundMode.setBackgroundDefaults();
+      this.backgroundMode.disableWebViewOptimizations().then(() => {
+        this.backgroundMode.moveToBackground();
+      });
+    });
+
+    this.platform.registerBackButtonAction((event) => {
+      //this.backgroundMode.overrideBackButton();
+      this.backgroundMode.disableWebViewOptimizations();
+      this.backgroundMode.moveToBackground();
+    });
+
     console.log("----------------- START -----------------------");
     this.checkMode().then((retValue) => {
     });
@@ -119,6 +154,7 @@ export class HomePage {
   ionViewWillLeave(){
     this.connected.unsubscribe();
     this.disconnected.unsubscribe();
+    this.backgrounded.unsubscribe();
   }
 
   onConnectUpdate(connectionState: string){
@@ -301,17 +337,17 @@ export class HomePage {
         ]
       });
       this.localNotification.on('map').subscribe(() => {
-        this.launchMap(event.location);
+        this.launchMap(event.location, true);
         resolve("alerting");
       });
       this.localNotification.on('mode').subscribe(() => {
-        this.selectEventsMode();
+        this.changeModeForEvent(event);
         resolve("alerting");
       });
     });
   }
 
-  eventOptionAlert(eventLocation: any) : Promise<boolean> {
+  eventOptionAlert(eventLocation: any) : Promise<any> {
     return new Promise(resolve => {
       let alert = this.alertCrl.create();
       alert.setCssClass("alertCss");
@@ -353,7 +389,8 @@ export class HomePage {
           }
         });
       });
-      resolve(alert.present());
+      // resolve(alert.present());
+      alert.present();
     })
   }
 
@@ -390,68 +427,85 @@ export class HomePage {
     });
   }
 
-  launchLyft(eventLocation: any) : Promise<any> {
+  launchLyft(eventLocation: any) : Promise<boolean> {
     return new Promise (resolve =>{
-      if(this.hasLyft) {
-        let options: LaunchNavigatorOptions = {
-          enableDebug: true,
-          app: this.launchNavigator.APP.LYFT
-        };
-        this.launchNavigator.navigate(eventLocation, options).then((success) => {
-          console.log("Home:: launched Lyft works");
-          resolve(true);
-        },(err) => {
-          console.log("Home:: lauching Lyft failed.");
-          resolve(false);
+      if(this.backgroundMode.backgroundMode.isEnabled()){
+        this.disableBackgroundMode().then(() => {
+          if(this.hasLyft) {
+            let options: LaunchNavigatorOptions = {
+              enableDebug: true,
+              app: this.launchNavigator.APP.LYFT
+            };
+            this.launchNavigator.navigate(eventLocation, options);
+            resolve(true);
+          };
         });
-      }
-    });
-  }
-
-  launchUber(eventLocation: any) : Promise<any> {
-    return new Promise (resolve =>{
-      if(this.hasUber) {
-        let options: LaunchNavigatorOptions = {
-          enableDebug: true,
-          app: this.launchNavigator.APP.UBER
-        };
-        this.launchNavigator.navigate(eventLocation, options).then((success) => {
-          console.log("Home:: launched Uber works");
-          resolve(true);
-        },(err) => {
-          console.log("Home:: lauching Uber failed.");
-          resolve(false);
-        });
-      }
-    });
-  }
-
-  launchMap(eventLocation: any) : Promise<boolean> {
-    return new Promise(resolve => {
-      let dest = eventLocation;
-      let options: LaunchNavigatorOptions = {
-        enableDebug: true,
-        // start: 'Chico, CA',
-        transportMode: this.launchNavigator.TRANSPORT_MODE.WALKING,
-        // enableGeocoding: true,
-        app: this.launchNavigator.APP.GOOGLE_MAPS
       };
-  
-      this.launchNavigator.navigate(dest, options).then((success) => {
-        console.log("Home:: launched navigator works");
+    });
+  }
+
+  launchUber(eventLocation: any) : Promise<boolean> {
+    return new Promise (resolve =>{
+      if(this.backgroundMode.backgroundMode.isEnabled()){
+        this.disableBackgroundMode().then(() => {
+          if(this.hasUber) {
+            let options: LaunchNavigatorOptions = {
+              enableDebug: true,
+              app: this.launchNavigator.APP.UBER
+            };
+            this.launchNavigator.navigate(eventLocation, options);
+            resolve(true);
+          };
+        });
+      };
+    });
+  }
+
+  launchMap(eventLocation: any, fromNotify?: boolean) : Promise<any>{
+    return new Promise(resolve => {
+      if(this.backgroundMode.backgroundMode.isEnabled() && !fromNotify){
+        this.disableBackgroundMode().then(() => {
+          let dest = eventLocation;
+          let options: LaunchNavigatorOptions = {
+            enableDebug: true,
+            // start: 'Chico, CA',
+            transportMode: this.launchNavigator.TRANSPORT_MODE.WALKING,
+            // enableGeocoding: true,
+            app: this.launchNavigator.APP.GOOGLE_MAPS
+          };
+          // This is supposed to be a promise but it is a sync call.
+          this.launchNavigator.navigate(dest, options);
+          resolve(true);
+        });
+      } else {
+        let dest = eventLocation;
+        let options: LaunchNavigatorOptions = {
+          enableDebug: true,
+          // start: 'Chico, CA',
+          transportMode: this.launchNavigator.TRANSPORT_MODE.WALKING,
+          // enableGeocoding: true,
+          app: this.launchNavigator.APP.GOOGLE_MAPS
+        };
+        // This is supposed to be a promise but it is a sync call.
+        this.launchNavigator.navigate(dest, options);
         resolve(true);
-      },(err) => {
-        console.log("Home:: lauching failed.");
-        resolve(false);
+      };
+    });
+  }
+
+  disableBackgroundMode() : Promise<any>{
+    return new Promise(resolve => {
+      this.backgroundMode.backgroundMode.disable();
+      this.backgroundMode.backgroundMode.on('disable').subscribe(() => {
+        console.log("Home::disableBackgroundMode(): success");
+        resolve(true);
       });
     });
   }
 
   changeModeForEvent(event: any){
     if (this.enableFunctionality){
-      console.log("EVENT PARM ID", event.id);
       this.trans.getNewMode(event).then((mode) => {
-        console.log("NEW MODE IS", mode);
         this.event.storeTodaysEvents(JSON.stringify(this.events), mode, event, false).then(() => {
           this.checkMode();
         });

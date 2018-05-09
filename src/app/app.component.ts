@@ -12,6 +12,7 @@ import { LoginGatePage } from '../pages/login-gate/login-gate';
 import { HomePage } from '../pages/home/home';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { GooglePlus } from '@ionic-native/google-plus';
+import { BackgroundModeProvider } from '../providers/background-mode/background-mode'
 
 //import { GoogleCalendar } from '../providers/google-calendar/google-calendar';
 import { LocationTracker } from '../providers/location-tracker/location-tracker'
@@ -45,7 +46,8 @@ export class MyApp {
     private alertCrl: AlertController,
     private googlePlus: GooglePlus,
     //private googleCalendar: GoogleCalendar,
-    private locationTracker: LocationTracker
+    private locationTracker: LocationTracker,
+    private backgroundMode: BackgroundModeProvider
   ){
     // This function will initialize the app upon opening the app.
     // Anything you want initialized, do it here!!!!
@@ -66,7 +68,7 @@ export class MyApp {
       //this.statusBar.styleBlackOpaque();
 
       /*** This is where the logic is implemented for checking user log ins ***/
-      this.locationTracker.startTracking().then(() => {
+      // this.locationTracker.startTracking().then(() => {
         this.storage.getItem('user') // Try to get item from local storage and...
         .then( (data) => {
           // Logic checks if users are logged in...this is the place
@@ -83,16 +85,16 @@ export class MyApp {
             });
           };
         }, (error) => {
-          console.log("App.comp::initializeApp() user object was not found at login.");
+          console.log("App.comp::initializeApp(): user object was not found at login.");
           // Failed, user not logged on, ask him/her to log in
           this.nav.setRoot(LoginGatePage);
           this.splashScreen.hide();
         });
-      }, (err) => {
-        console.log("app.component.ts Failed to start location ", err);
-      });
+      // }, (err) => {
+      //   console.log("App.comp::initializeApp(): Failed to start location ", err);
+      // });
     }, (err) => {
-        console.log(err);
+      console.log(err);
     });
   }
 
@@ -148,9 +150,8 @@ export class MyApp {
             //this.googleCalendar.refreshToken = null;
             console.log("refreshToken is successfully removed from native storage.");
             //console.log("refreshToken should now be null", this.googleCalendar.refreshToken);
-            this.nav.setRoot(LoginGatePage).then(() =>{
-              // DEBUGGING: this part below
-              this.locationTracker.stopTracking().then(() =>{
+            this.locationTracker.stopTracking().then(() =>{
+              this.nav.setRoot(LoginGatePage).then(() =>{
                 this.storage.getItem('refreshToken').then((res) => {
                   console.log("trying to get refresh token after it has been removed", (res));
                 }, (error) => {

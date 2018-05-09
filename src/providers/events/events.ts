@@ -52,11 +52,10 @@ export class Events {
               for (let oldEvent of oldEvents) {
                 if (oldEvent.mode != undefined){
                   oldTransDict[oldEvent.id] = oldEvent.mode;
-                  console.log("EVENTPARAM AND MODEPARAM", eventParam, modeParam);
                   if (eventParam != undefined && modeParam != undefined){
                     if (oldEvent.id === eventParam.id){
                       oldTransDict[oldEvent.id] = modeParam;
-                      console.log("OLDEVENT new MODE", modeParam);
+                      // console.log("OLDEVENT new MODE", modeParam);
                     };
                   };
                 };
@@ -71,10 +70,10 @@ export class Events {
               //  Check if new event is an old event if so use the old trans mode
               if (!allEventFlag){
                 if (event.id in oldTransDict) {
-                  console.log("EVEN EXIST IN OLD", oldTransDict[event.id]);
+                  // console.log("EVEN EXIST IN OLD", oldTransDict[event.id]);
                   if (oldTransDict[event.id] != null) {
                     newMode = oldTransDict[event.id];
-                    console.log("NEWMODE : ", newMode);
+                    // console.log("NEWMODE : ", newMode);
                   };
                 };
               };
@@ -143,48 +142,6 @@ export class Events {
     });
   }
 
-  // setAllEventMode(){
-  //   return new Promise(resolve => {
-  //     let todaysEventList = [];
-  //     let event_key = "";
-  //     let data = JSON.parse(jsonString);
-  //     let events = data['items'];
-  //     this.user.getUserInfo().then((user) => {
-  //       event_key = user.id + 'events';
-  //       this.map.getPreferenceMode().then((mode) => {
-  //         this.mode = mode;
-  //
-  //     for (let event of events) {
-  //       let start = event['start'];
-  //       let end = event['end'];
-  //       let beginTime = Date.parse(start['dateTime']) / 1000;
-  //       let finishTime = Date.parse(end['dateTime']) / 1000;
-  //       let new_event = {
-  //         id: event['id'],
-  //         summary: event['summary'],
-  //         location: event['location'],
-  //         startTime: beginTime,
-  //         endTime: finishTime,
-  //         mode: this.mode
-  //       };
-  //       todaysEventList.push(new_event);
-  //     }
-  //     let event_list_object = {
-  //       eventList: todaysEventList
-  //     };
-  //     this.user.getUserInfo().then((user) => {
-  //       this.storage.setItem(event_key, event_list_object).then(() => {
-  //         console.log('Events::storeTodaysEvents(): events saved to user!!');
-  //         resolve(true);
-  //       }, (err) => {
-  //         console.log('Events::storeTodaysEvents(): failed to store events ', err);
-  //       });
-  //     }, (err) => {
-  //       console.log('Events::storeTodaysEvents(): failed to get user ', err);
-  //     });
-  //   });
-  // }
-
   /**
    *  Returns an array of events, each event will have all of these
    *
@@ -214,7 +171,7 @@ export class Events {
             this.map.getPreferenceMode().then((mode) => {
               this.mode = mode;
               let counter = 0;
-              console.log("event list length is:", eventList.eventList.length);
+              // console.log("event list length is:", eventList.eventList.length);
               for (let event of events) {
                counter = counter + 1;
                let ongoing = 0;
@@ -256,7 +213,7 @@ export class Events {
 
   addTripToList(modEventList: any, mode: any){
     return new Promise(resolve => {
-      console.log("modified event list is ", this.modEventList);
+      // console.log("modified event list is ", this.modEventList);
       let counter = 0;
       let tempIndex = -1;
       for (let eventd of modEventList) {

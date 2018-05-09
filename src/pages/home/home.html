@@ -34,7 +34,7 @@
     <p> You have no events for the next 24 hours! </p>
   </ion-item>
   <ion-list>
-    <ion-item>
+    <ion-item *ngIf="!noEvents">
       <p item-left>
         <strong>Title</strong>
       </p>
