@@ -68,38 +68,30 @@ export class MyApp {
       //this.statusBar.styleBlackOpaque();
 
       /*** This is where the logic is implemented for checking user log ins ***/
-      // this.backgroundMode.enableBackgroundMode().then((retVal) => {
-      //   if(retVal){
-      //     console.log("App.comp::initializeApp(): Yes background mode should be on");
-      //   }
-      // });
-      // Before our app can run background mode must be enabled.
-      // this.backgroundMode.on('enable').subscribe( () => {
-        this.locationTracker.startTracking().then(() => {
-          this.storage.getItem('user') // Try to get item from local storage and...
-          .then( (data) => {
-            // Logic checks if users are logged in...this is the place
-            // to do all your init() and dummy calls if these calls depends on
-            // user being logged in. This is mainly for when user didn't log out
-            // and you need to re-init() stuff.
-            if (data.isLoggedIn == true){
-              this.trySilentLogin().then(() => {
-                // Succeed, profile exists...allow that person to access his/her data
-                this.nav.setRoot(HomePage);
-                this.splashScreen.hide();
-              }, (err) => {
-                console.log("Silent Login Failed", err);
-              });
-            };
-          }, (error) => {
-            console.log("App.comp::initializeApp(): user object was not found at login.");
-            // Failed, user not logged on, ask him/her to log in
-            this.nav.setRoot(LoginGatePage);
-            this.splashScreen.hide();
-          });
-        }, (err) => {
-          console.log("App.comp::initializeApp(): Failed to start location ", err);
+      // this.locationTracker.startTracking().then(() => {
+        this.storage.getItem('user') // Try to get item from local storage and...
+        .then( (data) => {
+          // Logic checks if users are logged in...this is the place
+          // to do all your init() and dummy calls if these calls depends on
+          // user being logged in. This is mainly for when user didn't log out
+          // and you need to re-init() stuff.
+          if (data.isLoggedIn == true){
+            this.trySilentLogin().then(() => {
+              // Succeed, profile exists...allow that person to access his/her data
+              this.nav.setRoot(HomePage);
+              this.splashScreen.hide();
+            }, (err) => {
+              console.log("Silent Login Failed", err);
+            });
+          };
+        }, (error) => {
+          console.log("App.comp::initializeApp(): user object was not found at login.");
+          // Failed, user not logged on, ask him/her to log in
+          this.nav.setRoot(LoginGatePage);
+          this.splashScreen.hide();
         });
+      // }, (err) => {
+      //   console.log("App.comp::initializeApp(): Failed to start location ", err);
       // });
     }, (err) => {
       console.log(err);

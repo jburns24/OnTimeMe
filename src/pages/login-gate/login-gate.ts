@@ -4,6 +4,7 @@ import { GooglePlus } from '@ionic-native/google-plus';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { HomePage } from '../home/home';
 import { Network } from '@ionic-native/network';
+import { LocationTracker } from '../../providers/location-tracker/location-tracker'
 import {
   IonicPage,
   NavController,
@@ -29,7 +30,8 @@ export class LoginGatePage {
   constructor(public navCtrl: NavController, private alertCrl: AlertController,
     private loadingCtrl: LoadingController, private googlePlus: GooglePlus,
     private menu: MenuController, private storage: NativeStorage,
-    private toast: ToastController, private network: Network) {
+    private toast: ToastController, private network: Network,
+    private locationTracker: LocationTracker) {
       // Diable menu in the login gate page
       this.disableMenu();
   }
@@ -41,6 +43,12 @@ export class LoginGatePage {
     } else {
       this.enableLogin = true;
     };
+
+    this.locationTracker.startTracking().then(() => {
+      console.log("LoginGatePage::ionViewWillEnter(): started tracking");
+    }, (error) => {
+      console.log("LoginGatePage::ionViewWillEnter(): error,", error);
+    });
   }
 
   ionViewDidEnter(){
