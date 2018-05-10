@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { MenuController, ToastController, AlertController, Platform } from 'ionic-angular';
+import { MenuController, ToastController, AlertController, Platform, NavController } from 'ionic-angular';
 import { UserProvider } from '../../providers/user/user';
 import { GoogleCalendar} from '../../providers/google-calendar/google-calendar';
 import { NativeStorage } from '@ionic-native/native-storage';
@@ -62,16 +62,18 @@ export class HomePage {
     private launchNavigator: LaunchNavigator,
     private alertCrl: AlertController,
     private backgroundMode: BackgroundModeProvider,
-    private platform: Platform){
+    private platform: Platform,
+    private navCtrl: NavController){
 
+    // Call this method whenever the app resumes from being backgrounded.
+    // This method will turn the background mode back on and check to see
+    // if location services is turned on.
     this.platform.resume.subscribe(() => {
-      console.log("-----OUR APP RESUMED------");
-      if(!this.backgroundMode.backgroundMode.isEnabled()){
-        this.backgroundMode.enableBackgroundMode().then((retVal) => {
-          if(retVal){
-            console.log("Home::constructor(): Background mode got turned on again");
-          }
-        });
+      console.log("------- OUR APP RESUMED FROM BACKGROUNDED ---------");
+      let view = this.navCtrl.getActive().name;
+      if(view == "HomePage"){
+        console.log("Running functions from HomePage...");
+        this.resumeAppFromBackground();
       };
     });
   }
@@ -81,7 +83,22 @@ export class HomePage {
   // Do permission checks and all that here.
   ionViewCanEnter(){
     this.localNotification.requestPermission().then((permission) => {
-      console.log("Home::ionViewDidEnter(): user allowed local notification", permission);
+      console.log("Home::ionViewCanEnter(): user allowed local notification", permission);
+    });
+
+    // Check and enable background mode if necessary.
+    this.locationTracker.isLocationEnabled().then((retVal) => {
+      if(!retVal){
+        this.locationTracker.enableLocationServices().then(() => {
+          this.locationTracker.startTracking().then(() => {
+            this.checkBackgroundMode();
+          });
+        });
+      } else {
+        this.locationTracker.startTracking().then(() => {
+          this.checkBackgroundMode();
+        });
+      };
     });
   }
 
@@ -109,14 +126,6 @@ export class HomePage {
     };
     console.log("-->>enableFunctionality:", this.enableFunctionality);
 
-    if(!this.backgroundMode.backgroundMode.isEnabled()){
-      this.backgroundMode.enableBackgroundMode().then((retVal) => {
-        if(retVal){
-          console.log("Home::ionViewWillEnter(): Background mode is turned on");
-        };
-      });
-    };
-    //this.locationTracker.startTracking();
   }
 
   ionViewDidEnter(){
@@ -142,17 +151,12 @@ export class HomePage {
     });
 
     this.platform.registerBackButtonAction((event) => {
-      //this.backgroundMode.overrideBackButton();
       this.backgroundMode.disableWebViewOptimizations();
       this.backgroundMode.moveToBackground();
     });
 
     console.log("----------------- START -----------------------");
-    this.isLocationEnabled().then(() => {
-      this.locationTracker.startTracking().then(() => {
-        this.checkMode().then((retValue) => {
-        });
-      });
+    this.checkMode().then(() => {
     });
   }
 
@@ -191,6 +195,21 @@ export class HomePage {
       this.checkForLyftOrUber();
     }, (error) => {
       console.log("Home::intit(): error cant get user info,", error);
+    });
+  }
+
+  checkBackgroundMode(){
+    return new Promise(resolve => {
+      if(!this.backgroundMode.backgroundMode.isEnabled()){
+        console.log("Home::ionViewWillEnter(): Background mode is off.");
+        this.backgroundMode.enableBackgroundMode().then((retVal) => {
+          if(retVal){
+            console.log("Home::checkBackgroundMode(): Background mode is turned on");
+          };
+        });
+      } else {
+        console.log("Home::checkBackgroundMode(): Background mode is already on");
+      };
     });
   }
 
@@ -435,7 +454,7 @@ export class HomePage {
   launchLyft(eventLocation: any) : Promise<boolean> {
     return new Promise (resolve =>{
       if(this.backgroundMode.backgroundMode.isEnabled()){
-        this.disableBackgroundMode().then(() => {
+        this.backgroundMode.disableBackgroundMode().then(() => {
           if(this.hasLyft) {
             let options: LaunchNavigatorOptions = {
               enableDebug: true,
@@ -452,7 +471,7 @@ export class HomePage {
   launchUber(eventLocation: any) : Promise<boolean> {
     return new Promise (resolve =>{
       if(this.backgroundMode.backgroundMode.isEnabled()){
-        this.disableBackgroundMode().then(() => {
+        this.backgroundMode.disableBackgroundMode().then(() => {
           if(this.hasUber) {
             let options: LaunchNavigatorOptions = {
               enableDebug: true,
@@ -469,7 +488,7 @@ export class HomePage {
   launchMap(eventLocation: any, fromNotify?: boolean) : Promise<any>{
     return new Promise(resolve => {
       if(this.backgroundMode.backgroundMode.isEnabled() && !fromNotify){
-        this.disableBackgroundMode().then(() => {
+        this.backgroundMode.disableBackgroundMode().then(() => {
           let dest = eventLocation;
           let options: LaunchNavigatorOptions = {
             enableDebug: true,
@@ -498,45 +517,57 @@ export class HomePage {
     });
   }
 
-  // Check to see if user has enabled location tracking...
-  isLocationEnabled(){
-    return new Promise(resolve => {
-      console.log("Checking location service settings");
-      console.log(this.locationTracker.backgroundGeolocation.isLocationEnabled());
-      this.locationTracker.backgroundGeolocation.isLocationEnabled().then((status) => {
-        if(!status){
-          let alert = this.alertCrl.create();
-          alert.setTitle('App requires location service to be turned on.');
-          alert.addButton({
-            text: 'OK',
-            handler: () => {
-              if(this.backgroundMode.backgroundMode.isEnabled()){
-                this.disableBackgroundMode().then(() => {
-                  this.locationTracker.backgroundGeolocation.showAppSettings();
-                  resolve(true);
-                });
-              } else{
-                this.locationTracker.backgroundGeolocation.showAppSettings();
-                resolve(true);
-              };
-            }
-          });
-          alert.present();
-        } else {
-          resolve(true);
+  // // Check to see if user has enabled location tracking...
+  // isLocationEnabled(){
+  //   return new Promise(resolve => {
+  //     console.log("Checking location service settings");
+  //     console.log(this.locationTracker.backgroundGeolocation.isLocationEnabled());
+  //     this.locationTracker.backgroundGeolocation.isLocationEnabled().then((status) => {
+  //       if(!status){
+  //         let alert = this.alertCrl.create();
+  //         alert.setTitle('App requires location service to be turned on.');
+  //         alert.addButton({
+  //           text: 'OK',
+  //           handler: () => {
+  //             if(this.backgroundMode.backgroundMode.isEnabled()){
+  //               this.disableBackgroundMode().then(() => {
+  //                 this.locationTracker.backgroundGeolocation.showLocationSettings();
+  //                 resolve(false);
+  //               });
+  //             } else{
+  //               this.locationTracker.backgroundGeolocation.showLocationSettings();
+  //               resolve(false);
+  //             };
+  //           }
+  //         });
+  //         alert.present();
+  //       } else {
+  //         this.locationTracker.startTracking().then(() => {
+  //           resolve(true);
+  //         });
+  //       };
+  //     });
+  //   });
+  // }
+  //
+  // disableBackgroundMode() : Promise<any>{
+  //   return new Promise(resolve => {
+  //     this.backgroundMode.backgroundMode.disable();
+  //     this.backgroundMode.backgroundMode.on('disable').subscribe(() => {
+  //       console.log("Home::disableBackgroundMode(): success");
+  //       resolve(true);
+  //     });
+  //   });
+  // }
+
+  resumeAppFromBackground(){
+    if(!this.backgroundMode.backgroundMode.isEnabled()){
+      this.backgroundMode.enableBackgroundMode().then((retVal) => {
+        if(retVal){
+          console.log("Home::resumeAppFromBackground(): Background mode got turned on again");
         };
       });
-    });
-  }
-
-  disableBackgroundMode() : Promise<any>{
-    return new Promise(resolve => {
-      this.backgroundMode.backgroundMode.disable();
-      this.backgroundMode.backgroundMode.on('disable').subscribe(() => {
-        console.log("Home::disableBackgroundMode(): success");
-        resolve(true);
-      });
-    });
+    };
   }
 
   changeModeForEvent(event: any){
@@ -558,12 +589,20 @@ export class HomePage {
   doRefresh(refresher){
     if (this.enableFunctionality){
       console.log("-------------- REFRESH START -------------")
-      this.isLocationEnabled().then(() => {
-        this.locationTracker.startTracking().then(() => {
-          this.checkMode().then((retValue) => {
+      this.locationTracker.isLocationEnabled().then((retVal) => {
+        if(!retVal){
+          this.locationTracker.enableLocationServices().then(() => {
+            this.locationTracker.startTracking().then(() => {
+              this.checkMode().then(() => {
+                refresher.complete();
+              }, (err) => { console.log("home::doRefresh(): error", err) });
+            });
+          });
+        } else {
+          this.checkMode().then(() => {
             refresher.complete();
-          }, (err) => { console.log("home::doRefresh(): error", err) });
-        });
+          });
+        };
       });
     } else {
       refresher.complete();

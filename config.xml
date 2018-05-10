@@ -97,6 +97,7 @@
         <variable name="ACCOUNT_LABEL" value="@string/app_name" />
         <variable name="ACCOUNT_TYPE" value="$PACKAGE_NAME.account" />
         <variable name="CONTENT_AUTHORITY" value="$PACKAGE_NAME" />
+        <variable name="ALWAYS_USAGE_DESCRIPTION" value="App requires background tracking enabled" />
     </plugin>
     <plugin name="cordova-plugin-network-information" spec="^2.0.1" />
     <plugin name="cordova-plugin-local-notification" spec="^0.9.0-beta.2" />
