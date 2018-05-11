@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { MenuController, ToastController, AlertController, Platform } from 'ionic-angular';
+import { MenuController, ToastController, AlertController, Platform, NavController } from 'ionic-angular';
 import { UserProvider } from '../../providers/user/user';
 import { GoogleCalendar} from '../../providers/google-calendar/google-calendar';
 import { NativeStorage } from '@ionic-native/native-storage';
@@ -62,40 +62,40 @@ export class HomePage {
     private launchNavigator: LaunchNavigator,
     private alertCrl: AlertController,
     private backgroundMode: BackgroundModeProvider,
-    private platform: Platform){
+    private platform: Platform,
+    private navCtrl: NavController){
 
+    // Call this method whenever the app resumes from being backgrounded.
+    // This method will turn the background mode back on and check to see
+    // if location services is turned on.
     this.platform.resume.subscribe(() => {
-      console.log("-----OUR APP RESUMED------");
-      if(!this.backgroundMode.backgroundMode.isEnabled()){
-        this.backgroundMode.enableBackgroundMode().then((retVal) => {
-          if(retVal){
-            console.log("Home::constructor(): Background mode got turned on again");
-          }
-        });
+      console.log("------- OUR APP RESUMED FROM BACKGROUNDED ---------");
+      let view = this.navCtrl.getActive().name;
+      if(view == "HomePage"){
+        console.log("Running functions from HomePage...");
+        this.resumeAppFromBackground();
       };
     });
   }
 
-  ///////////////////////// ION-VIEW BEGINS ////////////////////////////////////
-
-  // Do permission checks and all that here.
   ionViewCanEnter(){
     this.localNotification.requestPermission().then((permission) => {
-      console.log("Home::ionViewDidEnter(): user allowed local notification", permission);
+      console.log("Home::ionViewCanEnter(): user allowed local notification", permission);
     });
+
+    this.isLocationEnabled();
+    this.checkBackgroundMode();
   }
 
   // Runs when page loaded. This will fire up only once. If page leaves,
   // but is cached, it will not fire again in subsequent viewing. Good
   // place to put setup code for the page.
   ionViewDidLoad(){
-    this.enableMenu();
+    this.enableMenu(true);
     this.init();
 }
 
   ionViewWillEnter(){
-    // First, check to see if we have internet connection. Use the network plugin
-    // type to check this. We are looking for 'none'
     if(this.network.type == 'none'){
       this.enableFunctionality = false;
       console.log("Home::ionViewWillEnter(): we are offline, enable =", this.enableFunctionality);
@@ -109,20 +109,12 @@ export class HomePage {
     };
     console.log("-->>enableFunctionality:", this.enableFunctionality);
 
-    if(!this.backgroundMode.backgroundMode.isEnabled()){
-      this.backgroundMode.enableBackgroundMode().then((retVal) => {
-        if(retVal){
-          console.log("Home::ionViewWillEnter(): Background mode is turned on");
-        };
-      });
-    };
-
-    this.locationTracker.startTracking();
   }
 
   ionViewDidEnter(){
     this.connected = this.network.onConnect().subscribe(data =>{
       this.enableFunctionality = true;
+      this.enableMenu(true);
       this.onConnectUpdate(data.type);
     }, (error) => {
       console.log("Home::ionViewDidEnter(): error,", error);
@@ -131,6 +123,7 @@ export class HomePage {
     this.disconnected = this.network.onDisconnect().subscribe(data => {
       this.enableFunctionality = false;
       this.onDisconnectUpdate();
+      this.enableMenu(false);
     }, (error) => {
       console.log("Home::ionViewDidEnter(): error on disconnect,", error);
     });
@@ -143,13 +136,12 @@ export class HomePage {
     });
 
     this.platform.registerBackButtonAction((event) => {
-      //this.backgroundMode.overrideBackButton();
       this.backgroundMode.disableWebViewOptimizations();
       this.backgroundMode.moveToBackground();
     });
 
     console.log("----------------- START -----------------------");
-    this.checkMode().then((retValue) => {
+    this.checkMode().then(() => {
     });
   }
 
@@ -178,7 +170,6 @@ export class HomePage {
       duration: 4000
     }).present();
   }
-  /////////////////////////// End of ION-VIEW //////////////////////////////////
 
   init(){
     this.user.getUserInfo().then((user) => {
@@ -188,6 +179,21 @@ export class HomePage {
       this.checkForLyftOrUber();
     }, (error) => {
       console.log("Home::intit(): error cant get user info,", error);
+    });
+  }
+
+  checkBackgroundMode(){
+    return new Promise(resolve => {
+      if(!this.backgroundMode.backgroundMode.isEnabled()){
+        console.log("Home::ionViewWillEnter(): Background mode is off.");
+        this.backgroundMode.enableBackgroundMode().then((retVal) => {
+          if(retVal){
+            console.log("Home::checkBackgroundMode(): Background mode is turned on");
+          };
+        });
+      } else {
+        console.log("Home::checkBackgroundMode(): Background mode is already on");
+      };
     });
   }
 
@@ -391,7 +397,6 @@ export class HomePage {
           }
         });
       });
-      // resolve(alert.present());
       alert.present();
     })
   }
@@ -432,7 +437,7 @@ export class HomePage {
   launchLyft(eventLocation: any) : Promise<boolean> {
     return new Promise (resolve =>{
       if(this.backgroundMode.backgroundMode.isEnabled()){
-        this.disableBackgroundMode().then(() => {
+        this.backgroundMode.disableBackgroundMode().then(() => {
           if(this.hasLyft) {
             let options: LaunchNavigatorOptions = {
               enableDebug: true,
@@ -449,7 +454,7 @@ export class HomePage {
   launchUber(eventLocation: any) : Promise<boolean> {
     return new Promise (resolve =>{
       if(this.backgroundMode.backgroundMode.isEnabled()){
-        this.disableBackgroundMode().then(() => {
+        this.backgroundMode.disableBackgroundMode().then(() => {
           if(this.hasUber) {
             let options: LaunchNavigatorOptions = {
               enableDebug: true,
@@ -466,7 +471,7 @@ export class HomePage {
   launchMap(eventLocation: any, fromNotify?: boolean) : Promise<any>{
     return new Promise(resolve => {
       if(this.backgroundMode.backgroundMode.isEnabled() && !fromNotify){
-        this.disableBackgroundMode().then(() => {
+        this.backgroundMode.disableBackgroundMode().then(() => {
           let dest = eventLocation;
           let options: LaunchNavigatorOptions = {
             enableDebug: true,
@@ -495,12 +500,28 @@ export class HomePage {
     });
   }
 
-  disableBackgroundMode() : Promise<any>{
+  resumeAppFromBackground(){
+    if(!this.backgroundMode.backgroundMode.isEnabled()){
+      this.backgroundMode.enableBackgroundMode().then((retVal) => {
+        if(retVal){
+          console.log("Home::resumeAppFromBackground(): Background mode got turned on again");
+        };
+      });
+    };
+  }
+
+  isLocationEnabled(){
     return new Promise(resolve => {
-      this.backgroundMode.backgroundMode.disable();
-      this.backgroundMode.backgroundMode.on('disable').subscribe(() => {
-        console.log("Home::disableBackgroundMode(): success");
-        resolve(true);
+      this.locationTracker.isLocationEnabled().then((retVal) => {
+        if(retVal){
+          this.locationTracker.startTracking().then(() => {
+            console.log("HomePage:: started tracking...");
+            resolve(true);
+          });
+        } else {
+          this.locationTracker.enableLocationServices();
+          resolve(false);
+        };
       });
     });
   }
@@ -524,15 +545,27 @@ export class HomePage {
   doRefresh(refresher){
     if (this.enableFunctionality){
       console.log("-------------- REFRESH START -------------")
-      this.checkMode().then((retValue) => {
-        refresher.complete();
-      }, (err) => { console.log("home::doRefresh(): error", err) });
+      this.locationTracker.isLocationEnabled().then((retVal) => {
+        if(!retVal){
+          this.locationTracker.enableLocationServices().then(() => {
+            this.locationTracker.startTracking().then(() => {
+              this.checkMode().then(() => {
+                refresher.complete();
+              }, (err) => { console.log("home::doRefresh(): error", err) });
+            });
+          });
+        } else {
+          this.checkMode().then(() => {
+            refresher.complete();
+          });
+        };
+      });
     } else {
       refresher.complete();
     };
   }
 
-  enableMenu(){
-    this.menu.enable(true);
+  enableMenu(value: boolean){
+    this.menu.enable(value);
   }
 }

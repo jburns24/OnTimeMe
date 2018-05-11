@@ -34,6 +34,16 @@ export class BackgroundModeProvider{
     this.backgroundMode.moveToBackground();
   }
 
+  disableBackgroundMode() : Promise<any>{
+    return new Promise(resolve => {
+      this.backgroundMode.disable();
+      this.backgroundMode.on('disable').subscribe(() => {
+        console.log("BackgroundModeProvider::disableBackgroundMode(): success");
+        resolve(true);
+      });
+    });
+  }
+
   setBackgroundDefaults(){
     // Set the Default values for the background notification mode.
     this.backgroundMode.setDefaults({

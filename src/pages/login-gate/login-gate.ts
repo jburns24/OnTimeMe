@@ -4,6 +4,7 @@ import { GooglePlus } from '@ionic-native/google-plus';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { HomePage } from '../home/home';
 import { Network } from '@ionic-native/network';
+import { BackgroundModeProvider } from '../../providers/background-mode/background-mode';
 import { LocationTracker } from '../../providers/location-tracker/location-tracker'
 import {
   IonicPage,
@@ -11,7 +12,8 @@ import {
   LoadingController,
   Loading,
   MenuController,
-  ToastController
+  ToastController,
+  Platform
 } from 'ionic-angular';
 
 @IonicPage()
@@ -26,14 +28,41 @@ export class LoginGatePage {
   enableLogin: boolean;
   connected: any;
   disconnected: any;
+  locationServicesOn: any;
 
   constructor(public navCtrl: NavController, private alertCrl: AlertController,
     private loadingCtrl: LoadingController, private googlePlus: GooglePlus,
     private menu: MenuController, private storage: NativeStorage,
     private toast: ToastController, private network: Network,
-    private locationTracker: LocationTracker) {
+    private locationTracker: LocationTracker,
+    private platform: Platform,
+    private backgroundMode: BackgroundModeProvider) {
       // Diable menu in the login gate page
       this.disableMenu();
+
+      this.platform.resume.subscribe(() => {
+        let view = this.navCtrl.getActive().name;
+        if(view == "LoginGatePage"){
+          console.log("Rusuming from LoginGatePage...");
+          this.isLocationEnabled();
+        };
+      });
+
+      this.platform.pause.subscribe(() => {
+        let view = this.navCtrl.getActive().name;
+        if(view == "LoginGatePage"){
+          console.log("Paused from LoginGatePage...");
+          this.locationTracker.stopTracking();
+        };
+      });
+  }
+
+  ionViewCanEnter(){
+    console.log("LoginGate::ionViewCanEnter(): ran.");
+    if(this.backgroundMode.backgroundMode.isEnabled()){
+      this.backgroundMode.disableBackgroundMode();
+    };
+    this.isLocationEnabled();
   }
 
   ionViewWillEnter(){
@@ -86,14 +115,14 @@ export class LoginGatePage {
     this.offToast.present();
   }
 
-  public loginAccount() {
+  loginAccount() {
     if (this.enableLogin){
       // Create a loading status
-      this.loading = this.loadingCtrl.create({
+      let loading = this.loadingCtrl.create({
         content: 'Please wait...'
       });
       // Present loading when the login button is pressed
-      this.loading.present();
+      loading.present();
       // Begin google plus login process
       this.googlePlus.login(
         {
@@ -102,7 +131,7 @@ export class LoginGatePage {
           'offline': true
         }).then((user) => {
           // Dismiss the loading after login successful
-          this.loading.dismiss();
+          loading.dismiss();
           console.log(user);
           // Add user to native storage, 'user' is the reference name.
           this.storage.setItem('user', {
@@ -124,7 +153,7 @@ export class LoginGatePage {
           // If google log-in was unsuccessful, then output to console
           // show the error as well.
           console.log("Cannot login, ", error);
-          this.loading.dismiss();
+          loading.dismiss();
           this.showError(error);
 
         });
@@ -132,6 +161,22 @@ export class LoginGatePage {
     else{
       this.onDisconnectUpdate();
     }
+  }
+
+  isLocationEnabled(){
+    return new Promise(resolve => {
+      this.locationTracker.isLocationEnabled().then((retVal) => {
+        if(retVal){
+          this.locationTracker.startTracking().then(() => {
+            console.log("LoginGate:: started tracking...");
+            resolve(true);
+          });
+        } else {
+          this.locationTracker.enableLocationServices();
+          resolve(false);
+        };
+      });
+    });
   }
 
   showError(text) {
