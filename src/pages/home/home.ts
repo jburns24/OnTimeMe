@@ -91,7 +91,7 @@ export class HomePage {
   // but is cached, it will not fire again in subsequent viewing. Good
   // place to put setup code for the page.
   ionViewDidLoad(){
-    this.enableMenu();
+    this.enableMenu(true);
     this.init();
 }
 
@@ -114,6 +114,7 @@ export class HomePage {
   ionViewDidEnter(){
     this.connected = this.network.onConnect().subscribe(data =>{
       this.enableFunctionality = true;
+      this.enableMenu(true);
       this.onConnectUpdate(data.type);
     }, (error) => {
       console.log("Home::ionViewDidEnter(): error,", error);
@@ -122,6 +123,7 @@ export class HomePage {
     this.disconnected = this.network.onDisconnect().subscribe(data => {
       this.enableFunctionality = false;
       this.onDisconnectUpdate();
+      this.enableMenu(false);
     }, (error) => {
       console.log("Home::ionViewDidEnter(): error on disconnect,", error);
     });
@@ -563,7 +565,7 @@ export class HomePage {
     };
   }
 
-  enableMenu(){
-    this.menu.enable(true);
+  enableMenu(value: boolean){
+    this.menu.enable(value);
   }
 }

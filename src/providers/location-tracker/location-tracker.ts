@@ -35,7 +35,9 @@ export class LocationTracker {
           distanceFilter: 10,
           debug: false, // means app uses local notifications to notify when backgrounded location updates happen.
           interval: 10000,
-          stopOnTerminate: true
+          stopOnTerminate: true,
+          saveBatteryOnBackground: true,
+          stopOnStillActivity: true
         };
 
         this.backgroundGeolocation.configure(config).subscribe((location) => {
