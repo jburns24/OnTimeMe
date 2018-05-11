@@ -3,6 +3,8 @@ import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation';
 import { BackgroundModeProvider } from '../background-mode/background-mode';
 import { AlertController } from 'ionic-angular';
+import { Observable } from "rxjs/Observable";
+import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/filter';
 
 // Source: https://www.joshmorony.com/adding-background-geolocation-to-an-ionic-2-application/
@@ -13,13 +15,14 @@ export class LocationTracker {
   public watch: any;
   public lat: number = 0;
   public lng: number = 0;
+  public subject: any;
 
   constructor(public zone: NgZone,
     public backgroundGeolocation: BackgroundGeolocation,
     public geolocation: Geolocation,
     private alertCrl: AlertController,
     private backgroundMode: BackgroundModeProvider) {
-
+    this.subject = new Subject<any>();
   }
 
   startTracking() {
@@ -70,16 +73,18 @@ export class LocationTracker {
       //  The casting is needed so TypeScript doesnt yell at us.
       this.watch = this.geolocation.watchPosition(options).filter((p: any) => p.code === undefined).subscribe((position: Geoposition) => {
 
+        this.sendMessage(position);
         //console.log(position);
+
 
         // Run update inside of Angular's zone
         this.zone.run(() => {
           this.lat = position.coords.latitude;
           this.lng = position.coords.longitude;
         });
-
+        resolve(this.watch);
       });
-      resolve();
+      //resolve();
     });
   }
 
@@ -92,6 +97,26 @@ export class LocationTracker {
       }
     });
   }
+
+  sendMessage(position: any){
+    this.subject.next(position);
+  }
+
+  getMessage(): Observable<any> {
+    return this.subject.asObservable();
+  }
+
+  // watchThis(position: any){
+  //   // let observable = new Observable((observer) => {
+  //   //   observer.next(position);
+  //   //   observer.complete();
+  //   // });
+  //   //
+  //   // observable.subscribe((data) => {
+  //   //   this.position = data;
+  //   //   console.log("WATCH THIS:", data);
+  //   // });
+  // }
 
   isLocationEnabled(){
     return new Promise(resolve => {

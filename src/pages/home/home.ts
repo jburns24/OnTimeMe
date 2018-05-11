@@ -15,6 +15,8 @@ import { BackgroundModeProvider } from '../../providers/background-mode/backgrou
 // import { LocalNotification } from '../../providers/local-notification/local-notification';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 
+import { Geolocation, Geoposition } from '@ionic-native/geolocation';
+
 
 @Component({
   selector: 'page-home',
@@ -43,6 +45,7 @@ export class HomePage {
   hasUber = false;
   hasLyft = false;
   backgrounded: Subscription;
+  bgSubscription: Subscription;
 
   // Use this flag as a condition variable
   enableFunctionality: boolean;
@@ -141,6 +144,18 @@ export class HomePage {
     });
 
     console.log("----------------- START -----------------------");
+
+    // this.locationTracker.getObservable().then((observable) => {
+    //   console.log("WATCHING FROM HOME:", observable);
+    //   // let observablePosition = observable;
+    //   // observablePosition.subscribe((data) => {
+    //   //   console.log("WATCHING FROM HOME:", data);
+    //   // });
+    // });
+    this.bgSubscription = this.locationTracker.getMessage().subscribe((position) => {
+      console.log("WATCHING FROM HOME:", position);
+    });
+
     this.checkMode().then(() => {
     });
   }
@@ -514,7 +529,7 @@ export class HomePage {
     return new Promise(resolve => {
       this.locationTracker.isLocationEnabled().then((retVal) => {
         if(retVal){
-          this.locationTracker.startTracking().then(() => {
+          this.locationTracker.startTracking().then((watch) => {
             console.log("HomePage:: started tracking...");
             resolve(true);
           });
