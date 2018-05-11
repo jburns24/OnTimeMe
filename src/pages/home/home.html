@@ -1,5 +1,5 @@
 <ion-content class="home-content" padding>
-  <ion-refresher (ionRefresh)="doRefresh($event)">
+  <ion-refresher *ngIf="canRefresh" (ionRefresh)="doRefresh($event)">
       <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   <ion-header>

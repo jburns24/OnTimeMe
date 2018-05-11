@@ -73,7 +73,7 @@ export class LocationTracker {
       //  The casting is needed so TypeScript doesnt yell at us.
       this.watch = this.geolocation.watchPosition(options).filter((p: any) => p.code === undefined).subscribe((position: Geoposition) => {
 
-        this.sendMessage(position);
+        this.sendPosition(position);
         //console.log(position);
 
 
@@ -90,7 +90,6 @@ export class LocationTracker {
 
   stopTracking() {
     console.log('stopTracking');
-
     return this.backgroundGeolocation.stop().then(() => {
       if (typeof this.watch !== 'undefined') {
         this.watch.unsubscribe();
@@ -98,25 +97,13 @@ export class LocationTracker {
     });
   }
 
-  sendMessage(position: any){
+  sendPosition(position: any){
     this.subject.next(position);
   }
 
-  getMessage(): Observable<any> {
+  getPosition(): Observable<any> {
     return this.subject.asObservable();
   }
-
-  // watchThis(position: any){
-  //   // let observable = new Observable((observer) => {
-  //   //   observer.next(position);
-  //   //   observer.complete();
-  //   // });
-  //   //
-  //   // observable.subscribe((data) => {
-  //   //   this.position = data;
-  //   //   console.log("WATCH THIS:", data);
-  //   // });
-  // }
 
   isLocationEnabled(){
     return new Promise(resolve => {

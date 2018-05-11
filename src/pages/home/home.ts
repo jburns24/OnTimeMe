@@ -46,6 +46,8 @@ export class HomePage {
   hasLyft = false;
   backgrounded: Subscription;
   bgSubscription: Subscription;
+  needApiCall: any = false;
+  canRefresh: any;
 
   // Use this flag as a condition variable
   enableFunctionality: boolean;
@@ -101,6 +103,7 @@ export class HomePage {
   ionViewWillEnter(){
     if(this.network.type == 'none'){
       this.enableFunctionality = false;
+      this.canRefresh = false;
       console.log("Home::ionViewWillEnter(): we are offline, enable =", this.enableFunctionality);
       this.toast.create({
         message: 'You are offline. You must connect to the internet to use this app.',
@@ -109,6 +112,7 @@ export class HomePage {
       }).present();
     } else{
       this.enableFunctionality = true;
+      this.canRefresh = true;
     };
     console.log("-->>enableFunctionality:", this.enableFunctionality);
 
@@ -117,6 +121,7 @@ export class HomePage {
   ionViewDidEnter(){
     this.connected = this.network.onConnect().subscribe(data =>{
       this.enableFunctionality = true;
+      this.canRefresh = true;
       this.enableMenu(true);
       this.onConnectUpdate(data.type);
     }, (error) => {
@@ -125,6 +130,7 @@ export class HomePage {
 
     this.disconnected = this.network.onDisconnect().subscribe(data => {
       this.enableFunctionality = false;
+      this.canRefresh = false;
       this.onDisconnectUpdate();
       this.enableMenu(false);
     }, (error) => {
@@ -145,25 +151,24 @@ export class HomePage {
 
     console.log("----------------- START -----------------------");
 
-    // this.locationTracker.getObservable().then((observable) => {
-    //   console.log("WATCHING FROM HOME:", observable);
-    //   // let observablePosition = observable;
-    //   // observablePosition.subscribe((data) => {
-    //   //   console.log("WATCHING FROM HOME:", data);
-    //   // });
-    // });
-    this.bgSubscription = this.locationTracker.getMessage().subscribe((position) => {
+    this.bgSubscription = this.locationTracker.getPosition().subscribe((position) => {
       console.log("WATCHING FROM HOME:", position);
+      this.distanceFromUpdatedLocation(position);
     });
 
     this.checkMode().then(() => {
     });
   }
 
+  distanceFromUpdatedLocation(position){
+    console.log("LAST location: ", this.lastLocation);
+  }
+
   ionViewWillLeave(){
     this.connected.unsubscribe();
     this.disconnected.unsubscribe();
     this.backgrounded.unsubscribe();
+    this.bgSubscription.unsubscribe();
   }
 
   onConnectUpdate(connectionState: string){
@@ -557,27 +562,36 @@ export class HomePage {
     };
   }
 
+  // This method is disabled in the html if no internet connection
   doRefresh(refresher){
-    if (this.enableFunctionality){
+    // if (this.enableFunctionality){
       console.log("-------------- REFRESH START -------------")
-      this.locationTracker.isLocationEnabled().then((retVal) => {
-        if(!retVal){
-          this.locationTracker.enableLocationServices().then(() => {
-            this.locationTracker.startTracking().then(() => {
-              this.checkMode().then(() => {
-                refresher.complete();
-              }, (err) => { console.log("home::doRefresh(): error", err) });
-            });
-          });
-        } else {
-          this.checkMode().then(() => {
+      this.isLocationEnabled().then((retVal) => {
+        if(retVal){
+            this.navCtrl.setRoot(HomePage);
             refresher.complete();
-          });
+        } else {
+          refresher.complete();
         };
       });
-    } else {
-      refresher.complete();
-    };
+      // this.locationTracker.isLocationEnabled().then((retVal) => {
+      //   if(!retVal){
+      //     this.locationTracker.enableLocationServices().then(() => {
+      //       this.locationTracker.startTracking().then(() => {
+      //         // this.checkMode().then(() => {
+      //         // }, (err) => { console.log("home::doRefresh(): error", err) });
+      //       });
+      //     });
+      //     refresher.complete();
+      //   } else {
+      //     this.checkMode().then(() => {
+      //       refresher.complete();
+      //     });
+      //   };
+      // });
+    // } else {
+    //   refresher.complete();
+    // };
   }
 
   enableMenu(value: boolean){
