@@ -78,28 +78,13 @@ export class HomePage {
     });
   }
 
-  ///////////////////////// ION-VIEW BEGINS ////////////////////////////////////
-
-  // Do permission checks and all that here.
   ionViewCanEnter(){
     this.localNotification.requestPermission().then((permission) => {
       console.log("Home::ionViewCanEnter(): user allowed local notification", permission);
     });
 
-    // Check and enable background mode if necessary.
-    this.locationTracker.isLocationEnabled().then((retVal) => {
-      if(!retVal){
-        this.locationTracker.enableLocationServices().then(() => {
-          this.locationTracker.startTracking().then(() => {
-            this.checkBackgroundMode();
-          });
-        });
-      } else {
-        this.locationTracker.startTracking().then(() => {
-          this.checkBackgroundMode();
-        });
-      };
-    });
+    this.isLocationEnabled();
+    this.checkBackgroundMode();
   }
 
   // Runs when page loaded. This will fire up only once. If page leaves,
@@ -111,8 +96,6 @@ export class HomePage {
 }
 
   ionViewWillEnter(){
-    // First, check to see if we have internet connection. Use the network plugin
-    // type to check this. We are looking for 'none'
     if(this.network.type == 'none'){
       this.enableFunctionality = false;
       console.log("Home::ionViewWillEnter(): we are offline, enable =", this.enableFunctionality);
@@ -185,7 +168,6 @@ export class HomePage {
       duration: 4000
     }).present();
   }
-  /////////////////////////// End of ION-VIEW //////////////////////////////////
 
   init(){
     this.user.getUserInfo().then((user) => {
@@ -413,7 +395,6 @@ export class HomePage {
           }
         });
       });
-      // resolve(alert.present());
       alert.present();
     })
   }
@@ -517,49 +498,6 @@ export class HomePage {
     });
   }
 
-  // // Check to see if user has enabled location tracking...
-  // isLocationEnabled(){
-  //   return new Promise(resolve => {
-  //     console.log("Checking location service settings");
-  //     console.log(this.locationTracker.backgroundGeolocation.isLocationEnabled());
-  //     this.locationTracker.backgroundGeolocation.isLocationEnabled().then((status) => {
-  //       if(!status){
-  //         let alert = this.alertCrl.create();
-  //         alert.setTitle('App requires location service to be turned on.');
-  //         alert.addButton({
-  //           text: 'OK',
-  //           handler: () => {
-  //             if(this.backgroundMode.backgroundMode.isEnabled()){
-  //               this.disableBackgroundMode().then(() => {
-  //                 this.locationTracker.backgroundGeolocation.showLocationSettings();
-  //                 resolve(false);
-  //               });
-  //             } else{
-  //               this.locationTracker.backgroundGeolocation.showLocationSettings();
-  //               resolve(false);
-  //             };
-  //           }
-  //         });
-  //         alert.present();
-  //       } else {
-  //         this.locationTracker.startTracking().then(() => {
-  //           resolve(true);
-  //         });
-  //       };
-  //     });
-  //   });
-  // }
-  //
-  // disableBackgroundMode() : Promise<any>{
-  //   return new Promise(resolve => {
-  //     this.backgroundMode.backgroundMode.disable();
-  //     this.backgroundMode.backgroundMode.on('disable').subscribe(() => {
-  //       console.log("Home::disableBackgroundMode(): success");
-  //       resolve(true);
-  //     });
-  //   });
-  // }
-
   resumeAppFromBackground(){
     if(!this.backgroundMode.backgroundMode.isEnabled()){
       this.backgroundMode.enableBackgroundMode().then((retVal) => {
@@ -568,6 +506,22 @@ export class HomePage {
         };
       });
     };
+  }
+
+  isLocationEnabled(){
+    return new Promise(resolve => {
+      this.locationTracker.isLocationEnabled().then((retVal) => {
+        if(retVal){
+          this.locationTracker.startTracking().then(() => {
+            console.log("HomePage:: started tracking...");
+            resolve(true);
+          });
+        } else {
+          this.locationTracker.enableLocationServices();
+          resolve(false);
+        };
+      });
+    });
   }
 
   changeModeForEvent(event: any){

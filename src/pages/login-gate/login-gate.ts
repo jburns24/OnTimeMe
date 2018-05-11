@@ -4,6 +4,7 @@ import { GooglePlus } from '@ionic-native/google-plus';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { HomePage } from '../home/home';
 import { Network } from '@ionic-native/network';
+import { BackgroundModeProvider } from '../../providers/background-mode/background-mode';
 import { LocationTracker } from '../../providers/location-tracker/location-tracker'
 import {
   IonicPage,
@@ -34,7 +35,8 @@ export class LoginGatePage {
     private menu: MenuController, private storage: NativeStorage,
     private toast: ToastController, private network: Network,
     private locationTracker: LocationTracker,
-    private platform: Platform) {
+    private platform: Platform,
+    private backgroundMode: BackgroundModeProvider) {
       // Diable menu in the login gate page
       this.disableMenu();
 
@@ -45,10 +47,21 @@ export class LoginGatePage {
           this.isLocationEnabled();
         };
       });
+
+      this.platform.pause.subscribe(() => {
+        let view = this.navCtrl.getActive().name;
+        if(view == "LoginGatePage"){
+          console.log("Paused from LoginGatePage...");
+          this.locationTracker.stopTracking();
+        };
+      });
   }
 
   ionViewCanEnter(){
     console.log("LoginGate::ionViewCanEnter(): ran.");
+    if(this.backgroundMode.backgroundMode.isEnabled()){
+      this.backgroundMode.disableBackgroundMode();
+    };
     this.isLocationEnabled();
   }
 

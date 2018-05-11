@@ -117,9 +117,9 @@ export class MyApp {
           this.storage.remove('refreshToken').then(() =>{
             console.log("refreshToken is successfully removed from native storage.");
             this.locationTracker.stopTracking().then(() =>{
-              this.backgroundMode.disableBackgroundMode().then(() => {
+              // this.backgroundMode.disableBackgroundMode().then(() => {
                 this.nav.setRoot(LoginGatePage);
-              });
+              // });
             });
           }, (err) => {
             console.log("removing refreshToken errored", err);
