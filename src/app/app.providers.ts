@@ -5,7 +5,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { GooglePlus } from '@ionic-native/google-plus';
 import { GooglePlusMock } from '@ionic-native-mocks/google-plus';
 import { NativeStorage } from '@ionic-native/native-storage';
-import { NativeStorageMock } from '@ionic-native-mocks/native-storage'
+import { NativeStorageMock } from '../mocks/native-storage-mock'
 import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
 import { BackgroundGeolocatioMock } from '@ionic-native-mocks/background-geolocation'
 import { Geolocation } from '@ionic-native/geolocation';
@@ -16,6 +16,7 @@ import { Network } from '@ionic-native/network';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { BackgroundMode } from '@ionic-native/background-mode';
 import { BackgroundModeProvider } from '../providers/background-mode/background-mode';
+import { BackgroundModeMock } from '../mocks/background-mode-mock'
 
 //import { LocalNotificationsMocks } from '@ionic-native-mocks/local-notifications'
 import { LaunchNavigator } from '@ionic-native/launch-navigator';
@@ -55,6 +56,7 @@ export class AppProviders {
             Map,
             GoogleCalendar,
             UserProvider,
+            BackgroundModeProvider,
 
             //  Should be a mock
             LocalNotifications,
@@ -73,7 +75,8 @@ export class AppProviders {
             {provide: GooglePlus, useClass: GooglePlusMock},
             {provide: StatusBar, useClass: StatusBarMock},
             {provide: SplashScreen, useClass: SplashScreenMock},
-            {provide: ErrorHandler, useClass: IonicErrorHandler}
+            {provide: ErrorHandler, useClass: IonicErrorHandler},
+            {provide: BackgroundMode, useClass: BackgroundModeMock},
           ];
 
         } else {
