@@ -15,6 +15,7 @@ export class Map {
   getDistance(destinationParam: string, mode: any, origin: any){
     return new Promise( resolve => {
       // Convert the location string to strings that maps api will take
+      this.storeOnlyOnce(origin);
       let takeAwaySpace = destinationParam;
       let takeAwayComma = takeAwaySpace.split(' ').join('+');
       let destination = takeAwayComma.split(',').join('');
@@ -23,7 +24,6 @@ export class Map {
       let destParam = '&destinations=' + destination;
       let modeParam = '&mode=' + mode;
       let apiKey = '&key=AIzaSyC_VYR8OeR5oXOwzX--70vdgdFGoAAC8-w';
-
       // Make the map api call
       this.http.get(distanceUrl+originParam+destParam+modeParam+apiKey)
       .subscribe(data => {
@@ -34,6 +34,10 @@ export class Map {
         console.log("Maps::Failed: failed to get distance:", error);
       });
     });
+  }
+
+  storeOnlyOnce(origin: any){
+    this.storage.setItem('lastUpdatedLocation', origin);
   }
 
   // This calls user provider then in turn

@@ -22,6 +22,7 @@ import { Network } from '@ionic-native/network';
 import { AppProviders } from './app.providers'
 import { BackgroundMode } from '@ionic-native/background-mode';
 import { BackgroundModeProvider } from '../providers/background-mode/background-mode';
+import { NativeGeocoder } from '@ionic-native/native-geocoder';
 
 // Mocks
 import { GooglePlusMock } from '@ionic-native-mocks/google-plus';

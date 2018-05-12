@@ -30,17 +30,16 @@ export class LocationTracker {
         // Background Tracking
 
         let config = {
-          //locationProvider: BackgroundGeolocation.DISTANCE_FILTER_PROVIDER,
-          desiredAccuracy: 0,
+          //locationProvider: BackgroundGeolocation.LocationProvider.ANDROID_DISTANCE_FILTER_PROVIDER,
+          desiredAccuracy: 1,
           notificationTitle: 'OnTimMe Background Tracking',
           notificationText: 'Keeping you on time',
-          stationaryRadius: 20,
-          distanceFilter: 10,
+          stationaryRadius: 0.0003048,
+          distanceFilter: 0.0003048,
           debug: false, // means app uses local notifications to notify when backgrounded location updates happen.
-          interval: 10000,
+          interval: 1000,
           stopOnTerminate: true,
-          saveBatteryOnBackground: true,
-          stopOnStillActivity: true
+          stopOnStillActivity: false
         };
 
         this.backgroundGeolocation.configure(config).subscribe((location) => {
@@ -66,8 +65,8 @@ export class LocationTracker {
         // Foreground Tracking
 
       let options = {
-        frequency: 3000,
-        enableHighAccuracy: false
+        frequency: 1000,
+        enableHighAccuracy: true
       };
       //  subscribing to the observable returned by watchPosition, then filtering the response to ignore errors, then casting to type Geoposition
       //  The casting is needed so TypeScript doesnt yell at us.

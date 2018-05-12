@@ -75,4 +75,16 @@
     <p> * Last updated: {{(lastUpdateTime | date:'medium':'mediumTime')}} </p>
     <p> &nbsp;&nbsp;&nbsp;Location: {{lastLocation}} </p>
   </ion-item>
+  <ion-item no-lines style="background-color:transparent">
+    <p> * Distance of last updated location - current location:  </p>
+    <p> &nbsp;&nbsp;&nbsp;Distance difference in yards: {{needUpdateDistance}} </p>
+  </ion-item>
+  <ion-item no-lines style="background-color:transparent">
+    <p> * Old location:  </p>
+    <p> &nbsp;&nbsp;&nbsp;lat, long: {{oldLat}}, {{oldLong}} </p>
+  </ion-item>
+  <ion-item no-lines style="background-color:transparent">
+    <p> * Current location:  </p>
+    <p> &nbsp;&nbsp;&nbsp;lat, long: {{curLat}}, {{curLong}} </p>
+  </ion-item>
 </ion-content>

@@ -220,6 +220,7 @@ export class Events {
         counter = counter + 1;
         tempIndex = tempIndex + 1;
         let origin = this.locationTracker.lat + ',' + this.locationTracker.lng;
+        // Store origin used for proximity calculation
         this.map.getDistance(eventd['location'], eventd['mode'], origin).then ((suc) => {
           // Recreate event list with trip duration
           let rows = suc['rows'];

@@ -11,6 +11,8 @@ import { Network } from '@ionic-native/network';
 import { Subscription} from 'rxjs/Subscription';
 import { LaunchNavigator, LaunchNavigatorOptions } from '@ionic-native/launch-navigator';
 import { BackgroundModeProvider } from '../../providers/background-mode/background-mode';
+import { NativeGeocoder, NativeGeocoderReverseResult, NativeGeocoderForwardResult } from '@ionic-native/native-geocoder';
+import { Observable } from "rxjs/Observable";
 
 // import { LocalNotification } from '../../providers/local-notification/local-notification';
 import { LocalNotifications } from '@ionic-native/local-notifications';
@@ -48,6 +50,17 @@ export class HomePage {
   bgSubscription: Subscription;
   needApiCall: any = false;
   canRefresh: any;
+  needUpdateDistance: any;
+  startDistanceCalculation: any;
+  distanceCalObervable: any;
+
+  // testing
+  oldLat: any;
+  oldLong: any;
+  curLat: any;
+  curLong: any;
+  oldLocationLat: any;
+  oldLocationLong: any;
 
   // Use this flag as a condition variable
   enableFunctionality: boolean;
@@ -81,6 +94,8 @@ export class HomePage {
         this.resumeAppFromBackground();
       };
     });
+
+    this.startDistanceCalculation = false;
   }
 
   ionViewCanEnter(){
@@ -151,17 +166,20 @@ export class HomePage {
 
     console.log("----------------- START -----------------------");
 
-    this.bgSubscription = this.locationTracker.getPosition().subscribe((position) => {
-      console.log("WATCHING FROM HOME:", position);
-      this.distanceFromUpdatedLocation(position);
-    });
-
     this.checkMode().then(() => {
+      this.startDistanceCalculation = true;
     });
-  }
 
-  distanceFromUpdatedLocation(position){
-    console.log("LAST location: ", this.lastLocation);
+    this.storage.getItem('lastUpdatedLocation').then((location) => {
+      let oldLocation = location;
+      oldLocation = oldLocation.split(',');
+      this.oldLocationLat = oldLocation[0];
+      this.oldLocationLong = oldLocation[1];
+
+      this.bgSubscription = this.locationTracker.getPosition().subscribe((position) => {
+        this.distanceFromUpdatedLocation(position);
+      });
+    });
   }
 
   ionViewWillLeave(){
@@ -169,6 +187,7 @@ export class HomePage {
     this.disconnected.unsubscribe();
     this.backgrounded.unsubscribe();
     this.bgSubscription.unsubscribe();
+    this.startDistanceCalculation = false;
   }
 
   onConnectUpdate(connectionState: string){
@@ -562,36 +581,49 @@ export class HomePage {
     };
   }
 
+  distanceFromUpdatedLocation(position){
+    let curLocationLat = position.coords.latitude;
+    let curLocationLong = position.coords.longitude;
+
+    // Test for view of
+    this.oldLat = this.oldLocationLat;
+    this.oldLong = this.oldLocationLong;
+    this.curLat = curLocationLat;
+    this.curLong = curLocationLong;
+
+    console.log("old lat = ", this.oldLocationLat, "long = ", this.oldLocationLong);
+    console.log("current lat:", curLocationLat, "long:", curLocationLong);
+
+    this.getDistance(this.oldLocationLat, this.oldLocationLong, curLocationLat, curLocationLong)
+    .then((result) => {
+      this.needUpdateDistance = result;
+      this.needUpdateDistance = this.needUpdateDistance.toFixed(6);
+      console.log("REsults from to and fro is: ", this.needUpdateDistance, "in yard");
+    });
+  }
+
+  getDistance(lat1: any, long1: any, lat2: any, long2: any){
+    return new Promise(resolve => {
+      let p = 0.017453292519943295;    // Math.PI / 180
+      let c = Math.cos;
+      let a = 0.5 - c((lat1-lat2) * p) / 2 + c(lat2 * p) *c((lat1) * p) * (1 - c(((long1- long2) * p))) / 2;
+      let dis = (12742 * Math.asin(Math.sqrt(a))); // 2 * R; R = 6371 km
+      dis = (dis / 0.0009144);
+      resolve(dis);
+    });
+  }
+
   // This method is disabled in the html if no internet connection
   doRefresh(refresher){
-    // if (this.enableFunctionality){
-      console.log("-------------- REFRESH START -------------")
-      this.isLocationEnabled().then((retVal) => {
-        if(retVal){
-            this.navCtrl.setRoot(HomePage);
-            refresher.complete();
-        } else {
-          refresher.complete();
-        };
-      });
-      // this.locationTracker.isLocationEnabled().then((retVal) => {
-      //   if(!retVal){
-      //     this.locationTracker.enableLocationServices().then(() => {
-      //       this.locationTracker.startTracking().then(() => {
-      //         // this.checkMode().then(() => {
-      //         // }, (err) => { console.log("home::doRefresh(): error", err) });
-      //       });
-      //     });
-      //     refresher.complete();
-      //   } else {
-      //     this.checkMode().then(() => {
-      //       refresher.complete();
-      //     });
-      //   };
-      // });
-    // } else {
-    //   refresher.complete();
-    // };
+    console.log("-------------- REFRESH START -------------")
+    this.isLocationEnabled().then((retVal) => {
+      if(retVal){
+        this.navCtrl.setRoot(HomePage);
+        refresher.complete();
+      } else {
+        refresher.complete();
+      };
+    });
   }
 
   enableMenu(value: boolean){
