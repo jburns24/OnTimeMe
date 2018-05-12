@@ -6,6 +6,8 @@ import {
   LoadingController,
   AlertController
 } from 'ionic-angular';
+import { BackgroundModeProvider } from '../providers/background-mode/background-mode';
+import { BackgroundModeMock } from '../mocks/background-mode-mock'
 import { GooglePlus } from '@ionic-native/google-plus';
 import { GooglePlusMock } from '@ionic-native-mocks/google-plus';
 import { StatusBar } from '@ionic-native/status-bar';
@@ -25,6 +27,7 @@ import {
   LoadingControllerMock,
   AlertControllerMock,
 } from 'ionic-mocks'
+import { BackgroundMode } from '@ionic-native/background-mode';
 
 describe('MyApp Component', () => {
   let fixture;
@@ -45,7 +48,9 @@ describe('MyApp Component', () => {
         { provide: StatusBar, useClass: StatusBarMock },
         { provide: SplashScreen, useClass: SplashScreenMock },
         { provide: Platform, useClass: PlatformMock },
-        { provide: LoadingController, useClass: LoadingControllerMock }
+        { provide: LoadingController, useClass: LoadingControllerMock },
+        { provide: BackgroundModeProvider, useClass: BackgroundModeProvider },
+        { provide: BackgroundMode, useClass: BackgroundModeMock },
       ]
     })
   }));
